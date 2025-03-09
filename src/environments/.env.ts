@@ -5,6 +5,6 @@ export default {
     'version': '250226',
     'hash': 'ea15eecf'
   },
-  'allow_switching_backend_instance': true
+  'allow_switching_backend_instance': false
 };
 /* tslint:enable */

@@ -20,13 +20,14 @@ export const environment = {
   baseApiUrls:
     loadedEnv['fineractApiUrls'] ||
     'https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443,' +
-      window.location.protocol +
-      '//' +
-      window.location.hostname +
-      ':' +
-      window.location.port,
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    ':' +
+    window.location.port,
   // For connecting to server running elsewhere set the base API URL
-  baseApiUrl: 'https://lms-backenddev.racinesolutions.com',
+  baseApiUrl:
+    loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
   allowServerSwitch: env.allow_switching_backend_instance,
   apiProvider: loadedEnv['apiProvider'] || '/fineract-provider/api',
   apiVersion: loadedEnv['apiVersion'] || '/v1',

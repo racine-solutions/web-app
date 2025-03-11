@@ -20,11 +20,11 @@ export const environment = {
   baseApiUrls:
     loadedEnv['fineractApiUrls'] ||
     'https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443,' +
-      window.location.protocol +
-      '//' +
-      window.location.hostname +
-      ':' +
-      window.location.port,
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    ':' +
+    window.location.port,
   // For connecting to server running elsewhere set the base API URL
   baseApiUrl:
     loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,

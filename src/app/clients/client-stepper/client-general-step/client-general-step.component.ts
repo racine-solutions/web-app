@@ -95,6 +95,7 @@ export class ClientGeneralStepComponent implements OnInit {
       ],
       dateOfBirth: [''],
       clientTypeId: [''],
+      nin: [''],
       clientClassificationId: [''],
       submittedOnDate: [
         this.settingsService.businessDate,

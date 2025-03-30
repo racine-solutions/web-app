@@ -60,6 +60,10 @@
       client.clientClassificationId | find: clientTemplate.clientClassificationOptions : 'id' : 'name'
     }}</span>
   </div>
+  <div fxFlexFill *ngIf="client.nin">
+    <span fxFlex="40%">{{ 'labels.inputs.National Identification Number' | translate }}</span>
+    <span fxFlex="60%">{{ client.nin }}</span>
+  </div>
 
   <div fxFlexFill *ngIf="client.savingsProductId">
     <span fxFlex="40%">{{ 'labels.inputs.Savings Product' | translate }}</span>

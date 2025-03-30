@@ -205,6 +205,11 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-form-field *ngIf="createClientForm.contains('nin')" fxFlex="48%">
+      <mat-label>{{ 'labels.inputs.National Identification Number' | translate }}</mat-label>
+      <input matInput formControlName="nin" />
+    </mat-form-field>
+
     <mat-form-field fxFlex="48%" (click)="submittedOnDatePicker.open()">
       <mat-label>{{ 'labels.inputs.Submitted On' | translate }}</mat-label>
       <input

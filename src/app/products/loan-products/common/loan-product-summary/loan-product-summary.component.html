@@ -682,14 +682,14 @@
 
   <div fxFlexFill *ngIf="loanProduct.holdGuaranteeFunds" fxLayout="row wrap" fxLayout.lt-md="column">
     <span fxFlex="47%">{{ 'labels.inputs.Mandatory Guarantee' | translate }} (%):</span>
-    <span fxFlex="53%">{{ loanProduct.productGuaranteeData.mandatoryGuarantee }}</span>
-    <div fxFlexFill *ngIf="loanProduct.productGuaranteeData.minimumGuaranteeFromOwnFunds">
+    <span fxFlex="53%">{{ loanProduct.productGuaranteeData?.mandatoryGuarantee || 0 }}</span>
+    <div fxFlexFill *ngIf="loanProduct.productGuaranteeData?.minimumGuaranteeFromOwnFunds">
       <span fxFlex="47%">{{ 'labels.inputs.Minimum Guarantee from Own Funds' | translate }} (%):</span>
-      <span fxFlex="53%">{{ loanProduct.productGuaranteeData.minimumGuaranteeFromOwnFunds }}</span>
+      <span fxFlex="53%">{{ loanProduct.productGuaranteeData?.minimumGuaranteeFromOwnFunds }}</span>
     </div>
-    <div fxFlexFill *ngIf="loanProduct.productGuaranteeData.minimumGuaranteeFromGuarantor">
+    <div fxFlexFill *ngIf="loanProduct.productGuaranteeData?.minimumGuaranteeFromGuarantor">
       <span fxFlex="47%">{{ 'labels.inputs.Minimum Guarantee from Guarantor Funds' | translate }} (%):</span>
-      <span fxFlex="53%">{{ loanProduct.productGuaranteeData.minimumGuaranteeFromGuarantor }}</span>
+      <span fxFlex="53%">{{ loanProduct.productGuaranteeData?.minimumGuaranteeFromGuarantor }}</span>
     </div>
   </div>
 

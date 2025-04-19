@@ -61,6 +61,10 @@ export class RecoveryRepaymentComponent implements OnInit {
     this.setRecoveryRepaymentLoanDetails();
     if (this.dataObject.currency) {
       this.currency = this.dataObject.currency;
+    }else {
+      this.loanService.getLoanAccountDetails(this.loanId).subscribe((loanDetails: any) => {
+        this.currency = loanDetails.currency;
+      });
     }
   }
 

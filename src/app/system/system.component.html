@@ -206,6 +206,20 @@
               {{ 'labels.text.Two-factor authentication configuration' | translate }}
             </p>
           </mat-list-item>
+
+          <mat-list-item>
+            <mat-icon matListIcon [routerLink]="['sms-event-configuration']">
+              <fa-icon icon="bell" size="sm"></fa-icon>
+            </mat-icon>
+            <h4 matLine [routerLink]="['sms-event-configuration']">
+              {{ 'labels.heading.SMS Event Configuration' | translate }}
+            </h4>
+            <fa-icon (click)="arrowBooleansToggle(13)" *ngIf="!arrowBooleans[13]" icon="arrow-down" size="md"></fa-icon>
+            <fa-icon (click)="arrowBooleansToggle(13)" *ngIf="arrowBooleans[13]" icon="arrow-up" size="md"></fa-icon>
+            <p matLine *ngIf="arrowBooleans[13]" [routerLink]="['sms-event-configuration']">
+              {{ 'labels.text.SMS Event Configuration' | translate }}
+            </p>
+          </mat-list-item>
         </mat-nav-list>
       </div>
     </div>

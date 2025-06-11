@@ -756,4 +756,11 @@ export class SystemService {
     const emptyData = {};
     return this.http.post(`/loans/catch-up`, emptyData);
   }
+
+  /**
+   * @returns {Observable<any>}
+   */
+  getSmsEventConfiguration(): Observable<any> {
+    return this.http.get('/smsevents/configuration');
+  }
 }

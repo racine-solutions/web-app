@@ -6,7 +6,7 @@ import { SystemService } from '../system.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ManageExternalEventsResolver implements Resolve<boolean> {
+export class SmsEventConfigurationResolver implements Resolve<boolean> {
   /**
    * @param {SystemService} systemService System service.
    */

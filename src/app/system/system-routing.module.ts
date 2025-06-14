@@ -89,6 +89,7 @@ import { SurveyResolver } from './manage-surveys/survey.resolver';
 import { RolesAndPermissionsResolver } from './roles-and-permissions/roles-and-permissions.resolver';
 import { ViewRoleResolver } from './roles-and-permissions/view-role/view-role.resolver';
 import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
+import { SmsEventConfigurationResolver } from './sms-event-configuration/sms.event.configuration.resolver';
 
 const routes: Routes = [
   Route.withShell([
@@ -602,7 +603,10 @@ const routes: Routes = [
           children: [
             {
               path: '',
-              component: SmsEventConfigurationComponent
+              component: SmsEventConfigurationComponent,
+              resolve: {
+                events: SmsEventConfigurationResolver
+              }
             }
           ]
         }

@@ -3360,6 +3360,10 @@
       "LoanAccountApprovalEvent": "Loan Account Approval Event",
       "LoanAccountCreationEvent": "Loan Account Creation Event",
       "LoanAccountDisbursementEvent": "Loan Account Disbursement Event",
+      "LoanAccountRepaymentEvent": "Loan Account Repayment Event",
+      "SavingsAccountDepositEvent": "Savings Account Deposit Event",
+      "SavingsAccountWithdrawEvent": "Savings Account Withdraw Event",
+      "LoanAccountRejectedEvent": "Loan Account Rejected Event",
       "“Maker-Checker” principle requires every tasks": "The “Maker-Checker” principle requires every tasks to be completed by two people to reduce the chance of errors and misuse. One person initiates the process and the second completes it."
     },
     "titles": {

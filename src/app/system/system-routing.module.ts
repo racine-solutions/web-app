@@ -88,6 +88,8 @@ import { ManageSurveysResolver } from './manage-surveys/manage-surveys.resolver'
 import { SurveyResolver } from './manage-surveys/survey.resolver';
 import { RolesAndPermissionsResolver } from './roles-and-permissions/roles-and-permissions.resolver';
 import { ViewRoleResolver } from './roles-and-permissions/view-role/view-role.resolver';
+import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
+import { SmsEventConfigurationResolver } from './sms-event-configuration/sms.event.configuration.resolver';
 
 const routes: Routes = [
   Route.withShell([
@@ -591,6 +593,19 @@ const routes: Routes = [
               data: { title: 'View Audit', routeParamBreadcrumb: 'id' },
               resolve: {
                 auditTrail: AuditTrailResolver
+              }
+            }
+          ]
+        },
+        {
+          path: 'sms-event-configuration',
+          data: { title: 'SMS Event Configuration', breadcrumb: 'SMS Event Configuration' },
+          children: [
+            {
+              path: '',
+              component: SmsEventConfigurationComponent,
+              resolve: {
+                events: SmsEventConfigurationResolver
               }
             }
           ]

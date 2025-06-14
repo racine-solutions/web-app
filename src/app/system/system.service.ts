@@ -717,6 +717,10 @@ export class SystemService {
     return this.http.put('/externalevents/configuration', payload);
   }
 
+  putSmsEventConfiguration(payload: any): Observable<any> {
+    return this.http.put('/smsevents/configuration', payload);
+  }
+
   /** Datatable Entries for Entities */
   getEntityDatatables(appTable: string) {
     const httpParams = new HttpParams().set('apptable', appTable);
@@ -755,5 +759,12 @@ export class SystemService {
   runCOBCatchUp() {
     const emptyData = {};
     return this.http.post(`/loans/catch-up`, emptyData);
+  }
+
+  /**
+   * @returns {Observable<any>}
+   */
+  getSmsEventConfiguration(): Observable<any> {
+    return this.http.get('/smsevents/configuration');
   }
 }

@@ -1,52 +1,96 @@
-###############
-### STAGE 1: Build app
-###############
-ARG BUILDER_IMAGE=node:22.9.0-alpine
-ARG NGINX_IMAGE=nginx:1.27.4-alpine3.21-slim
+name: Build and Push Fineract Web to Docker Hub
 
-FROM $BUILDER_IMAGE as builder
-ARG NPM_REGISTRY_URL=https://registry.npmjs.org/
-ARG BUILD_ENVIRONMENT_OPTIONS="--configuration production"
-ARG PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
-ARG PUPPETEER_CHROMIUM_REVISION_ARG=1011831
-ARG PUPPETEER_SKIP_DOWNLOAD_ARG
+on:
+  push:
+    branches:
+      - Release-1.11.0-preview-non-official
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - Release-1.11.0-preview-non-official
+  workflow_dispatch:
 
-# Set the environment variable to increase Node.js memory limit
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: racinepay-web
 
-RUN apk add --no-cache git
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
 
-WORKDIR /usr/src/app
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-# Export Puppeteer env variables for installation with non-default registry.
-ENV PUPPETEER_DOWNLOAD_HOST $PUPPETEER_DOWNLOAD_HOST_ARG
-ENV PUPPETEER_CHROMIUM_REVISION $PUPPETEER_CHROMIUM_REVISION_ARG
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-ENV PUPPETEER_SKIP_DOWNLOAD $PUPPETEER_SKIP_DOWNLOAD_ARG
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=sha,prefix={{branch}}-
+        labels: |
+          org.opencontainers.image.title=Fineract Web
+          org.opencontainers.image.description=Apache Fineract Web Application
+          org.opencontainers.image.vendor=Apache Fineract
 
-COPY ./ /usr/src/app/
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          NPM_REGISTRY_URL=https://registry.npmjs.org/
+          BUILD_ENVIRONMENT_OPTIONS=--configuration production
+          PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
+          PUPPETEER_CHROMIUM_REVISION_ARG=1011831
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
-RUN npm cache clear --force
+    - name: Generate build summary
+      run: |
+        echo "## Docker Build Summary 🐳" >> $GITHUB_STEP_SUMMARY
+        echo "**Image:** \`${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "**Tags:** " >> $GITHUB_STEP_SUMMARY
+        echo "${{ steps.meta.outputs.tags }}" | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+        echo "**Platforms:** linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+        echo "**Pushed:** ${{ github.event_name != 'pull_request' }}" >> $GITHUB_STEP_SUMMARY
 
-RUN npm config set fetch-retry-maxtimeout 120000
-RUN npm config set registry $NPM_REGISTRY_URL --location=global
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
 
-RUN npm install --location=global @angular/cli@16.0.2
+    steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
 
-RUN npm install
-
-RUN ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
-
-###############
-### STAGE 2: Serve app with nginx ###
-###############
-FROM $NGINX_IMAGE
-
-COPY --from=builder /dist /usr/share/nginx/html
-
-EXPOSE 80
-
-# When the container starts, replace the env.js with values from environment variables
-CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'

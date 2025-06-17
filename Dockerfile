@@ -1,87 +1,52 @@
-name: Build and Push Docker Image
+name: Publish Image in Docker Hub
 
 on:
   push:
-    branches:
-      - Release-1.11.0-preview-non-official
-  pull_request:
-    branches:
-      - Release-1.11.0-preview-non-official
-
-env:
-  REGISTRY: docker.io
-  IMAGE_NAME: hero78/racinepaybackend
+    branches: [main, dev, angular-update]
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    env:
+      DOCKER_ORGANIZATION: ${{ secrets.DOCKER_ORGANIZATION }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch full history
-          fetch-tags: true # Fetch all tags
+      - uses: actions/checkout@v2
 
-      - name: Debug - Check Dockerfile
-        run: |
-          echo "=== Repository structure ==="
-          ls -la
-          echo ""
-          echo "=== Looking for Dockerfile ==="
-          find . -name "*ockerfile*" -type f
-          echo ""
-          echo "=== First 10 lines of Dockerfile (if exists) ==="
-          if [ -f "Dockerfile" ]; then
-            head -10 Dockerfile
-            echo "✅ Dockerfile found and looks correct"
-          else
-            echo "❌ Dockerfile not found in root directory"
-            echo "Files in current directory:"
-            ls -la
-          fi
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
 
       - name: Log in to Docker Hub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            NPM_REGISTRY_URL=https://registry.npmjs.org/
-            BUILD_ENVIRONMENT_OPTIONS=--configuration production
-            PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
-            PUPPETEER_CHROMIUM_REVISION_ARG=1011831
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Get Git Hashes
+        run: |
+          echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        id: git_hashes
 
-      - name: Image digest
-        run: echo ${{ steps.build.outputs.digest }}
+      - name: Build and Push Multi-Arch Docker Image
+        run: |
+          TAGS="--tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}"
+
+          if [ "${{ steps.extract_branch.outputs.branch }}" == "main" ]; then
+            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.short_hash }} --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.long_hash }}"
+          else
+            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}-${{ steps.git_hashes.outputs.short_hash }}"
+          fi
+
+          docker build --push --build-arg="PUPPETEER_SKIP_DOWNLOAD_ARG=true" --platform linux/amd64,linux/arm64 $TAGS .

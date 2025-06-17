@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: racinepay-web
+  IMAGE_NAME: hero78/racinepay-web
 
 jobs:
   build-and-push:

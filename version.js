@@ -1,12 +1,21 @@
-const { gitDescribeSync } = require('git-describe');
 const { resolve, relative } = require('path');
 const { writeFileSync } = require('fs-extra');
 const moment = require('moment');
 
-const gitInfo = gitDescribeSync({
-  dirtyMark: false,
-  dirtySemver: false
-});
+let gitInfo;
+try {
+  const { gitDescribeSync } = require('git-describe');
+  gitInfo = gitDescribeSync({
+    dirtyMark: false,
+    dirtySemver: false
+  });
+} catch (error) {
+  console.log('Warning: Unable to get git information. Using fallback values.');
+  gitInfo = {
+    hash: 'unknown',
+    raw: 'unknown'
+  };
+}
 
 gitInfo.version = moment().format('YYMMDD');
 

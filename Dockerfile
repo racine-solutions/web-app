@@ -5,6 +5,11 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
+# Copy version.js file needed for postinstall script
+COPY version.js ./
+
+# Create necessary directories for version.js
+RUN mkdir -p src/environments
 
 # Install dependencies
 ARG NPM_REGISTRY_URL=https://registry.npmjs.org/

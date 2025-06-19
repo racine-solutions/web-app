@@ -1,52 +1,42 @@
-name: Publish Image in Docker Hub
+# Stage 1: Build the Angular application
+FROM node:16 as build
 
-on:
-  push:
-    branches: [main, dev, angular-update]
+WORKDIR /app
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_ORGANIZATION: ${{ secrets.DOCKER_ORGANIZATION }}
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-    steps:
-      - uses: actions/checkout@v2
+# Install dependencies
+ARG NPM_REGISTRY_URL=https://registry.npmjs.org/
+RUN npm config set registry $NPM_REGISTRY_URL
+RUN npm ci
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+# Copy the rest of the application code
+COPY . .
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          install: true
+# Set Puppeteer arguments if needed
+ARG PUPPETEER_SKIP_DOWNLOAD_ARG=true
+ARG PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
+ARG PUPPETEER_CHROMIUM_REVISION_ARG=1011831
+ENV PUPPETEER_SKIP_DOWNLOAD=$PUPPETEER_SKIP_DOWNLOAD_ARG
+ENV PUPPETEER_DOWNLOAD_HOST=$PUPPETEER_DOWNLOAD_HOST_ARG
+ENV PUPPETEER_CHROMIUM_REVISION=$PUPPETEER_CHROMIUM_REVISION_ARG
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+# Build the application
+ARG BUILD_ENVIRONMENT_OPTIONS=--configuration production
+RUN npm run build -- $BUILD_ENVIRONMENT_OPTIONS
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
+# Stage 2: Serve the application with Nginx
+FROM nginx:alpine
 
-      - name: Get Git Hashes
-        run: |
-          echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        id: git_hashes
+# Copy the build output to replace the default nginx contents
+COPY --from=build /app/dist/web-app /usr/share/nginx/html
 
-      - name: Build and Push Multi-Arch Docker Image
-        run: |
-          TAGS="--tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}"
+# Copy custom nginx configuration if needed
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-          if [ "${{ steps.extract_branch.outputs.branch }}" == "main" ]; then
-            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.short_hash }} --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.long_hash }}"
-          else
-            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}-${{ steps.git_hashes.outputs.short_hash }}"
-          fi
+# Expose port 80
+EXPOSE 80
 
-          docker build --push --build-arg="PUPPETEER_SKIP_DOWNLOAD_ARG=true" --platform linux/amd64,linux/arm64 $TAGS .
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]

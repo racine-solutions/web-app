@@ -2,11 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches:
-      - Release-1.11.0-preview-non-official
+    branches: [Release-1.11.0-preview-non-official]
   pull_request:
-    branches:
-      - Release-1.11.0-preview-non-official
+    branches: [Release-1.11.0-preview-non-official]
 
 env:
   REGISTRY: docker.io
@@ -26,22 +24,13 @@ jobs:
           fetch-depth: 0  # Fetch full history
           fetch-tags: true # Fetch all tags
 
-      - name: Debug - Check Dockerfile
+      - name: Check Dockerfile
         run: |
-          echo "=== Repository structure ==="
-          ls -la
-          echo ""
-          echo "=== Looking for Dockerfile ==="
-          find . -name "*ockerfile*" -type f
-          echo ""
-          echo "=== First 10 lines of Dockerfile (if exists) ==="
           if [ -f "Dockerfile" ]; then
-            head -10 Dockerfile
-            echo "✅ Dockerfile found and looks correct"
+            echo "✅ Dockerfile found"
           else
             echo "❌ Dockerfile not found in root directory"
-            echo "Files in current directory:"
-            ls -la
+            exit 1
           fi
 
       - name: Set up Docker Buildx
@@ -52,7 +41,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata
@@ -67,11 +56,12 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

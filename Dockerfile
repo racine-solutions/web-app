@@ -29,10 +29,13 @@ COPY package.json package-lock.json ./
 # Configure npm and install dependencies in a single layer
 RUN npm config set fetch-retry-maxtimeout 120000 \
     && npm config set registry $NPM_REGISTRY_URL --location=global \
-    && npm ci
+    && npm ci --ignore-scripts
 
 # Copy the rest of the application code
 COPY . .
+
+# Run version.js and ngcc manually (these were in postinstall script)
+RUN node version.js && npx ngcc
 
 # Build the application
 RUN npm run build -- --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS

@@ -1,47 +1,52 @@
-# Stage 1: Build the Angular application
-FROM node:16 as build
+###############
+### STAGE 1: Build app
+###############
+ARG BUILDER_IMAGE=node:22.9.0-alpine
+ARG NGINX_IMAGE=nginx:1.27.4-alpine3.21-slim
 
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-# Copy version.js file needed for postinstall script
-COPY version.js ./
-
-# Create necessary directories for version.js
-RUN mkdir -p src/environments
-
-# Install dependencies
+FROM $BUILDER_IMAGE as builder
 ARG NPM_REGISTRY_URL=https://registry.npmjs.org/
-RUN npm config set registry $NPM_REGISTRY_URL
-RUN npm ci
-
-# Copy the rest of the application code
-COPY . .
-
-# Set Puppeteer arguments if needed
-ARG PUPPETEER_SKIP_DOWNLOAD_ARG=true
+ARG BUILD_ENVIRONMENT_OPTIONS="--configuration production"
 ARG PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
 ARG PUPPETEER_CHROMIUM_REVISION_ARG=1011831
-ENV PUPPETEER_SKIP_DOWNLOAD=$PUPPETEER_SKIP_DOWNLOAD_ARG
-ENV PUPPETEER_DOWNLOAD_HOST=$PUPPETEER_DOWNLOAD_HOST_ARG
-ENV PUPPETEER_CHROMIUM_REVISION=$PUPPETEER_CHROMIUM_REVISION_ARG
+ARG PUPPETEER_SKIP_DOWNLOAD_ARG
 
-# Build the application
-ARG BUILD_ENVIRONMENT_OPTIONS=--configuration production
-RUN npm run build -- $BUILD_ENVIRONMENT_OPTIONS
+# Set the environment variable to increase Node.js memory limit
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# Stage 2: Serve the application with Nginx
-FROM nginx:alpine
+RUN apk add --no-cache git
 
-# Copy the build output to replace the default nginx contents
-COPY --from=build /app/dist/web-app /usr/share/nginx/html
+WORKDIR /usr/src/app
 
-# Copy custom nginx configuration if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
-# Expose port 80
+# Export Puppeteer env variables for installation with non-default registry.
+ENV PUPPETEER_DOWNLOAD_HOST $PUPPETEER_DOWNLOAD_HOST_ARG
+ENV PUPPETEER_CHROMIUM_REVISION $PUPPETEER_CHROMIUM_REVISION_ARG
+
+ENV PUPPETEER_SKIP_DOWNLOAD $PUPPETEER_SKIP_DOWNLOAD_ARG
+
+COPY ./ /usr/src/app/
+
+RUN npm cache clear --force
+
+RUN npm config set fetch-retry-maxtimeout 120000
+RUN npm config set registry $NPM_REGISTRY_URL --location=global
+
+RUN npm install --location=global @angular/cli@16.0.2
+
+RUN npm install
+
+RUN ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
+
+###############
+### STAGE 2: Serve app with nginx ###
+###############
+FROM $NGINX_IMAGE
+
+COPY --from=builder /dist /usr/share/nginx/html
+
 EXPOSE 80
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# When the container starts, replace the env.js with values from environment variables
+CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]

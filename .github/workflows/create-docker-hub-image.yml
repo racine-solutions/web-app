@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [CI-CD-Pipeline-git-action]
   pull_request:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [CI-CD-Pipeline-git-action]
 
 env:
   REGISTRY: docker.io

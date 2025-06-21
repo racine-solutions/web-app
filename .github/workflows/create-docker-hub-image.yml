@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [CI-CD-Pipeline-git-action]
 
+# Cancel in-progress runs on new pushes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: docker.io
   IMAGE_NAME: hero78/racinepayfrontend
@@ -13,6 +18,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Set a reasonable timeout to prevent hanging builds
     permissions:
       contents: read
       packages: write
@@ -21,20 +27,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history
-          fetch-tags: true # Fetch all tags
-
-      - name: Check Dockerfile
-        run: |
-          if [ -f "Dockerfile" ]; then
-            echo "✅ Dockerfile found"
-          else
-            echo "❌ Dockerfile not found in root directory"
-            exit 1
-          fi
+          fetch-depth: 1  # Only fetch the latest commit
+          fetch-tags: false # Don't fetch tags unless needed
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Set up Node.js cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
@@ -61,7 +66,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64  # Build for a single platform initially
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -72,6 +77,8 @@ jobs:
             PUPPETEER_CHROMIUM_REVISION_ARG=1011831
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Add output caching to speed up builds
+          outputs: type=docker,dest=/tmp/image.tar
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}

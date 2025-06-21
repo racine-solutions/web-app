@@ -13,31 +13,29 @@ ARG PUPPETEER_SKIP_DOWNLOAD_ARG
 
 # Set the environment variable to increase Node.js memory limit
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+ENV PUPPETEER_DOWNLOAD_HOST $PUPPETEER_DOWNLOAD_HOST_ARG
+ENV PUPPETEER_CHROMIUM_REVISION $PUPPETEER_CHROMIUM_REVISION_ARG
+ENV PUPPETEER_SKIP_DOWNLOAD $PUPPETEER_SKIP_DOWNLOAD_ARG
 
+# Install git and other dependencies in a single layer
 RUN apk add --no-cache git
 
 WORKDIR /usr/src/app
 
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
+# Copy package files first to leverage Docker layer caching
+COPY package.json package-lock.json ./
 
-# Export Puppeteer env variables for installation with non-default registry.
-ENV PUPPETEER_DOWNLOAD_HOST $PUPPETEER_DOWNLOAD_HOST_ARG
-ENV PUPPETEER_CHROMIUM_REVISION $PUPPETEER_CHROMIUM_REVISION_ARG
+# Configure npm and install dependencies in a single layer
+RUN npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set registry $NPM_REGISTRY_URL --location=global \
+    && npm ci
 
-ENV PUPPETEER_SKIP_DOWNLOAD $PUPPETEER_SKIP_DOWNLOAD_ARG
+# Copy the rest of the application code
+COPY . .
 
-COPY ./ /usr/src/app/
-
-RUN npm cache clear --force
-
-RUN npm config set fetch-retry-maxtimeout 120000
-RUN npm config set registry $NPM_REGISTRY_URL --location=global
-
-RUN npm install --location=global @angular/cli@16.0.2
-
-RUN npm install
-
-RUN ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
+# Build the application
+RUN npm run build -- --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
 
 ###############
 ### STAGE 2: Serve app with nginx ###

@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [CI-CD-Pipeline-git-action]
+    branches: [Release-1.11.0-preview-non-official]
   pull_request:
-    branches: [CI-CD-Pipeline-git-action]
+    branches: [Release-1.11.0-preview-non-official]
 
 # Cancel in-progress runs on new pushes
 concurrency:

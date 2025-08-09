@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [RPAY-59]
   pull_request:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [RPAY-59]
 
 # Cancel in-progress runs on new pushes
 concurrency:

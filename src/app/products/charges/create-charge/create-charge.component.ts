@@ -145,27 +145,28 @@ export class CreateChargeComponent implements OnInit {
    */
   filteredChargeCalculationType(): any {
     return this.chargeCalculationTypeData.filter((chargeCalculationType: any) => {
-      if (
-        this.chargeForm.get('chargeTimeType').value === 12 &&
-        (chargeCalculationType.id === 3 || chargeCalculationType.id === 4)
-      ) {
+      const chargeTimeType = this.chargeForm.get('chargeTimeType').value;
+      const chargeAppliesTo = this.chargeForm.get('chargeAppliesTo').value;
+
+      if (chargeTimeType === 12 && (chargeCalculationType.id === 3 || chargeCalculationType.id === 4)) {
         return false;
       }
-      if (this.chargeForm.get('chargeTimeType').value !== 12 && chargeCalculationType.id === 5) {
+
+      if (chargeTimeType !== 12 && chargeCalculationType.id === 5) {
         return false;
       }
-      if (this.chargeForm.get('chargeAppliesTo').value === 2) {
-        if (
-          !(
-            this.chargeForm.get('chargeTimeType').value === 5 ||
-            this.chargeForm.get('chargeTimeType').value === 16 ||
-            this.chargeForm.get('chargeTimeType').value === 17
-          ) &&
-          chargeCalculationType.id === 2
-        ) {
+
+      if (chargeCalculationType.id === 6) {
+        return chargeAppliesTo === 1 && chargeTimeType === 8;
+      }
+
+      if (chargeAppliesTo === 2) {
+        if (!(chargeTimeType === 5 || chargeTimeType === 16 || chargeTimeType === 17) &&
+          chargeCalculationType.id === 2) {
           return false;
         }
       }
+
       return true;
     });
   }

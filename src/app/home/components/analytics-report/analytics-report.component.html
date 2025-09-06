@@ -1,0 +1,176 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Analytics Report</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngIf="analyticsData" class="analytics-container">
+
+      <div class="analytics-section">
+        <h3>Loans</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.activeLoansCount }}</div>
+            <div class="analytics-label">Active Loans</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.activeLoansAmount | currency }}</div>
+            <div class="analytics-label">Active Loans Amount</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.pendingApprovalLoansCount }}</div>
+            <div class="analytics-label">Pending Approval Loans</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.pendingApprovalLoansAmount | currency }}</div>
+            <div class="analytics-label">Pending Approval Loans Amount</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.closedLoansCount }}</div>
+            <div class="analytics-label">Closed Loans</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.closedLoansAmount | currency }}</div>
+            <div class="analytics-label">Closed Loans Amount</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.rejectedLoansCount }}</div>
+            <div class="analytics-label">Rejected Loans</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.rejectedLoansAmount | currency }}</div>
+            <div class="analytics-label">Rejected Loans Amount</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.loansInArrearsCount }}</div>
+            <div class="analytics-label">Loans in Arrears</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Interest</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalInterestExpected | currency }}</div>
+            <div class="analytics-label">Total Interest Expected</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalInterestPaid | currency }}</div>
+            <div class="analytics-label">Total Interest Paid</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Penalties</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalPenaltiesGenerated | currency }}</div>
+            <div class="analytics-label">Total Penalties Generated</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalPenaltiesPaid | currency }}</div>
+            <div class="analytics-label">Total Penalties Paid</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalPenaltiesWaived | currency }}</div>
+            <div class="analytics-label">Total Penalties Waived</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Clients</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalClients }}</div>
+            <div class="analytics-label">Total Clients</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.activeClients }}</div>
+            <div class="analytics-label">Active Clients</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.pendingClients }}</div>
+            <div class="analytics-label">Pending Clients</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Savings Accounts</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.activeSavingsAccountsCount }}</div>
+            <div class="analytics-label">Active Savings Accounts</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.activeSavingsAccountsAmount | currency }}</div>
+            <div class="analytics-label">Active Savings Accounts Amount</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.pendingApprovalSavingsAccountsCount }}</div>
+            <div class="analytics-label">Pending Approval Savings Accounts</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.closedSavingsAccountsCount }}</div>
+            <div class="analytics-label">Closed Savings Accounts</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.rejectedSavingsAccountsCount }}</div>
+            <div class="analytics-label">Rejected Savings Accounts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Overdue</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalOverduePrincipal | currency }}</div>
+            <div class="analytics-label">Total Overdue Principal</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalOverdueInterest | currency }}</div>
+            <div class="analytics-label">Total Overdue Interest</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalOverdueFees | currency }}</div>
+            <div class="analytics-label">Total Overdue Fees</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.totalOverduePenalties | currency }}</div>
+            <div class="analytics-label">Total Overdue Penalties</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.averageOverdueDays }}</div>
+            <div class="analytics-label">Average Overdue Days</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.maxOverdueDays }}</div>
+            <div class="analytics-label">Max Overdue Days</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Overdue Loans by Risk Level</h3>
+        <div class="analytics-grid" *ngIf="analyticsData.overdueLoansByRiskLevel">
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.overdueLoansByRiskLevel.High }}</div>
+            <div class="analytics-label">High</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.overdueLoansByRiskLevel.Medium }}</div>
+            <div class="analytics-label">Medium</div>
+          </div>
+          <div class="analytics-item">
+            <div class="analytics-value">{{ analyticsData.overdueLoansByRiskLevel.Low }}</div>
+            <div class="analytics-label">Low</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -159,4 +159,12 @@ export class ReportsService {
       params: httpParams
     });
   }
+
+  /**
+   * @returns {Observable<any>} Analytics report data.
+   */
+  getAnalyticsReport(): Observable<any> {
+    return this.http.get('/runreports/analyticsReport');
+  }
+
 }

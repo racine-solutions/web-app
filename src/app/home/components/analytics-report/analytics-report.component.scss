@@ -1,0 +1,34 @@
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.analytics-section {
+  h3 {
+    margin-bottom: 10px;
+  }
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.analytics-item {
+  border: 1px solid #eee;
+  padding: 16px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.analytics-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.analytics-label {
+  font-size: 14px;
+  color: #666;
+}

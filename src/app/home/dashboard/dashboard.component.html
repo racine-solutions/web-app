@@ -1,35 +1,35 @@
 <div class="container">
 
-  <mat-card class="card">
-    <mat-card-header>
-      <mat-card-title></mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+  <mat-tab-group #tabGroup (selectChange)="onTabChange($event)">
+    <mat-tab label="Analytics Report">
       <mifosx-analytics-report></mifosx-analytics-report>
-    </mat-card-content>
-  </mat-card>
-<br/>
-  <mat-card class="card">
-    <mat-card-header>
-      <mat-card-title></mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div fxLayout="row" class="top-card">
-        <div class="trends-bar">
-          <mifosx-client-trends-bar></mifosx-client-trends-bar>
-        </div>
-      </div>
+    </mat-tab>
+    <mat-tab label="Client & Collection Trends">
+      <ng-template matTabContent>
+        <mat-card class="card">
+          <mat-card-header>
+            <mat-card-title></mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="row" class="top-card">
+              <div class="trends-bar">
+                <mifosx-client-trends-bar></mifosx-client-trends-bar>
+              </div>
+            </div>
 
-      <div fxLayout="row" class="bottom-card">
-        <div class="amount-disbursed">
-          <mifosx-amount-disbursed-pie></mifosx-amount-disbursed-pie>
-        </div>
+            <div fxLayout="row" class="bottom-card">
+              <div class="amount-disbursed">
+                <mifosx-amount-disbursed-pie></mifosx-amount-disbursed-pie>
+              </div>
 
-        <div class="amount-collected">
-          <mifosx-amount-collected-pie></mifosx-amount-collected-pie>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+              <div class="amount-collected">
+                <mifosx-amount-collected-pie></mifosx-amount-collected-pie>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
 
 </div>

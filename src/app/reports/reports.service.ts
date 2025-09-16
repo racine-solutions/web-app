@@ -166,5 +166,4 @@ export class ReportsService {
   getAnalyticsReport(): Observable<any> {
     return this.http.get('/runreports/analyticsReport');
   }
-
 }

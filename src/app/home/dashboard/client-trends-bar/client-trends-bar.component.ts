@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 
 /** rxjs Imports */
 import { forkJoin, merge } from 'rxjs';
-import { skip } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
 
 /** Custom Services */
 import { HomeService } from '../../home.service';
@@ -51,8 +51,8 @@ export class ClientTrendsBarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getChartData();
     this.initializeControls();
+    this.getChartData();
   }
 
   /**
@@ -68,8 +68,7 @@ export class ClientTrendsBarComponent implements OnInit {
    * Fetches data accordingly and sets charts based on fetched data.
    */
   getChartData() {
-    merge(this.officeId.valueChanges, this.timescale.valueChanges)
-      .pipe(skip(1))
+    merge(this.officeId.valueChanges.pipe(startWith(1)), this.timescale.valueChanges.pipe(startWith('Day')))
       .subscribe(() => {
         const officeId = this.officeId.value;
         const timescale = this.timescale.value;

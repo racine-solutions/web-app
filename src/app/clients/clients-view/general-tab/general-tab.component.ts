@@ -203,10 +203,19 @@ export class GeneralTabComponent {
 
   navigateToMakeRepayment(loan: any, $event: MouseEvent) {
     $event.stopPropagation();
-    this.router.navigate(['../', 'loans-accounts', loan.id, 'actions', 'Make Repayment'], {
-      relativeTo: this.route,
-      state: { data: loan }
-    });
+    this.router.navigate(
+      [
+        '../',
+        'loans-accounts',
+        loan.id,
+        'actions',
+        'Make Repayment'
+      ],
+      {
+        relativeTo: this.route,
+        state: { data: loan }
+      }
+    );
   }
   /**
    * @param {any} loanId Loan Id

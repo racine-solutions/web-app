@@ -123,11 +123,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       .map((entry: any[]) => entry[0])
       .filter(
         (activity: string) => ![
-          '/',
-          '/login',
-          '/home',
-          '/dashboard'
-        ].includes(activity)
+            '/',
+            '/login',
+            '/home',
+            '/dashboard'
+          ].includes(activity)
       )
       .slice(0, 3);
   }

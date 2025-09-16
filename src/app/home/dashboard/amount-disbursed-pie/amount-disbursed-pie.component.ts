@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
+import { startWith } from 'rxjs/operators';
+
 /** Custom Services */
 import { HomeService } from '../../home.service';
 
@@ -48,15 +50,15 @@ export class AmountDisbursedPieComponent implements OnInit {
    * Initialize with office Id 1 for better UX.
    */
   ngOnInit() {
-    this.getChartData();
     this.officeId.patchValue(1);
+    this.getChartData();
   }
 
   /**
    * Subscribes to value changes of office Id fetches chart data accordingly.
    */
   getChartData() {
-    this.officeId.valueChanges.subscribe((value: number) => {
+    this.officeId.valueChanges.pipe(startWith(1)).subscribe((value: number) => {
       this.homeService.getDisbursedAmount(value).subscribe((response: any) => {
         const data = Object.entries(response[0]).map((entry) => entry[1]);
         if (!(data[0] === 0 && data[1] === 0)) {

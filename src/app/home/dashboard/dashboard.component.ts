@@ -33,7 +33,10 @@ export class DashboardComponent implements OnInit {
   /**
    * Gets user activities from local storage.
    */
-  constructor(private router: Router, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
     this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
   }
 

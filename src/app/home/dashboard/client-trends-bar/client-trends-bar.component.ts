@@ -68,8 +68,8 @@ export class ClientTrendsBarComponent implements OnInit {
    * Fetches data accordingly and sets charts based on fetched data.
    */
   getChartData() {
-    merge(this.officeId.valueChanges.pipe(startWith(1)), this.timescale.valueChanges.pipe(startWith('Day')))
-      .subscribe(() => {
+    merge(this.officeId.valueChanges.pipe(startWith(1)), this.timescale.valueChanges.pipe(startWith('Day'))).subscribe(
+      () => {
         const officeId = this.officeId.value;
         const timescale = this.timescale.value;
         switch (timescale) {
@@ -116,7 +116,8 @@ export class ClientTrendsBarComponent implements OnInit {
             });
             break;
         }
-      });
+      }
+    );
   }
 
   /**

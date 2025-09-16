@@ -1,7 +1,8 @@
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatTabGroup } from '@angular/material/tabs';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { activities } from '../activities';
@@ -27,10 +28,15 @@ export class DashboardComponent implements OnInit {
   /** All User Activities. */
   allActivities: any[] = activities;
 
+  @ViewChild('tabGroup') tabGroup: MatTabGroup;
+
   /**
    * Gets user activities from local storage.
    */
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
     this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
   }
 
@@ -38,6 +44,16 @@ export class DashboardComponent implements OnInit {
     this.recentActivities = this.getRecentActivities();
     this.frequentActivities = this.getFrequentActivities();
     this.setFilteredActivities();
+  }
+
+  onTabChange(event: any) {
+    if (event.index === 1) {
+      const tab = this.tabGroup._tabs.toArray()[1];
+      if (tab.content) {
+        tab.content.viewContainerRef.createEmbeddedView(tab.content.templateRef);
+        this.changeDetectorRef.detectChanges();
+      }
+    }
   }
 
   /**

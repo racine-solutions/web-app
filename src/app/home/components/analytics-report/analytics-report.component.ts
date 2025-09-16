@@ -7,15 +7,13 @@ import { ReportsService } from 'app/reports/reports.service';
   styleUrls: ['./analytics-report.component.scss']
 })
 export class AnalyticsReportComponent implements OnInit {
-
   analyticsData: any;
 
-  constructor(private reportsService: ReportsService) { }
+  constructor(private reportsService: ReportsService) {}
 
   ngOnInit() {
     this.reportsService.getAnalyticsReport().subscribe((response: any) => {
       this.analyticsData = response;
     });
   }
-
 }

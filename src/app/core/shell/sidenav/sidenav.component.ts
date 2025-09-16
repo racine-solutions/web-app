@@ -4,9 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 /** Custom Components */
-import {
-  KeyboardShortcutsDialogComponent
-} from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
 
 /** Custom Services */
 import { AuthenticationService } from '../../authentication/authentication.service';
@@ -17,15 +15,7 @@ import { ConfigurationWizardService } from '../../../configuration-wizard/config
 import { frequentActivities } from './frequent-activities';
 import { SettingsService } from 'app/settings/settings.service';
 
-export type TooltipPosition =
-  | 'left'
-  | 'right'
-  | 'above'
-  | 'below'
-  | 'before'
-  | 'after';
-
-
+export type TooltipPosition = 'left' | 'right' | 'above' | 'below' | 'before' | 'after';
 
 /**
  * Sidenav component.
@@ -123,11 +113,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       .map((entry: any[]) => entry[0])
       .filter(
         (activity: string) => ![
-          '/',
-          '/login',
-          '/home',
-          '/dashboard'
-        ].includes(activity)
+            '/',
+            '/login',
+            '/home',
+            '/dashboard'
+          ].includes(activity)
       )
       .slice(0, 3);
   }

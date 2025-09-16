@@ -18,7 +18,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Set a reasonable timeout to prevent hanging builds
+    timeout-minutes: 30 # Set a reasonable timeout to prevent hanging builds
     permissions:
       contents: read
       packages: write
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1  # Only fetch the latest commit
+          fetch-depth: 1 # Only fetch the latest commit
           fetch-tags: false # Don't fetch tags unless needed
 
       - name: Set up Docker Buildx
@@ -66,7 +66,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64  # Build for a single platform initially
+          platforms: linux/amd64 # Build for a single platform initially
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

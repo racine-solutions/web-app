@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 /** Custom Components */
 import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { ReleaseNotesComponent } from 'app/shared/release-notes/release-notes.component';
 
 /** Custom Services */
 import { AuthenticationService } from '../../authentication/authentication.service';
@@ -95,6 +96,14 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    */
   showKeyboardShortcuts() {
     const dialogRef = this.dialog.open(KeyboardShortcutsDialogComponent);
+    dialogRef.afterClosed().subscribe(() => {});
+  }
+
+  /**
+   * Opens Release Notes dialog.
+   */
+  showReleaseNotes() {
+    const dialogRef = this.dialog.open(ReleaseNotesComponent);
     dialogRef.afterClosed().subscribe(() => {});
   }
 

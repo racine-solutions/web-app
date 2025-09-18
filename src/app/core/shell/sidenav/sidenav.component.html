@@ -148,6 +148,16 @@
           </mat-icon>
           <a matLine>{{ 'labels.menus.Keyboard Shortcuts' | translate }}</a>
         </mat-list-item>
+
+        <mat-list-item
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'tooltips.Release Notes' | translate }}">
+          <mat-icon matListIcon (click)="showReleaseNotes()">
+            <fa-icon icon="sticky-note" size="sm"></fa-icon>
+          </mat-icon>
+          <a matLine>{{ 'labels.menus.Release Notes' | translate }}</a>
+        </mat-list-item>
+
         <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">
           <mat-icon matListIcon (click)="help()">
             <fa-icon icon="question-circle" size="sm"></fa-icon>

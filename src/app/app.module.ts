@@ -36,12 +36,15 @@ import { ProfileModule } from './profile/profile.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ConfigurationWizardModule } from './configuration-wizard/configuration-wizard.module';
 import { PortalModule } from '@angular/cdk/portal';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 /** Main Routing Module */
 import { AppRoutingModule } from './app-routing.module';
 import { DatePipe, LocationStrategy } from '@angular/common';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ReleaseNotesComponent } from './shared/release-notes/release-notes.component';
 
 /**
  * App Module
@@ -72,6 +75,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     PortalModule,
+    MatDialogModule,
+    FontAwesomeModule,
     CoreModule,
     HomeModule,
     LoginModule,
@@ -99,7 +104,8 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   declarations: [
     WebAppComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    ReleaseNotesComponent
   ],
   providers: [DatePipe],
   bootstrap: [WebAppComponent]

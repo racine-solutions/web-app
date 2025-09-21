@@ -263,20 +263,21 @@
           <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.clientsByGender)">
             <mat-icon class="analytics-icon">wc</mat-icon>
             <div class="analytics-value">{{ analyticsData.clientsByGender[item] }}</div>
-            <div class="analytics-label">{{ item }}</div>
+            <div class="analytics-label">{{ item === 'N/A' ? 'Gender Not Specified' : item }}</div>
           </div>
         </div>
+        <br>
         <div class="analytics-grid" *ngIf="analyticsData.clientsByAgeGroup">
           <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.clientsByAgeGroup)">
             <mat-icon class="analytics-icon">cake</mat-icon>
             <div class="analytics-value">{{ analyticsData.clientsByAgeGroup[item] }}</div>
-            <div class="analytics-label">Age: {{ item }}</div>
+            <div class="analytics-label">{{ item === 'N/A' ? 'Age Not Specified' : 'Age: ' + item }}</div>
           </div>
         </div>
       </div>
 
       <div class="analytics-section">
-        <h3>Product Mix</h3>
+        <h3>Loan Product statistics</h3>
         <div class="analytics-grid" *ngIf="analyticsData.activeLoansByProduct">
           <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.activeLoansByProduct)">
             <mat-icon class="analytics-icon">category</mat-icon>
@@ -284,6 +285,9 @@
             <div class="analytics-label">{{ item }}</div>
           </div>
         </div>
+      </div>
+      <div class="analytics-section">
+        <h3>Savings Product statistics</h3>
         <div class="analytics-grid" *ngIf="analyticsData.activeSavingsByProduct">
           <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.activeSavingsByProduct)">
             <mat-icon class="analytics-icon">inventory_2</mat-icon>

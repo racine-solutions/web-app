@@ -8,6 +8,7 @@ import { ReportsService } from 'app/reports/reports.service';
 })
 export class AnalyticsReportComponent implements OnInit {
   analyticsData: any;
+  objectKeys = Object.keys;
 
   constructor(private reportsService: ReportsService) {}
 

@@ -167,6 +167,46 @@
             <div class="analytics-value">{{ analyticsData.pendingClients }}</div>
             <div class="analytics-label">Pending Clients</div>
           </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">calendar_today</mat-icon>
+            <div class="analytics-value">{{ analyticsData.newClientsThisMonth }}</div>
+            <div class="analytics-label">New Clients This Month</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">date_range</mat-icon>
+            <div class="analytics-value">{{ analyticsData.newClientsThisQuarter }}</div>
+            <div class="analytics-label">New Clients This Quarter</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">view_week</mat-icon>
+            <div class="analytics-value">{{ analyticsData.newClientsLast7Days }}</div>
+            <div class="analytics-label">New Clients in Last 7 Days</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">calendar_view_month</mat-icon>
+            <div class="analytics-value">{{ analyticsData.newClientsLast30Days }}</div>
+            <div class="analytics-label">New Clients in Last 30 Days</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">event_note</mat-icon>
+            <div class="analytics-value">{{ analyticsData.newClientsLast90Days }}</div>
+            <div class="analytics-label">New Clients in Last 90 Days</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">credit_card</mat-icon>
+            <div class="analytics-value">{{ analyticsData.clientsWithActiveLoan }}</div>
+            <div class="analytics-label">Clients with Active Loan</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">account_balance</mat-icon>
+            <div class="analytics-value">{{ analyticsData.clientsWithActiveSavingsAccount }}</div>
+            <div class="analytics-label">Clients with Active Savings</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">group_work</mat-icon>
+            <div class="analytics-value">{{ analyticsData.clientsWithBothLoanAndSavings }}</div>
+            <div class="analytics-label">Clients with Loan and Savings</div>
+          </div>
         </div>
       </div>
 
@@ -186,7 +226,7 @@
           <div class="analytics-item">
             <mat-icon class="analytics-icon">pending</mat-icon>
             <div class="analytics-value">{{ analyticsData.pendingApprovalSavingsAccountsCount }}</div>
-            <div class="analytics-label">Pending Approval Savings Accounts</div>
+            <div class="analytics-label">Pending Approval Savings</div>
           </div>
           <div class="analytics-item">
             <mat-icon class="analytics-icon">no_accounts</mat-icon>
@@ -200,6 +240,63 @@
           </div>
         </div>
       </div>
+
+      <div class="analytics-section">
+        <h3>Today's Activity</h3>
+        <div class="analytics-grid">
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">today</mat-icon>
+            <div class="analytics-value">{{ analyticsData.loansActivatedTodayCount }}</div>
+            <div class="analytics-label">Loans Activated Today</div>
+          </div>
+          <div class="analytics-item">
+            <mat-icon class="analytics-icon">savings</mat-icon>
+            <div class="analytics-value">{{ analyticsData.savingsActivatedTodayCount }}</div>
+            <div class="analytics-label">Savings Activated Today</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Client Demographics</h3>
+        <div class="analytics-grid" *ngIf="analyticsData.clientsByGender">
+          <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.clientsByGender)">
+            <mat-icon class="analytics-icon">wc</mat-icon>
+            <div class="analytics-value">{{ analyticsData.clientsByGender[item] }}</div>
+            <div class="analytics-label">{{ item === 'N/A' ? 'Gender Not Specified' : item }}</div>
+          </div>
+        </div>
+        <br>
+        <div class="analytics-grid" *ngIf="analyticsData.clientsByAgeGroup">
+          <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.clientsByAgeGroup)">
+            <mat-icon class="analytics-icon">cake</mat-icon>
+            <div class="analytics-value">{{ analyticsData.clientsByAgeGroup[item] }}</div>
+            <div class="analytics-label">{{ item === 'N/A' ? 'Age Not Specified' : 'Age: ' + item }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-section">
+        <h3>Loan Product statistics</h3>
+        <div class="analytics-grid" *ngIf="analyticsData.activeLoansByProduct">
+          <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.activeLoansByProduct)">
+            <mat-icon class="analytics-icon">category</mat-icon>
+            <div class="analytics-value">{{ analyticsData.activeLoansByProduct[item] }}</div>
+            <div class="analytics-label">{{ item }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-section">
+        <h3>Savings Product statistics</h3>
+        <div class="analytics-grid" *ngIf="analyticsData.activeSavingsByProduct">
+          <div class="analytics-item" *ngFor="let item of objectKeys(analyticsData.activeSavingsByProduct)">
+            <mat-icon class="analytics-icon">inventory_2</mat-icon>
+            <div class="analytics-value">{{ analyticsData.activeSavingsByProduct[item] }}</div>
+            <div class="analytics-label">{{ item }}</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </mat-card-content>
 </mat-card>

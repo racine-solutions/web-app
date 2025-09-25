@@ -157,6 +157,16 @@
           </mat-icon>
           <a matLine>{{ 'labels.menus.Release Notes' | translate }}</a>
         </mat-list-item>
+        <mat-list-item
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'tooltips.Raise Issues' | translate }}">
+          <mat-icon matListIcon>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScRo1Q9l7HJt2WmqW2xv3SsVnn6H6RTvbqep6KOFZvwBaFn7Q/viewform" target="_blank">
+              <fa-icon icon="anchor" size="sm"></fa-icon>
+            </a>
+          </mat-icon>
+          <a matLine href="https://docs.google.com/forms/d/e/1FAIpQLScRo1Q9l7HJt2WmqW2xv3SsVnn6H6RTvbqep6KOFZvwBaFn7Q/viewform" target="_blank">{{ 'labels.menus.Raise Issues' | translate }}</a>
+        </mat-list-item>
 
         <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">
           <mat-icon matListIcon (click)="help()">

@@ -2581,6 +2581,7 @@
       "Redeem Shares": "Redeem Shares",
       "Approve Additional Shares": "Approve Additional Shares",
       "Reject Additional Shares": "Reject Additional Shares",
+      "Raise Issues": "Raise Issues",
       "XBRL": "XBRL"
     },
     "placeholders": {
@@ -3404,6 +3405,7 @@
     "After the minimum deposit term has passed": "After the minimum deposit term has passed, additional deposit durations may be specified.",
     "Allocate Cash": "Allocate Cash",
     "Allowed": "Allowed",
+    "Raise Issues": "Raise Issues",
     "Amount to be rounded off": "The amount to be rounded off (example: 100 rounds off to 200, 300, 400, etc)",
     "An boolean flag to attach": "An boolean flag to attach  taxes to interest posting",
     "An boolean flag to attach  taxes to interest posting": "An boolean flag to attach  taxes to interest posting",

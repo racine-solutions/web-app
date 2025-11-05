@@ -7,7 +7,7 @@
   <div class="navigation-panel" fxLayout="column">
     <!-- TODO: Allow customization by organization -->
     <div class="app-brand" [routerLink]="['/home']">
-      <img src="assets/images/racine_solutions.jpeg" alt="app-logo" class="app-logo" />
+      <img src="assets/images/racine_solutions.svg" alt="app-logo" class="app-logo" />
       <!--      <span #logo class="app-logo-text text-muted">{{ 'APP_NAME' | translate }}</span>-->
     </div>
 
@@ -168,12 +168,15 @@
           <a matLine href="https://docs.google.com/forms/d/e/1FAIpQLScRo1Q9l7HJt2WmqW2xv3SsVnn6H6RTvbqep6KOFZvwBaFn7Q/viewform" target="_blank">{{ 'labels.menus.Raise Issues' | translate }}</a>
         </mat-list-item>
 
-        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">
-          <mat-icon matListIcon (click)="help()">
-            <fa-icon icon="question-circle" size="sm"></fa-icon>
-          </mat-icon>
-          <a matLine>{{ 'labels.menus.Help' | translate }}</a>
-        </mat-list-item>
+
+<!--         hide mifos help link for now-->
+
+<!--        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">-->
+<!--          <mat-icon matListIcon (click)="help()">-->
+<!--            <fa-icon icon="question-circle" size="sm"></fa-icon>-->
+<!--          </mat-icon>-->
+<!--          <a matLine>{{ 'labels.menus.Help' | translate }}</a>-->
+<!--        </mat-list-item>-->
       </mat-nav-list>
     </div>
   </div>

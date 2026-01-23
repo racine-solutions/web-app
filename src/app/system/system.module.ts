@@ -9,6 +9,7 @@
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { TranslateModule } from '@ngx-translate/core';
 
 /** Module Imports */
 import { SharedModule } from '../shared/shared.module';
@@ -110,7 +111,8 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     AuditTrailsComponent,
     ViewAuditComponent,
     RolesAndPermissionsComponent,
-    AddRoleComponent
+    AddRoleComponent,
+    TranslateModule
   ],
   declarations: []
 })

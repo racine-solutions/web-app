@@ -4,13 +4,26 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { SystemService } from '../system.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatLabel } from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from 'app/pipes/translate.pipe';
 
 @Component({
   selector: 'mifosx-sms-event-configuration',
   templateUrl: './sms-event-configuration.component.html',
   styleUrls: ['./sms-event-configuration.component.scss'],
   standalone: true,
-  imports: [MatPaginator, MatSort]
+  imports: [
+    MatPaginator,
+    MatSort,
+    MatFormFieldModule,
+    MatLabel,
+    MatTableModule,
+    MatInputModule,
+    TranslatePipe
+  ]
 })
 export class SmsEventConfigurationComponent implements OnInit {
   /** Events Data. */

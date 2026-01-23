@@ -1,11 +1,19 @@
-<div class="container" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
-  <mat-form-field fxFlex="31%">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container layout-row-wrap gap-2px responsive-column filter-container">
+  <mat-form-field class="flex-31">
     <mat-label>{{ 'labels.inputs.Office Name' | translate }}</mat-label>
     <input matInput [formControl]="officeName" [matAutocomplete]="officeNameAutocomplete" />
   </mat-form-field>
 
   <mifosx-gl-account-selector
-    fxFlex="31%"
+    class="flex-31"
     [inputFormControl]="glAccount"
     [glAccountList]="glAccountData"
     [required]="true"
@@ -13,16 +21,18 @@
   >
   </mifosx-gl-account-selector>
 
-  <mat-form-field fxFlex="31%">
+  <mat-form-field class="flex-31">
     <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
     <mat-select [formControl]="entryTypeFilter" (selectionChange)="applyFilter($event.value, 'manualEntriesOnly')">
-      <mat-option *ngFor="let filter of entryTypeFilterData" [value]="filter.value">
-        {{ filter.option }}
-      </mat-option>
+      @for (filter of entryTypeFilterData; track filter) {
+        <mat-option [value]="filter.value">
+          {{ filter.option | translate }}
+        </mat-option>
+      }
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field fxFlex="31%" (click)="transactionDateFromPicker.open()">
+  <mat-form-field class="flex-31" (click)="transactionDateFromPicker.open()">
     <mat-label>{{ 'labels.inputs.Transaction Date From' | translate }}</mat-label>
     <input
       matInput
@@ -35,7 +45,7 @@
     <mat-datepicker #transactionDateFromPicker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field fxFlex="31%" (click)="transactionDateToPicker.open()">
+  <mat-form-field class="flex-31" (click)="transactionDateToPicker.open()">
     <mat-label>{{ 'labels.inputs.Transaction Date To' | translate }}</mat-label>
     <input
       matInput
@@ -48,12 +58,12 @@
     <mat-datepicker #transactionDateToPicker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field fxFlex="31%">
+  <mat-form-field class="flex-31">
     <mat-label>{{ 'labels.inputs.Transaction ID' | translate }}</mat-label>
     <input matInput [formControl]="transactionId" />
   </mat-form-field>
 
-  <mat-form-field fxFlex="31%" (click)="submittedOnDateFromPicker.open()">
+  <mat-form-field class="flex-31" (click)="submittedOnDateFromPicker.open()">
     <mat-label>{{ 'labels.inputs.Submitted on Date From' | translate }}</mat-label>
     <input
       matInput
@@ -65,7 +75,7 @@
     <mat-datepicker #submittedOnDateFromPicker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field fxFlex="31%" (click)="submittedOnDateToPicker.open()">
+  <mat-form-field class="flex-31" (click)="submittedOnDateToPicker.open()">
     <mat-label>{{ 'labels.inputs.Submitted on Date To' | translate }} </mat-label>
     <input
       matInput
@@ -80,18 +90,19 @@
 
 <!-- Autocomplete data -->
 <mat-autocomplete autoActiveFirstOption #officeNameAutocomplete="matAutocomplete" [displayWith]="displayOfficeName">
-  <mat-option *ngFor="let office of filteredOfficeData | async" [value]="{ id: office.id, name: office.name }">
-    {{ office.name }}
-  </mat-option>
+  @for (office of filteredOfficeData | async; track office) {
+    <mat-option [value]="{ id: office.id, name: office.name }">
+      {{ office.name }}
+    </mat-option>
+  }
 </mat-autocomplete>
 
-<div class="mat-elevation-z8 container">
+<div class="mat-elevation-z8 container table-container">
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Entry ID' | translate }}</th>
       <td mat-cell *matCellDef="let journalEntry">{{ journalEntry.id }}</td>
     </ng-container>
-
     <ng-container matColumnDef="officeName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Office' | translate }}</th>
       <td mat-cell *matCellDef="let journalEntry">{{ journalEntry.officeName }}</td>
@@ -140,14 +151,18 @@
     <ng-container matColumnDef="debit">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Debit' | translate }}</th>
       <td mat-cell *matCellDef="let journalEntry">
-        <span *ngIf="journalEntry.entryType.value === 'DEBIT'"> {{ journalEntry.amount | formatNumber }} </span>
+        @if (journalEntry.entryType.value === 'DEBIT') {
+          <span> {{ journalEntry.amount | formatNumber }} </span>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="credit">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Credit' | translate }}</th>
       <td mat-cell *matCellDef="let journalEntry">
-        <span *ngIf="journalEntry.entryType.value === 'CREDIT'"> {{ journalEntry.amount | formatNumber }} </span>
+        @if (journalEntry.entryType.value === 'CREDIT') {
+          <span> {{ journalEntry.amount | formatNumber }} </span>
+        }
       </td>
     </ng-container>
 

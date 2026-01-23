@@ -1,26 +1,49 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { Datatables } from 'app/core/utils/datatables';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-client-datatable-step',
   templateUrl: './client-datatable-step.component.html',
-  styleUrls: ['./client-datatable-step.component.scss']
+  styleUrls: ['./client-datatable-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class ClientDatatableStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private settingsService = inject(SettingsService);
+  private datatableService = inject(Datatables);
+
   /** Input Fields Data */
   @Input() datatableData: any;
   /** Create Input Form */
   datatableForm: UntypedFormGroup;
 
   datatableInputs: any = [];
-
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private settingsService: SettingsService,
-    private datatableService: Datatables
-  ) {}
 
   ngOnInit(): void {
     this.datatableInputs = this.datatableService.filterSystemColumns(this.datatableData.columnHeaderData);

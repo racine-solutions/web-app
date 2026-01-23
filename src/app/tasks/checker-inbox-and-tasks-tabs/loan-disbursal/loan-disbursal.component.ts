@@ -1,8 +1,28 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Dialog Imports */
@@ -13,13 +33,40 @@ import { TasksService } from '../../tasks.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-disbursal',
   templateUrl: './loan-disbursal.component.html',
-  styleUrls: ['./loan-disbursal.component.scss']
+  styleUrls: ['./loan-disbursal.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCheckbox,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FormatNumberPipe
+  ]
 })
 export class LoanDisbursalComponent {
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+  private tasksService = inject(TasksService);
+
   /** Loans Data */
   loans: any;
   /** Batch Requests */
@@ -46,14 +93,7 @@ export class LoanDisbursalComponent {
    * @param {SettingsService} settingsService Settings Service.
    * @param {TasksService} tasksService Tasks Service.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
-    private dateUtils: Dates,
-    private settingsService: SettingsService,
-    private translateService: TranslateService,
-    private tasksService: TasksService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { loansData: any }) => {
       this.loans = data.loansData.pageItems;
       this.loans = this.loans.filter((account: any) => {
@@ -122,7 +162,7 @@ export class LoanDisbursalComponent {
     });
     this.tasksService.submitBatchData(this.batchRequests).subscribe((response: any) => {
       response.forEach((responseEle: any) => {
-        if ((responseEle.statusCode = '200')) {
+        if (responseEle.statusCode === '200') {
           approvedAccounts++;
           responseEle.body = JSON.parse(responseEle.body);
           if (selectedAccounts === approvedAccounts) {

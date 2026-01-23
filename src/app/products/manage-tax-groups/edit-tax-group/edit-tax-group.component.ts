@@ -1,8 +1,16 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
@@ -16,6 +24,24 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 import { DatepickerBase } from 'app/shared/form-dialog/formfield/model/datepicker-base';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { FindPipe } from '../../../pipes/find.pipe';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Tax Group component.
@@ -23,9 +49,36 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 @Component({
   selector: 'mifosx-edit-tax-group',
   templateUrl: './edit-tax-group.component.html',
-  styleUrls: ['./edit-tax-group.component.scss']
+  styleUrls: ['./edit-tax-group.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FindPipe,
+    DateFormatPipe
+  ]
 })
 export class EditTaxGroupComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private productsService = inject(ProductsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  dialog = inject(MatDialog);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+
   /** Minimum start date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum start date allowed. */
@@ -57,16 +110,7 @@ export class EditTaxGroupComponent implements OnInit {
    * @param {SettingsService} settingsService Settings Service.
    * @param {TranslateService} translateService translate Service.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private productsService: ProductsService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    public dialog: MatDialog,
-    private settingsService: SettingsService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { taxGroup: any }) => {
       this.taxGroupData = data.taxGroup;
       this.taxComponentOptions = this.taxGroupData.taxComponents;
@@ -109,7 +153,6 @@ export class EditTaxGroupComponent implements OnInit {
         maxDate: this.maxDate,
         order: 2
       })
-
     ];
     const data = {
       title: 'Add Tax Component',
@@ -148,7 +191,6 @@ export class EditTaxGroupComponent implements OnInit {
         maxDate: this.maxDate,
         order: 2
       })
-
     ];
     if (!taxComponent.isNew) {
       formfields.push(

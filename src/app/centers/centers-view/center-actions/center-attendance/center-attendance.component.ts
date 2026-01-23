@@ -1,8 +1,16 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { CentersService } from 'app/centers/centers.service';
@@ -16,6 +24,25 @@ import { TranslateService } from '@ngx-translate/core';
 import { Dates } from 'app/core/utils/dates';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
+import { MatFormField, MatLabel, MatHint } from '@angular/material/form-field';
+import { NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Center Attendance component.
@@ -23,9 +50,37 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 @Component({
   selector: 'mifosx-center-attendance',
   templateUrl: './center-attendance.component.html',
-  styleUrls: ['./center-attendance.component.scss']
+  styleUrls: ['./center-attendance.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatHint,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    NgSwitch,
+    NgSwitchCase,
+    MatIconButton,
+    FaIconComponent,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FindPipe,
+    DateFormatPipe
+  ]
 })
 export class CenterAttendanceComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+  private router = inject(Router);
+  private centersService = inject(CentersService);
+  private settingsService = inject(SettingsService);
+  dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** Members data. */
   membersData: any;
   /** Center Data */
@@ -57,15 +112,7 @@ export class CenterAttendanceComponent implements OnInit {
    * @param {SettingsService} settingsService Settings Service.
    * @param {MatDialog} dialog Mat Dialog
    */
-  constructor(
-    private route: ActivatedRoute,
-    private dateUtils: Dates,
-    private router: Router,
-    private centersService: CentersService,
-    private settingsService: SettingsService,
-    public dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { centersActionData: any }) => {
       this.centerData = data.centersActionData;
       this.membersData = data.centersActionData.clients;
@@ -110,7 +157,6 @@ export class CenterAttendanceComponent implements OnInit {
         options: { label: 'value', value: 'id', data: this.attendanceTypeOptions },
         required: false
       })
-
     ];
     const data = {
       title:

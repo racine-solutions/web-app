@@ -1,14 +1,35 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import { ChangePasswordDialogComponent } from 'app/shared/change-password-dialog/change-password-dialog.component';
-import { UserService } from 'app/self-service/users/user.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Profile Component.
@@ -16,9 +37,28 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow
+  ]
 })
 export class ProfileComponent implements OnInit {
+  private authenticationService = inject(AuthenticationService);
+  private settingsService = inject(SettingsService);
+  private router = inject(Router);
+  dialog = inject(MatDialog);
+
   /** Profile Data */
   profileData: any;
   /** Language, TODO: Update when df, locale settings are setup */
@@ -38,13 +78,9 @@ export class ProfileComponent implements OnInit {
    * @param {Router} router Router
    * @param {MatDialog} dialog Mat Dialog
    */
-  constructor(
-    private authenticationService: AuthenticationService,
-    private settingsService: SettingsService,
-    private userService: UserService,
-    private router: Router,
-    public dialog: MatDialog
-  ) {
+  constructor() {
+    const authenticationService = this.authenticationService;
+
     this.profileData = authenticationService.getCredentials();
   }
 
@@ -65,7 +101,7 @@ export class ProfileComponent implements OnInit {
         const password = response.password;
         const repeatPassword = response.repeatPassword;
         const data = { password: password, repeatPassword: repeatPassword };
-        this.userService.changePassword(this.profileData.userId, data).subscribe(() => {
+        this.authenticationService.changePassword(this.profileData.userId, data).subscribe(() => {
           this.router.navigate(['/home']);
         });
       }

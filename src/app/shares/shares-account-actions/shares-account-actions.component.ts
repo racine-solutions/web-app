@@ -1,9 +1,27 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Services */
 import { SharesService } from '../shares.service';
+import { ApproveSharesAccountComponent } from './approve-shares-account/approve-shares-account.component';
+import { RejectSharesAccountComponent } from './reject-shares-account/reject-shares-account.component';
+import { CloseSharesAccountComponent } from './close-shares-account/close-shares-account.component';
+import { ActivateSharesAccountComponent } from './activate-shares-account/activate-shares-account.component';
+import { UndoApprovalSharesAccountComponent } from './undo-approval-shares-account/undo-approval-shares-account.component';
+import { ApplySharesComponent } from './apply-shares/apply-shares.component';
+import { RedeemSharesComponent } from './redeem-shares/redeem-shares.component';
+import { ApproveSharesComponent } from './approve-shares/approve-shares.component';
+import { RejectSharesComponent } from './reject-shares/reject-shares.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Shares Account Actions Component
@@ -11,9 +29,23 @@ import { SharesService } from '../shares.service';
 @Component({
   selector: 'mifosx-shares-account-actions',
   templateUrl: './shares-account-actions.component.html',
-  styleUrls: ['./shares-account-actions.component.scss']
+  styleUrls: ['./shares-account-actions.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    ApproveSharesAccountComponent,
+    RejectSharesAccountComponent,
+    CloseSharesAccountComponent,
+    ActivateSharesAccountComponent,
+    UndoApprovalSharesAccountComponent,
+    ApplySharesComponent,
+    RedeemSharesComponent,
+    ApproveSharesComponent,
+    RejectSharesComponent
+  ]
 })
 export class SharesAccountActionsComponent {
+  private route = inject(ActivatedRoute);
+
   /** Shares Account Data */
   sharesAccountData: any;
   /** Flag object to store possible actions and render appropriate UI to the user */
@@ -42,8 +74,10 @@ export class SharesAccountActionsComponent {
   /**
    * @param {ActivatedRoute} route Activated Route
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     const name = this.route.snapshot.params['name'];
-    this.actions[name] = true;
+    if (name && name in this.actions) {
+      this.actions[name as keyof typeof this.actions] = true;
+    }
   }
 }

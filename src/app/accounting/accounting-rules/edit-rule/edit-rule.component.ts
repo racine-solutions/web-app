@@ -1,13 +1,25 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { AccountingService } from '../../accounting.service';
 
 /** Custom Validators */
 import { oneOfTheFieldsIsRequiredValidator } from '../one-of-the-fields-is-required.validator';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit accounting rule component.
@@ -15,9 +27,21 @@ import { oneOfTheFieldsIsRequiredValidator } from '../one-of-the-fields-is-requi
 @Component({
   selector: 'mifosx-edit-rule',
   templateUrl: './edit-rule.component.html',
-  styleUrls: ['./edit-rule.component.scss']
+  styleUrls: ['./edit-rule.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatRadioGroup,
+    MatRadioButton,
+    MatCheckbox,
+    CdkTextareaAutosize
+  ]
 })
 export class EditRuleComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private accountingService = inject(AccountingService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Accounting rule form. */
   accountingRuleForm: UntypedFormGroup;
   /** Accounting rule. */
@@ -38,12 +62,7 @@ export class EditRuleComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private accountingService: AccountingService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { accountingRulesTemplate: any; accountingRule: any }) => {
       this.officeData = data.accountingRulesTemplate.allowedOffices;
       this.glAccountData = data.accountingRulesTemplate.allowedAccounts;

@@ -1,20 +1,48 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { activities } from '../activities';
+import { MatAutocompleteTrigger, MatAutocomplete, MatOption } from '@angular/material/autocomplete';
+import { AsyncPipe } from '@angular/common';
+import { ClientTrendsBarComponent } from './client-trends-bar/client-trends-bar.component';
+import { AmountDisbursedPieComponent } from './amount-disbursed-pie/amount-disbursed-pie.component';
+import { AmountCollectedPieComponent } from './amount-collected-pie/amount-collected-pie.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 /**
  * Dashboard component.
  */
 @Component({
   selector: 'mifosx-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    ClientTrendsBarComponent,
+    AmountDisbursedPieComponent,
+    AmountCollectedPieComponent,
+    AsyncPipe
+  ]
 })
 export class DashboardComponent implements OnInit {
+  private router = inject(Router);
+
   /** Array of all user activities */
   userActivity: string[];
   /** Array of most recent user activities */
@@ -36,9 +64,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef
-  ) {
     this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
-  }
+  ) {
 
   ngOnInit() {
     this.recentActivities = this.getRecentActivities();
@@ -85,9 +112,10 @@ export class DashboardComponent implements OnInit {
    */
   getFrequentActivities() {
     const frequencyCounts: any = {};
-    let index = this.userActivity.length;
+    let index = this.userActivity?.length;
     while (index) {
-      frequencyCounts[this.userActivity[--index]] = (frequencyCounts[this.userActivity[index]] || 0) + 1;
+      const activity = this.userActivity[--index];
+      frequencyCounts[activity] = (frequencyCounts[activity] || 0) + 1;
     }
     const frequencyCountsArray = Object.entries(frequencyCounts);
     const topEigthFrequentActivities = frequencyCountsArray

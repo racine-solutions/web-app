@@ -1,13 +1,35 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { TooltipPosition } from '@angular/material/tooltip';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatDivider } from '@angular/material/divider';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-fixed-deposit-product-terms-step',
   templateUrl: './fixed-deposit-product-terms-step.component.html',
-  styleUrls: ['./fixed-deposit-product-terms-step.component.scss']
+  styleUrls: ['./fixed-deposit-product-terms-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    MatDivider,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class FixedDepositProductTermsStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+
   @Input() fixedDepositProductsTemplate: any;
 
   fixedDepositProductTermsForm: UntypedFormGroup;
@@ -17,7 +39,7 @@ export class FixedDepositProductTermsStepComponent implements OnInit {
   interestCalculationTypeData: any;
   interestCalculationDaysInYearTypeData: any;
 
-  constructor(private formBuilder: UntypedFormBuilder) {
+  constructor() {
     this.createFixedDepositProductTermsForm();
   }
 

@@ -1,14 +1,30 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Component, Input } from '@angular/core';
 import {
   AdvancePaymentAllocationData,
   CreditAllocation,
   PaymentAllocation
 } from 'app/products/loan-products/loan-product-stepper/loan-product-payment-strategy-step/payment-allocation-model';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-view-advance-paymeny-allocation',
   templateUrl: './view-advance-paymeny-allocation.component.html',
-  styleUrls: ['./view-advance-paymeny-allocation.component.scss']
+  styleUrls: ['./view-advance-paymeny-allocation.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle
+  ]
 })
 export class ViewAdvancePaymenyAllocationComponent {
   @Input() paymentAllocation: PaymentAllocation | null;

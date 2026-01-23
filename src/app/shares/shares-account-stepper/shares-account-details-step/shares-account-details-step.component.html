@@ -1,11 +1,21 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <form [formGroup]="sharesAccountDetailsForm">
-  <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
-    <mat-form-field fxFlex="48%">
+  <div class="layout-row-wrap gap-2px responsive-column">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Product Name' | translate }}</mat-label>
       <mat-select formControlName="productId" required>
-        <mat-option *ngFor="let product of productData" [value]="product.id">
-          {{ product.name }}
-        </mat-option>
+        @for (product of productData; track product) {
+          <mat-option [value]="product.id">
+            {{ product.name }}
+          </mat-option>
+        }
       </mat-select>
       <mat-error>
         {{ 'labels.inputs.Product Name' | translate }} {{ 'labels.commons.is' | translate }}
@@ -13,7 +23,7 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="48%" (click)="submittedOnDatePicker.open()">
+    <mat-form-field class="flex-48" (click)="submittedOnDatePicker.open()">
       <mat-label>{{ 'labels.inputs.Submitted On' | translate }}</mat-label>
       <input
         matInput
@@ -31,18 +41,24 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="48%">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.External ID' | translate }}</mat-label>
       <input matInput formControlName="externalId" />
     </mat-form-field>
   </div>
 
-  <div fxLayout="row" class="margin-t" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="2%">
+  <div class="layout-row align-center gap-2percent margin-t responsive-column">
     <button mat-raised-button matStepperPrevious disabled>
       <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
       {{ 'labels.buttons.Previous' | translate }}
     </button>
-    <button mat-raised-button matStepperNext>
+    <button
+      mat-raised-button
+      matStepperNext
+      [disabled]="
+        !(sharesAccountDetailsForm.get('productId')?.value && sharesAccountDetailsForm.get('submittedDate')?.value)
+      "
+    >
       {{ 'labels.buttons.Next' | translate }}
       <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
     </button>

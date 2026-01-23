@@ -1,6 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormArray } from '@angular/forms';
+import { Component, OnInit, Input, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormArray,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -17,6 +31,27 @@ import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+
+import { MatDivider } from '@angular/material/divider';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-recurring-deposit-product-interest-rate-chart-step',
@@ -26,11 +61,38 @@ import { TranslateService } from '@ngx-translate/core';
     trigger('expandChartSlab', [
       state('collapsed', style({ height: '0px', minHeight: '0' })),
       state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))])
-
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ])
+  ],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatDivider,
+    MatIconButton,
+    MatTooltip,
+    MatCheckbox,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    FindPipe
   ]
 })
 export class RecurringDepositProductInterestRateChartStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  dialog = inject(MatDialog);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+
   @Input() recurringDepositProductsTemplate: any;
 
   recurringDepositProductInterestRateChartForm: UntypedFormGroup;
@@ -70,13 +132,7 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
    * @param {SettingsService} settingsService Settings Service.
    */
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    public dialog: MatDialog,
-    private dateUtils: Dates,
-    private settingsService: SettingsService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.createrecurringDepositProductInterestRateChartForm();
   }
 
@@ -145,7 +201,7 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
         formArray.push(chartSlabInfo);
 
         // Iterate for every slab in chartSlab
-        const chartIncentiveControl = chartDetailControl.controls['chartSlabs']['controls'][j];
+        const chartIncentiveControl = (chartDetailControl.controls['chartSlabs'] as UntypedFormArray).controls[j];
 
         // Iterate to input all the incentive for particular chart slab
         this.chartsDetail[i].chartSlabs[j].incentives.forEach((chartIncentiveDetail: any) => {
@@ -175,7 +231,7 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
               Validators.required
             ]
           });
-          const newFormArray = chartIncentiveControl['controls']['incentives'] as UntypedFormArray;
+          const newFormArray = (chartIncentiveControl as UntypedFormGroup).controls['incentives'] as UntypedFormArray;
           newFormArray.push(incentiveInfo);
         });
       });
@@ -184,7 +240,14 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
 
   getChartsDetailsData() {
     this.chartDetailData.forEach((chartData: any) => {
-      const chart = {
+      const chart: {
+        id?: any;
+        endDate: string | Date;
+        fromDate: string | Date;
+        isPrimaryGroupingByAmount: any;
+        name: any;
+        chartSlabs: any[];
+      } = {
         endDate: chartData.endDate ? new Date(chartData.endDate) : '',
         fromDate: chartData.fromDate ? new Date(chartData.fromDate) : '',
         isPrimaryGroupingByAmount: chartData.isPrimaryGroupingByAmount,
@@ -212,7 +275,17 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
     }
 
     chartSlabData.forEach((eachChartSlabData: any) => {
-      const chartSlab = {
+      const chartSlab: {
+        id?: any;
+        periodType: any;
+        amountRangeFrom: any;
+        amountRangeTo: any;
+        annualInterestRate: any;
+        description: any;
+        fromPeriod: any;
+        toPeriod: any;
+        incentives: any[];
+      } = {
         periodType: eachChartSlabData.periodType.id,
         amountRangeFrom: eachChartSlabData.amountRangeFrom,
         amountRangeTo: eachChartSlabData.amountRangeTo,
@@ -433,7 +506,6 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
         required: true,
         order: 7
       })
-
     ];
     return formfields;
   }

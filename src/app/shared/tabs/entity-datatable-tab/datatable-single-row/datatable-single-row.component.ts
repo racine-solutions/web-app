@@ -1,4 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Datatables } from 'app/core/utils/datatables';
@@ -8,33 +16,56 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SystemService } from 'app/system/system.service';
+import { NgClass } from '@angular/common';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatDivider } from '@angular/material/divider';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { DatetimeFormatPipe } from '../../../../pipes/datetime-format.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { PrettyPrintPipe } from '../../../../pipes/pretty-print.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
 
 @Component({
   selector: 'mifosx-datatable-single-row',
   templateUrl: './datatable-single-row.component.html',
-  styleUrls: ['./datatable-single-row.component.scss']
+  styleUrls: ['./datatable-single-row.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatDivider,
+    MatCard,
+    MatCardContent,
+    NgClass,
+    CdkTextareaAutosize,
+    MatIconButton,
+    MatTooltip,
+    DateFormatPipe,
+    DatetimeFormatPipe,
+    FormatNumberPipe,
+    PrettyPrintPipe
+  ]
 })
 export class DatatableSingleRowComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+  private dialog = inject(MatDialog);
+  private settingsService = inject(SettingsService);
+  public datatables = inject(Datatables);
+  private systemService = inject(SystemService);
+
   @Input() dataObject: any;
   @Input() entityId: string;
   @Input() entityType: string;
   datatableName: string;
 
-  /**
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {Dates} dateUtils Date Utils.
-   * @param {SystemService} systemService System Service.
-   * @param {SettingsService} settingsService Settings Service
-   * @param {Datatables} datatables Datatable utils
-   */
-  constructor(
-    private route: ActivatedRoute,
-    private dateUtils: Dates,
-    private dialog: MatDialog,
-    private settingsService: SettingsService,
-    private datatables: Datatables,
-    private systemService: SystemService
-  ) {}
+  formatTabLabel(label: string): string {
+    return formatTabLabel(label);
+  }
 
   ngOnInit() {
     this.route.params.subscribe((routeParams: any) => {
@@ -54,7 +85,7 @@ export class DatatableSingleRowComponent implements OnInit {
       dataTableEntryObject
     );
     const data = {
-      title: 'Add ' + this.datatableName + ' for ' + this.entityType,
+      title: 'Add ' + formatTabLabel(this.datatableName) + ' for ' + this.entityType,
       formfields: formfields
     };
     const addDialogRef = this.dialog.open(FormDialogComponent, { data, width: '50rem' });
@@ -106,9 +137,10 @@ export class DatatableSingleRowComponent implements OnInit {
       return formfield;
     });
     const data = {
-      title: 'Edit ' + this.datatableName + ' for ' + this.entityType,
+      title: 'Edit ' + formatTabLabel(this.datatableName) + ' for ' + this.entityType,
       formfields: formfields,
-      layout: { addButtonText: 'Save' }
+      layout: { addButtonText: 'Submit' },
+      pristine: false
     };
     const editDialogRef = this.dialog.open(FormDialogComponent, { data, width: '50rem' });
     editDialogRef.afterClosed().subscribe((response: any) => {
@@ -133,7 +165,7 @@ export class DatatableSingleRowComponent implements OnInit {
 
   delete() {
     const deleteDataTableDialogRef = this.dialog.open(DeleteDialogComponent, {
-      data: { deleteContext: ` the contents of ${this.datatableName}` }
+      data: { deleteContext: ` the contents of ${formatTabLabel(this.datatableName)}` }
     });
     deleteDataTableDialogRef.afterClosed().subscribe((response: any) => {
       if (response.delete) {
@@ -154,6 +186,15 @@ export class DatatableSingleRowComponent implements OnInit {
   }
 
   getColumnType(columnDisplayType: string, columnType: string) {
+    if (
+      columnType &&
+      (columnType.toLowerCase().includes('timestamp') ||
+        columnType.toLowerCase() === 'created_at' ||
+        columnType.toLowerCase() === 'updated_at')
+    ) {
+      return 'DATETIME';
+    }
+
     switch (columnDisplayType) {
       case 'DATE': {
         return columnDisplayType;
@@ -165,6 +206,9 @@ export class DatatableSingleRowComponent implements OnInit {
         return columnDisplayType;
       }
       case 'DECIMAL': {
+        return columnDisplayType;
+      }
+      case 'CODELOOKUP': {
         return columnDisplayType;
       }
       case 'TEXT': {

@@ -1,13 +1,32 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { RecurringDepositsService } from '../../recurring-deposits.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { Currency } from 'app/shared/models/general.model';
+import { TransactionCommand, TransactionTypeFlags } from '../../../transaction.model';
+import { InputAmountComponent } from '../../../../shared/input-amount/input-amount.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Deposits Recurring Deposits Account Component
@@ -15,9 +34,22 @@ import { Currency } from 'app/shared/models/general.model';
 @Component({
   selector: 'mifosx-deposit-recurring-deposits-account',
   templateUrl: './deposit-recurring-deposits-account.component.html',
-  styleUrls: ['./deposit-recurring-deposits-account.component.scss']
+  styleUrls: ['./deposit-recurring-deposits-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    InputAmountComponent,
+    MatSlideToggle,
+    CdkTextareaAutosize
+  ]
 })
 export class DepositRecurringDepositsAccountComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private recurringDepositsService = inject(RecurringDepositsService);
+  private settingsService = inject(SettingsService);
+
   @Input() currency: Currency;
 
   /** Transactions Amount */
@@ -39,8 +71,8 @@ export class DepositRecurringDepositsAccountComponent implements OnInit {
 
   action: string;
   actionName: string;
-  transactionCommand: string;
-  transactionType: { deposit: boolean; withdrawal: boolean } = { deposit: false, withdrawal: false };
+  transactionCommand: TransactionCommand;
+  transactionType: TransactionTypeFlags = { deposit: false, withdrawal: false };
 
   /**
    * Retrieves action details transactions template data from `resolve`
@@ -50,14 +82,7 @@ export class DepositRecurringDepositsAccountComponent implements OnInit {
    * @param {Dates} dateUtils Date Utils
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private recurringDepositsService: RecurringDepositsService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { recurringDepositsAccountActionData: any }) => {
       this.transactionAmount = data.recurringDepositsAccountActionData.amount;
       this.paymentTypes = data.recurringDepositsAccountActionData.paymentTypeOptions;
@@ -66,13 +91,18 @@ export class DepositRecurringDepositsAccountComponent implements OnInit {
         data.recurringDepositsAccountActionData.outstandingChargeAmount > 0
       ) {
         this.outstandingChargeAmount = data.recurringDepositsAccountActionData.outstandingChargeAmount;
-        this.transactionAmount = this.transactionAmount + this.outstandingChargeAmount;
+        this.transactionAmount += this.outstandingChargeAmount;
       }
     });
     this.actionName = this.route.snapshot.params['name'];
     this.action = this.actionName.toLowerCase();
-    this.transactionCommand = this.action.toLowerCase();
-    this.transactionType[this.transactionCommand] = true;
+    if (this.action === 'deposit' || this.action === 'withdrawal') {
+      this.transactionCommand = this.action;
+      this.transactionType[this.transactionCommand] = true;
+    } else {
+      throw new Error(`Invalid transaction action: ${this.actionName}`);
+    }
+
     this.accountId = this.route.parent.snapshot.params['recurringDepositAccountId'];
   }
 

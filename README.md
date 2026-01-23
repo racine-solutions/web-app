@@ -1,242 +1,343 @@
-# Mifos X Web App ![build](https://github.com/openMF/web-app/actions/workflows/build.yml/badge.svg) [testRigor](https://app.testrigor.com/public/X3THbQd9nxLMxkdPu) [Slack](https://app.slack.com/client/T0F5GHE8Y/CJJGJLN10)
+# Mifos® X Web App ![build](https://github.com/openMF/web-app/actions/workflows/build.yml/badge.svg)
 
-Mifos X Web App is the revamped version of the Mifos X Community App, an effective financial inclusion solution and the default web application built on top of the Mifos X platform for the Mifos User Community.
+## Overview
 
-It is a Single-Page App (SPA) written in standard web technologies [HTML5](http://whatwg.org/html), [SCSS](http://sass-lang.com) and [TypeScript](http://www.typescriptlang.org). It leverages the popular [Angular](https://angular.io/) framework and [Angular Material](https://material.angular.io/) for material design components.
+Mifos® X Web App is a modern single-page application (SPA) built on top of the Mifos® X platform for financial inclusion. It serves as the default web interface for the Mifos® user community.
 
-## Getting started using
+**Technologies Used:**
 
-The latest code is continuously deployed at [https://sandbox.mifos.community/#/login](https://sandbox.mifos.community/#/login) every night.
+- HTML5, SCSS, and TypeScript
+- Angular framework
+- Angular Material components
 
-## Getting started developing
+## Quick Links
 
-1. Ensure you have the following installed in your system:
+- [Live Demo](https://sandbox.mifos.community/#/login) (Updated nightly — sandbox data is reset every 6 hours; test data and transient state may be cleared.)
+- [GitHub Repository](https://github.com/openMF/web-app)
+- [Slack Channel](https://app.slack.com/client/T0F5GHE8Y/CJJGJLN10)
+- [Jira Board of Mifos](https://mifosforge.jira.com/jira/your-work)
+- [Jira Board of Mifos Web App Project](https://mifosforge.jira.com/jira/software/c/projects/WEB/boards/62)
 
-   [`git`](https://git-scm.com/downloads)
+## Installation Guide
 
-   [`nodeJs`](https://nodejs.org/en/download/)
+### Prerequisites for All Methods
 
-2. Install [angular-cli](https://github.com/angular/angular-cli) globally.
+- Git: [Download here](https://git-scm.com/downloads)
+- Mifos® X Backend (Apache Fineract®) - **Required before running the web app**
 
-```
-npm install -g @angular/cli@16.0.2
-```
+### Backend Setup (REQUIRED FIRST)
 
-3. Clone the project locally into your system.
+Before installing the web app, you need to set up the Apache Fineract® backend server:
 
-```
-git clone https://github.com/openMF/web-app.git
-```
+1. **Choose ONE of these backend options:**
+   - **Option A: Use existing remote server**
+   - Use the [sandbox (MariaDB)](https://sandbox.mifos.community) — sandbox data is reset every 6 hours; test data and transient state may be cleared.
+   - Use the [demo (MariaDB)](https://demo.mifos.community)
+   - Use the [demo (Keycloak)](https://oauth.mifos.community)
+   - Use the [demo (2FA)](https://2fa.mifos.community)
+   - Use the [demo (Oidc)](https://oidc.mifos.community)
+   - Use the [demo (Postgres)](https://elephant.mifos.community)
+   - Configure to your server by updating API URLs in environment files
 
-4. `cd` into project root directory and make sure you are on the master branch.
+   - **Option B: Install local Fineract server**
 
-5. Install the dependencies.
+     [Installation Guide](https://github.com/apache/fineract?tab=readme-ov-file#instructions-how-to-run-for-local-development)
 
-```
-npm install
-```
+   - **Option C: Docker Compose for full stack**
+     - See Docker Compose section below for one-step backend+frontend setup
 
-6. To preview the app, run the following command and navigate to `http://localhost:4200/`.
+2. **Configure environment files to point to your backend:**
+   - Update `environments/environment.ts` (development)
+   - Update `environments/environment.prod.ts` (production)
+   - Change OAuth2 settings if needed (disabled by default)
 
-```
-ng serve
-```
+### Frontend Setup (Web App)
 
-The application is using the development server with basic authentication by default. The credentials for the same are:
+Choose ONE of the following methods to install the web app:
 
-    Username - mifos
-    Password - password
+#### Method 1: Manual Installation
 
-**Important Note:** Please do not make any alterations to these credentials.
+1. Install Node.js: [Download here](https://nodejs.org/en/download/)
+2. Install Angular CLI:
+   ```
+   npm install -g @angular/cli@16.0.2
+   ```
+3. Clone the repository:
+   ```
+   git clone https://github.com/openMF/web-app.git
+   ```
+   For Windows:
+   ```
+   git clone https://github.com/openMF/web-app.git --config core.autocrlf=input
+   ```
+4. Navigate to the project directory:
+   ```
+   cd web-app
+   ```
+5. Install dependencies:
+   ```
+   npm install
+   ```
+6. Start the development server:
+   ```
+   ng serve
+   ```
+7. Access the application at `http://localhost:4200/`
 
-### Development server
+#### Method 2: Docker Container Only
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. Build the Docker image:
+   ```
+   docker build -t openmf/web-app:latest .
+   ```
+2. Run the container:
+   ```
+   docker run -d -p 4200:80 openmf/web-app:latest
+   ```
+3. Access the application at `http://localhost:4200/`
 
-### Code scaffolding
+#### Method 3: Docker Compose (Frontend + Backend)
 
-Run `ng generate component component-name` to generate a new component. You can also use
-`ng generate directive|pipe|service|class|guard|interface|enum|module`.
+This sets up both the Mifos® X Web App and Apache Fineract® backend:
 
-### Build
+1. Clone the repository:
+   ```
+   git clone https://github.com/openMF/web-app.git
+   cd web-app
+   ```
+   For Windows:
+   ```
+   git clone https://github.com/openMF/web-app.git --config core.autocrlf=input
+   cd web-app
+   ```
+2. Start Docker Compose:
+   ```
+   docker compose up -d
+   ```
+3. Access the application at `http://localhost:4200/`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--configuration production` flag for a production build.
+## Default Login Credentials
 
-Run `npm run build:prod` to build a production artifacts Instead.
+When using the development server with basic authentication:
 
-### Further help
+- **Username:** mifos
+- **Password:** password
 
-To get more help on the Angular CLI use `ng help` or go check out the
-[Angular-CLI README](https://github.com/angular/angular-cli).
+**Important:** Do not alter these credentials.
 
-## Setting up a local server
+## Development Commands
 
-Follow the given instructions for your operating system to setup a local server for the Mifos X platform.
+- **Serve application:** `ng serve`
+- **Generate new component:** `ng generate component component-name`
+- **Build for production:** `ng build --configuration production` or `npm run build:prod`
+- **Get Angular CLI help:** `ng help`
 
-[Windows](https://cwiki.apache.org/confluence/display/FINERACT/Fineract-platform+Installation+on+Windows)
+## Proxy Configuration
 
-[Ubuntu](https://cwiki.apache.org/confluence/display/FINERACT/Fineract+Installation+on+Ubuntu+Server)
+The web app includes a proxy configuration (`proxy.conf.js`) that allows you to forward API requests to a remote Fineract backend during local development. This helps avoid CORS issues and enables you to work against production-like environments.
 
-For connecting to server running elsewhere update the base API URL and/or tenant identifier property in the `environments/environment.ts` file and `environments/environment.prod.ts` file for development and production use respectively.
+### Using the Sandbox Proxy (Default)
 
-By default OAuth2 is disabled. To enable it, change the value of oauth.enabled property to true in the `environments/environment.ts` file and `environments/environment.prod.ts` file for development and production use respectively.
+By default, the proxy forwards `/fineract-provider` requests to the Mifos sandbox environment:
 
-### Docker
+- **Target:** `https://sandbox.mifos.community`
+- **API Endpoint:** `https://apis.mifos.community` (exposed in the sandbox)
+- **System Reset:** Sandbox test data and transient state are reset every 6 hours (expect data to be periodically cleared).
 
-To locally build this Docker image from source (after `git clone` this repo), run:
+**Sandbox Environment Variables:**
 
-```
-docker build -t openmf/web-app:latest .
-```
-
-You can then run a Docker Container from the image above like this:
-
-```
-docker run -d -p 4200:80 openmf/web-app:latest
-```
-
-Access the webapp on http://localhost:4200 in your browser.
-
-### Docker compose
-
-It is possible to do a 'one-touch' installation of Mifos X Web App using containers (AKA "Docker").
-Fineract now packs the Mifos community-app web UI in it's docker deploy.
-
-As Prerequisites, you must have `docker` and Docker Compose v2 or later installed on your machine; see
-[Docker Install](https://docs.docker.com/install/) and
-[Docker Compose Install](https://docs.docker.com/compose/install/).
-
-Now to run a new MifosX Web App instance you can simply:
-
-1. `git clone https://github.com/openMF/web-app.git ; cd web-app`
-1. for windows, use `git clone https://github.com/openMF/web-app.git --config core.autocrlf=input ; cd web-app`
-1. `docker compose up -d`
-1. Access the webapp on http://localhost:4200 in your browser.
-
-You can also setup different configurations for the MifosX Web App using environment variables:
-
-1. Use environment variables (best choice if you run with Docker Compose):
-
-Fineract backend settings
-
-```
-FINERACT_API_URLS
-```
-
-Value to set a Fineract server list (environments) to be used, Default value:
-
-```
-https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443
-```
-
-```
-FINERACT_API_URL
-```
-
-Default value used from the Fineract server list. Default value:
-
-```
-https://localhost:8443
-```
-
-```
-FINERACT_PLATFORM_TENANT_IDENTIFIER
-```
-
-Fineract Tenant identifier to be used by default, It must be aligned with the Fineract `tenants` table. Default value:
-
-```
-default
-```
-
-```
-FINERACT_PLATFORM_TENANTS_IDENTIFIER
-```
-
-Fineract Tenant identifier list to be used, Those must be aligned with the Fineract `tenants` table.
-
-Setting for Languages (i18n) still under development
-
-```
+```bash
+FINERACT_API_URLS=https://apis.mifos.community
+FINERACT_API_URL=https://apis.mifos.community
+FINERACT_API_PROVIDER=/fineract-provider/api
+FINERACT_API_ACTUATOR=/fineract-provider
+FINERACT_API_VERSION=/v1
+FINERACT_PLATFORM_TENANT_IDENTIFIER=default
 MIFOS_DEFAULT_LANGUAGE=en-US
-```
-
-```
 MIFOS_SUPPORTED_LANGUAGES=cs-CS,de-DE,en-US,es-MX,fr-FR,it-IT,ko-KO,lt-LT,lv-LV,ne-NE,pt-PT,sw-SW
-```
-
-These are the Language available now:
-
-```
-MIFOS_SESSION_IDLE_TIMEOUT=300000
-```
-
-Time in milliseconds for Session idle timeout, default 300000 seconds
-
-|  Language  | Code |    File    |
-| :--------: | :--: | :--------: |
-|   Czech    |  cs  | cs-CS.json |
-|   German   |  de  | de-DE.json |
-|  English   |  en  | en-US.json |
-|  Spanish   |  es  | es-MX.json |
-|   French   |  fr  | fr-FR.json |
-|  Italian   |  it  | it-IT.json |
-|   Korean   |  ko  | ko-KO.json |
-| Lithuanian |  li  | li-LI.json |
-|  Latvian   |  lv  | lv-LV.json |
-|   Nepali   |  ne  | ne-NE.json |
-| Portuguese |  pt  | pt-PT.json |
-|  Swahili   |  sw  | sw-SW.json |
-
-Setting for applying the Client preload in the Clients view, Default true
-
-```
-MIFOS_PRELOAD_CLIENTS=false
-```
-
-Setting for exporting report table to CSV file using this field delimiter
-
-```
+MIFOS_PRELOAD_CLIENTS=true
 MIFOS_DEFAULT_CHAR_DELIMITER=,
 ```
 
-Setting for Wait time in seconds for reading the user notifications, Default 60 seconds
+### Using a Local Fineract Instance
 
+To proxy to a local Fineract server instead:
+
+Use the provided localhost proxy file (recommended for `ng serve`):
+
+1. Start the dev server with the localhost proxy:
+
+   ```bash
+   ng serve --proxy-config proxy.localhost.conf.js
+   ```
+
+2. Ensure your local Fineract instance is running on `http://localhost:8443`.
+
+Notes:
+
+- `proxy.localhost.conf.js` forwards `/fineract-provider` to your local backend to avoid CORS during development.
+- The `HttpsProxyAgent` / `setupForProxy` logic (present in `proxy.conf.js`) is only necessary when an upstream corporate/HTTP proxy must be used (set via `HTTP_PROXY`/`http_proxy`). It is not required for a direct `localhost` backend.
+
+### Proxy Features
+
+- **CORS Avoidance:** Eliminates cross-origin issues during local development
+- **Error Handling:** Gracefully handles proxy failures with detailed logging
+- **Corporate Proxy Support:** Maintains support for corporate proxy agents via `HTTP_PROXY` environment variable
+- **Debug Logging:** All proxy requests are logged for troubleshooting
+
+The proxy is configured to work with Fineract endpoints as described in this section.
+
+### Testing the Proxy
+
+To verify the proxy is working correctly, start the development server (`ng serve`) and test with curl:
+
+**Successful proxy request:**
+
+```bash
+curl -i "http://localhost:4200/fineract-provider/api/v1/runreports/FullClientReport?R_officeId=1&output-type=HTML&R_loanOfficerId=-1"
 ```
-MIFOS_WAIT_TIME_FOR_NOTIFICATIONS=60
+
+Expected: HTTP 200 response with proxied data from the sandbox. Server console shows:
+
+```text
+[Proxy] Proxying: GET /fineract-provider/api/v1/runreports/... -> https://sandbox.mifos.community/api/v1/runreports/...
 ```
 
-Setting for Wait time in seconds for reading the COB Catch-Up status, Default 30 seconds
+**Simulated proxy error (backend unreachable):**
 
-```
-MIFOS_WAIT_TIME_FOR_CATCHUP=30
-```
+If the backend is unreachable or returns an error, the proxy returns HTTP 502:
 
-Setting for display or hide the Tenant selector in the Login view (mainly for Production environments and for security reasons), Default true
-
-```
-MIFOS_DISPLAY_TENANT_SELECTOR=false
+```bash
+# Stop your Fineract backend (if using localhost) or test with an invalid target
+# The proxy will log the error and return:
 ```
 
-Setting for display or hide the Backend info (url) in the footer part (mainly for security reasons), Default true
+Server console (example):
 
+```text
+[Proxy] Error while proxying request: GET /fineract-provider/... -> https://sandbox.mifos.community - ECONNREFUSED
 ```
-MIFOS_DISPLAY_BACKEND_INFO=false
+
+HTTP response:
+
+```http
+HTTP/1.1 502 Bad Gateway
+Content-Type: text/plain
+
+Proxy error: connect ECONNREFUSED
 ```
 
-For more information look the env.sample file in the root directory of the project
+## Configuration Options
 
-# Jira Links
+### Environment Variables for Docker
 
-Jira Board Link: [Kanban Board]
-https://mifosforge.jira.com/jira/your-work
+All these environment variables can be set when using Docker or Docker Compose:
 
-Jira Web App Project Link:  
-https://mifosforge.jira.com/jira/software/c/projects/WEB/boards/62
+#### Fineract Backend Settings
 
-## Want to help? [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/openMF/web-app/issues)
+| Variable                             | Description                                                          | Default Value                                                                       |
+| ------------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| FINERACT_API_URLS                    | Fineract server list                                                 | https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443 |
+| FINERACT_API_URL                     | Default Fineract server                                              | https://localhost:8443                                                              |
+| FINERACT_API_ACTUATOR                | Default Fineract Actuator endpoint                                   | /fineract-provider                                                                  |
+| FINERACT_PLATFORM_TENANT_IDENTIFIER  | Default tenant identifier (must align with Fineract `tenants` table) | default                                                                             |
+| FINERACT_PLATFORM_TENANTS_IDENTIFIER | Tenant identifier list (must align with Fineract `tenants` table)    | -                                                                                   |
 
-Want to file a bug, request a feature, contribute some code, or improve documentation? Excellent! Read up on our guidelines for [contributing](.github/CONTRIBUTING.md) and then check out one of our [issues](https://github.com/openMF/web-app/issues). Make sure you follow the guidelines before sending a contribution!
+#### Language Settings (i18n)
 
-Apache Fineract provides open APIs and affordable core banking solution for financial institutions
-and it is the backend for all UIs of the Mifos. Its GitHub Repository is (https://github.com/apache/fineract)
+| Variable                  | Description                 | Default Value                                                           |
+| ------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| MIFOS_DEFAULT_LANGUAGE    | Default language            | en-US                                                                   |
+| MIFOS_SUPPORTED_LANGUAGES | List of supported languages | cs-CS,de-DE,en-US,es-MX,fr-FR,it-IT,ko-KO,lt-LT,lv-LV,ne-NE,pt-PT,sw-SW |
+
+Available languages:
+
+| Language   | Code | File       |
+| ---------- | ---- | ---------- |
+| Czech      | cs   | cs-CS.json |
+| German     | de   | de-DE.json |
+| English    | en   | en-US.json |
+| Spanish    | es   | es-MX.json |
+| French     | fr   | fr-FR.json |
+| Italian    | it   | it-IT.json |
+| Korean     | ko   | ko-KO.json |
+| Lithuanian | lt   | lt-LT.json |
+| Latvian    | lv   | lv-LV.json |
+| Nepali     | ne   | ne-NE.json |
+| Portuguese | pt   | pt-PT.json |
+| Swahili    | sw   | sw-SW.json |
+
+#### Session & Performance Settings
+
+| Variable                          | Description                                          | Default Value |
+| --------------------------------- | ---------------------------------------------------- | ------------- |
+| MIFOS_SESSION_IDLE_TIMEOUT        | Session timeout in milliseconds                      | 300000        |
+| MIFOS_PRELOAD_CLIENTS             | Whether to preload clients in Clients view           | true          |
+| MIFOS_DEFAULT_CHAR_DELIMITER      | Character delimiter for CSV exports                  | ,             |
+| MIFOS_WAIT_TIME_FOR_NOTIFICATIONS | Wait time in seconds for reading notifications       | 60            |
+| MIFOS_WAIT_TIME_FOR_CATCHUP       | Wait time in seconds for reading COB Catch-Up status | 30            |
+| MIFOS_MIN_PASSWORD_LENGTH         | Minimum length for user passwords                    | 12            |
+| MIFOS_HTTP_CACHE_ENABLED          | whether to use HTTP Get calls with cache             | false         |
+
+#### UI Display Settings
+
+| Variable                           | Description                            | Default Value |
+| ---------------------------------- | -------------------------------------- | ------------- |
+| MIFOS_DISPLAY_TENANT_SELECTOR      | Display tenant selector in Login view  | true          |
+| MIFOS_DISPLAY_BACKEND_INFO         | Display backend info in footer         | true          |
+| MIFOS_ALLOW_SERVER_SWITCH_SELECTOR | Display DNS server list                | true          |
+| MIFOS_COMPLIANCE_HIDE_CLIENT_DATA  | Hide client names in UI (mask with \*) | false         |
+
+#### OAUTH Settings
+
+| Variable                   | Description                    | Default Value |
+| -------------------------- | ------------------------------ | ------------- |
+| MIFOS_OAUTH_SERVER_ENABLED | Enable the use of Oauth server | false         |
+| MIFOS_OAUTH_SERVER_URL     | Set the Oauth server URL       |               |
+| MIFOS_OAUTH_CLIENT_ID      | Set the Client Id              |               |
+
+#### OIDC Settings
+
+| Variable                          | Description                    | Default Value |
+| --------------------------------- | ------------------------------ | ------------- |
+| FINERACT_PLUGIN_OIDC_ENABLED      | Enable the use of Oidc server  | false         |
+| FINERACT_PLUGIN_OIDC_BASE_URL     | Set the Oidc server URL        |               |
+| FINERACT_PLUGIN_OIDC_CLIENT_ID    | Set the Client Id              |               |
+| FINERACT_PLUGIN_OIDC_API_URL      | Set the Client API URL         |               |
+| FINERACT_PLUGIN_OIDC_FRONTEND_URL | Set the Front End URL callback |               |
+
+For more detailed configuration options, refer to the `env.sample` file in the root directory of the project.
+
+### Client Data Masking Example
+
+When `MIFOS_COMPLIANCE_HIDE_CLIENT_DATA=false` (default):
+
+EMANUEL CASTILLO
+MIGUEL TECO
+
+When `MIFOS_COMPLIANCE_HIDE_CLIENT_DATA=true`:
+
+E**\*** C**\*\*\***
+M**\*** T\*\*\*
+
+This applies to client name display, e.g. in Institution/Clients list.
+
+## Releases
+
+### 1.0.0 (Tag: 1.0.0-fineract1.11)
+
+This is the first official release of the Mifos® X web application:
+
+- Developed for Apache Fineract® 1.11
+- No Self Service area
+- GLIM support limited
+- JLG not yet supported
+- Surveys not yet supported
+
+## Contributing
+
+We welcome contributions! Please read our [contribution guidelines](./CONTRIBUTING.md) before submitting pull requests.
+
+## Related Projects
+
+[Apache Fineract](https://github.com/apache/fineract) - Apache Fineract® provides open APIs and affordable core banking solution for financial institutions and is the backend for all UIs of the Mifos®.

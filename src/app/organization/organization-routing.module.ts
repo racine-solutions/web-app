@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -52,7 +60,7 @@ import { ViewBulkImportComponent } from './bulk-import/view-bulk-import/view-bul
 import { ViewLoanProvisioningCriteriaComponent } from './loan-provisioning-criteria/view-loan-provisioning-criteria/view-loan-provisioning-criteria.component';
 import { CreateCampaignComponent } from './sms-campaigns/create-campaign/create-campaign.component';
 import { EditCampaignComponent } from './sms-campaigns/edit-campaign/edit-campaign.component';
-import { CreateEnityDataTableChecksComponent } from './entity-data-table-checks/create-enity-data-table-checks/create-enity-data-table-checks.component';
+import { CreateEntityDataTableChecksComponent } from './entity-data-table-checks/create-entity-data-table-checks/create-entity-data-table-checks.component';
 import { CreateLoanProvisioningCriteriaComponent } from './loan-provisioning-criteria/create-loan-provisioning-criteria/create-loan-provisioning-criteria.component';
 import { BulkLoanReassignmnetComponent } from './bulk-loan-reassignmnet/bulk-loan-reassignmnet.component';
 import { EditLoanProvisioningCriteriaComponent } from './loan-provisioning-criteria/edit-loan-provisioning-criteria/edit-loan-provisioning-criteria.component';
@@ -339,7 +347,7 @@ const routes: Routes = [
         {
           path: 'fund-mapping',
           component: FundMappingComponent,
-          data: { title: 'Advance Search', breadcrumb: 'Advance Search' },
+          data: { title: 'Fund Mapping', breadcrumb: 'Fund Mapping' },
           resolve: {
             advanceSearchTemplate: AdvanceSearchTemplateResolver
           }
@@ -550,7 +558,7 @@ const routes: Routes = [
         {
           path: 'bulkloan',
           component: BulkLoanReassignmnetComponent,
-          data: { title: 'Bulk Loan Reassignment', breadcrumb: 'Bulk Loan Reasssignment' },
+          data: { title: 'Bulk Loan Reassignment', breadcrumb: 'Bulk Loan Reassignment' },
           resolve: {
             offices: OfficesResolver
           }
@@ -568,7 +576,7 @@ const routes: Routes = [
             },
             {
               path: 'create',
-              component: CreateEnityDataTableChecksComponent,
+              component: CreateEntityDataTableChecksComponent,
               data: { title: 'Create Entity Data Table Checks', breadcrumb: 'Create' },
               resolve: {
                 dataTableEntity: EntityDataTableChecksTemplateResolver
@@ -695,7 +703,6 @@ const routes: Routes = [
       ]
     }
   ])
-
 ];
 
 /**

@@ -1,16 +1,64 @@
-import { Component, Input, OnInit } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
 import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { ChargesFilterPipe } from '../../../../pipes/charges-filter.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-saving-product-charges-step',
   templateUrl: './saving-product-charges-step.component.html',
-  styleUrls: ['./saving-product-charges-step.component.scss']
+  styleUrls: ['./saving-product-charges-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    ChargesFilterPipe,
+    FormatNumberPipe
+  ]
 })
 export class SavingProductChargesStepComponent implements OnInit {
+  dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   @Input() savingProductsTemplate: any;
   @Input() currencyCode: UntypedFormControl;
 
@@ -26,11 +74,6 @@ export class SavingProductChargesStepComponent implements OnInit {
   ];
 
   pristine = true;
-
-  constructor(
-    public dialog: MatDialog,
-    private translateService: TranslateService
-  ) {}
 
   ngOnInit() {
     this.chargeData = this.savingProductsTemplate.chargeOptions;

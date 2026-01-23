@@ -1,17 +1,26 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 /** Environment Configuration */
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 
 /** Custom Services */
 import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
+import { TranslateService } from '@ngx-translate/core'; // Added import for TranslateService
 
 /** Initialize Logger */
 const log = new Logger('ErrorHandlerInterceptor');
@@ -21,22 +30,20 @@ const log = new Logger('ErrorHandlerInterceptor');
  */
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
-  /**
-   * @param {AlertService} alertService Alert Service.
-   */
-  constructor(private alertService: AlertService) {}
+  private alertService = inject(AlertService);
+  private translate = inject(TranslateService);
 
   /**
    * Intercepts a Http request and adds a default error handler.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(catchError((error) => this.handleError(error)));
+    return next.handle(request).pipe(catchError((error) => this.handleError(error, request)));
   }
 
   /**
    * Error handler.
    */
-  private handleError(response: HttpErrorResponse): Observable<HttpEvent<any>> {
+  private handleError(response: HttpErrorResponse, request: HttpRequest<any>): Observable<HttpEvent<any>> {
     const status = response.status;
     let errorMessage = response.error.developerMessage || response.message;
     if (response.error.errors) {
@@ -45,7 +52,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       }
     }
 
-    if (!environment.production) {
+    const isClientImage404 = status === 404 && request.url.includes('/clients/') && request.url.includes('/images');
+
+    if (!environment.production && !isClientImage404) {
       log.error(`Request Error: ${errorMessage}`);
     }
 
@@ -64,11 +73,26 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
         message: errorMessage || 'You are not authorized for this request!'
       });
     } else if (status === 404) {
-      this.alertService.alert({ type: 'Resource does not exist', message: errorMessage || 'Resource does not exist!' });
+      // Check if this is an image request that should be silently handled (client profile image)
+      if (isClientImage404) {
+        // Don't show alerts for missing client images
+        // This is an expected condition, not an error
+        return EMPTY;
+      } else {
+        this.alertService.alert({
+          type: this.translate.instant('error.resource.not.found'),
+          message: errorMessage || 'Resource does not exist!'
+        });
+      }
     } else if (status === 500) {
       this.alertService.alert({
         type: 'Internal Server Error',
         message: 'Internal Server Error. Please try again later.'
+      });
+    } else if (status === 501) {
+      this.alertService.alert({
+        type: this.translate.instant('error.resource.notImplemented.type'),
+        message: this.translate.instant('error.resource.notImplemented.message')
       });
     } else {
       this.alertService.alert({ type: 'Unknown Error', message: 'Unknown Error. Please try again later.' });

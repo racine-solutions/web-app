@@ -1,5 +1,19 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div class="container">
-  <mat-horizontal-stepper class="mat-elevation-z8" labelPosition="bottom" #recurringDepositAccountStepper>
+  <mat-stepper
+    orientation="vertical"
+    [linear]="false"
+    class="mat-elevation-z8"
+    labelPosition="bottom"
+    #recurringDepositAccountStepper
+  >
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -72,16 +86,17 @@
       </mifosx-recurring-deposits-account-charges-step>
     </mat-step>
 
-    <mat-step state="preview" *ngIf="recurringDepositAccountFormValidAndNotPristine" completed>
-      <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
-
-      <mifosx-recurring-deposits-account-preview-step
-        [recurringDepositsAccountTemplate]="recurringDepositsAccountAndTemplate"
-        [recurringDepositsAccountProductTemplate]="recurringDepositsAccountProductTemplate"
-        [recurringDepositAccountData]="recurringDepositAccountData"
-        (submitEvent)="submit()"
-      >
-      </mifosx-recurring-deposits-account-preview-step>
-    </mat-step>
-  </mat-horizontal-stepper>
+    @if (recurringDepositAccountFormValidAndNotPristine) {
+      <mat-step state="preview" completed>
+        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <mifosx-recurring-deposits-account-preview-step
+          [recurringDepositsAccountTemplate]="recurringDepositsAccountAndTemplate"
+          [recurringDepositsAccountProductTemplate]="recurringDepositsAccountProductTemplate"
+          [recurringDepositAccountData]="recurringDepositAccountData"
+          (submitEvent)="submit()"
+        >
+        </mifosx-recurring-deposits-account-preview-step>
+      </mat-step>
+    }
+  </mat-stepper>
 </div>

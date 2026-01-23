@@ -1,14 +1,26 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 .search-bar {
   .search {
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     font-size: 1rem;
+    color: white;
   }
 
   .resource {
-    max-width: 90px;
+    min-width: 100px;
+    max-width: 100px;
     width: 100%;
     font-size: 1rem;
+    color: white;
+    padding-left: 5px;
   }
 }
 
@@ -16,4 +28,18 @@
   margin-left: 1rem;
   display: flex;
   align-items: center;
+}
+
+.mat-mdc-floating-label,
+mat-form-field input {
+  color: white !important;
+  height: 16px;
+  transition: height ease-in-out 400ms;
+}
+
+mat-form-field input:focus {
+  color: white !important;
+  background-color: transparent;
+  height: 16px;
+  transition: height ease-in-out 400ms;
 }

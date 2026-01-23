@@ -1,7 +1,18 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl } from '@angular/forms';
+import { Component, OnInit, Input, OnChanges, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Recurring Deposits Terms Step
@@ -9,9 +20,18 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-recurring-deposits-account-terms-step',
   templateUrl: './recurring-deposits-account-terms-step.component.html',
-  styleUrls: ['./recurring-deposits-account-terms-step.component.scss']
+  styleUrls: ['./recurring-deposits-account-terms-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class RecurringDepositsAccountTermsStepComponent implements OnInit, OnChanges {
+  private formBuilder = inject(UntypedFormBuilder);
+  private settingsService = inject(SettingsService);
+
   @Input() recurringDepositsAccountTemplate: any;
   @Input() recurringDepositsAccountProductTemplate: any;
 
@@ -34,10 +54,7 @@ export class RecurringDepositsAccountTermsStepComponent implements OnInit, OnCha
    * @param {FormBuilder} formBuilder Form Builder
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.createRecurringDepositsAccountTermsForm();
   }
 

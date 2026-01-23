@@ -1,10 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ClientsService } from '../../../clients.service';
 import { AuthenticationService } from '../../../../core/authentication/authentication.service';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Take Survey Component
@@ -12,9 +23,20 @@ import { AuthenticationService } from '../../../../core/authentication/authentic
 @Component({
   selector: 'mifosx-take-survey',
   templateUrl: './take-survey.component.html',
-  styleUrls: ['./take-survey.component.scss']
+  styleUrls: ['./take-survey.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatRadioGroup,
+    FormsModule,
+    MatRadioButton
+  ]
 })
 export class TakeSurveyComponent {
+  private route = inject(ActivatedRoute);
+  private clientsService = inject(ClientsService);
+  private router = inject(Router);
+  private authenticationService = inject(AuthenticationService);
+
   /** List of all Survey Data */
   allSurveyData: any;
   /** User Id */
@@ -43,12 +65,7 @@ export class TakeSurveyComponent {
    * @param {Router} router Router
    * @param {AuthenticationService} authenticationService AuthenticationService
    */
-  constructor(
-    private route: ActivatedRoute,
-    private clientsService: ClientsService,
-    private router: Router,
-    private authenticationService: AuthenticationService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { clientActionData: any }) => {
       this.allSurveyData = data.clientActionData;
       this.clientId = this.route.parent.snapshot.params['clientId'];
@@ -72,7 +89,7 @@ export class TakeSurveyComponent {
 
   // TODO: document the function
   groupBy(array: any, func: any) {
-    const groups = {};
+    const groups: { [key: string]: any[] } = {};
     array.forEach((ele: any) => {
       const group = JSON.stringify(func(ele));
       groups[group] = groups[group] || [];

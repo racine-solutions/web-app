@@ -1,5 +1,20 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators, UntypedFormControl } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  UntypedFormArray,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
@@ -8,17 +23,66 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { TranslateService } from '@ngx-translate/core';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { MatDivider } from '@angular/material/divider';
+import { GlAccountSelectorComponent } from '../../../../shared/accounting/gl-account-selector/gl-account-selector.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-saving-product-accounting-step',
   templateUrl: './saving-product-accounting-step.component.html',
-  styleUrls: ['./saving-product-accounting-step.component.scss']
+  styleUrls: ['./saving-product-accounting-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatRadioGroup,
+    MatRadioButton,
+    MatDivider,
+    GlAccountSelectorComponent,
+    MatCheckbox,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    FindPipe
+  ]
 })
 export class SavingProductAccountingStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   @Input() savingProductsTemplate: any;
   @Input() accountingRuleData: any;
   @Input() isDormancyTrackingActive: UntypedFormControl;
   @Input() savingProductFormValid: boolean;
+  @Input() allowOverdraft: UntypedFormControl;
 
   savingProductAccountingForm: UntypedFormGroup;
 
@@ -43,11 +107,7 @@ export class SavingProductAccountingStepComponent implements OnInit {
     'actions'
   ];
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.createsavingProductAccountingForm();
     this.setConditionalControls();
   }
@@ -106,6 +166,10 @@ export class SavingProductAccountingStepComponent implements OnInit {
         this.savingProductAccountingForm.patchValue({
           feesReceivableAccountId: this.savingProductsTemplate.accountingMappings.feeReceivableAccount.id,
           penaltiesReceivableAccountId: this.savingProductsTemplate.accountingMappings.penaltyReceivableAccount.id,
+          interestReceivableAccountId:
+            this.savingProductsTemplate.accountingMappings.interestReceivableAccount == null || undefined
+              ? ''
+              : this.savingProductsTemplate.accountingMappings.interestReceivableAccount.id,
           interestPayableAccountId: this.savingProductsTemplate.accountingMappings.interestPayableAccount.id
         });
       }
@@ -201,10 +265,25 @@ export class SavingProductAccountingStepComponent implements OnInit {
             'penaltiesReceivableAccountId',
             new UntypedFormControl('', Validators.required)
           );
+          if (this.allowOverdraft.value) {
+            this.savingProductAccountingForm.addControl('interestReceivableAccountId', new UntypedFormControl(''));
+          }
+          this.allowOverdraft.valueChanges.subscribe((allowOverdraft: boolean) => {
+            if (allowOverdraft) {
+              this.savingProductAccountingForm.addControl('interestReceivableAccountId', new UntypedFormControl(''));
+            } else {
+              this.savingProductAccountingForm.removeControl('interestReceivableAccountId');
+            }
+          });
           this.savingProductAccountingForm.addControl(
             'interestPayableAccountId',
             new UntypedFormControl('', Validators.required)
           );
+        }
+        if (accountingRule === 2) {
+          this.savingProductAccountingForm.removeControl('feesReceivableAccountId');
+          this.savingProductAccountingForm.removeControl('penaltiesReceivableAccountId');
+          this.savingProductAccountingForm.removeControl('interestPayableAccountId');
         }
 
         if (this.isDormancyTrackingActive.value) {
@@ -255,6 +334,7 @@ export class SavingProductAccountingStepComponent implements OnInit {
         this.savingProductAccountingForm.removeControl('escheatLiabilityId');
         this.savingProductAccountingForm.removeControl('feesReceivableAccountId');
         this.savingProductAccountingForm.removeControl('penaltiesReceivableAccountId');
+        this.savingProductAccountingForm.removeControl('interestReceivableAccountId');
         this.savingProductAccountingForm.removeControl('interestPayableAccountId');
       }
     });
@@ -284,7 +364,7 @@ export class SavingProductAccountingStepComponent implements OnInit {
 
   add(formType: string, formArray: UntypedFormArray) {
     const data = { ...this.getData(formType), pristine: false };
-    const dialogRef = this.dialog.open(FormDialogComponent, { data });
+    const dialogRef = this.dialog.open(FormDialogComponent, { data, width: '20rem' });
     dialogRef.afterClosed().subscribe((response: any) => {
       if (response.data) {
         formArray.push(response.data);
@@ -354,7 +434,6 @@ export class SavingProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }
@@ -377,7 +456,6 @@ export class SavingProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }
@@ -400,7 +478,6 @@ export class SavingProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }

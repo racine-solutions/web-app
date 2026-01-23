@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 /** rxjs Imports */
@@ -12,7 +20,15 @@ import { HomeService } from '../../home.service';
 
 /** Charting Imports */
 import { Dates } from 'app/core/utils/dates';
-import Chart from 'chart.js';
+import { Chart, registerables } from 'chart.js';
+import { MatCard, MatCardHeader, MatCardContent } from '@angular/material/card';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgStyle } from '@angular/common';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 /**
  * Client Trends Bar Chart Component.
@@ -20,9 +36,21 @@ import Chart from 'chart.js';
 @Component({
   selector: 'mifosx-client-trends-bar',
   templateUrl: './client-trends-bar.component.html',
-  styleUrls: ['./client-trends-bar.component.scss']
+  styleUrls: ['./client-trends-bar.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCardHeader,
+    FaIconComponent,
+    NgStyle,
+    MatButtonToggleGroup,
+    MatButtonToggle
+  ]
 })
 export class ClientTrendsBarComponent implements OnInit {
+  private homeService = inject(HomeService);
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+
   /** Static Form control for office Id */
   officeId = new UntypedFormControl();
   /** Static Form control for time scale */
@@ -40,11 +68,7 @@ export class ClientTrendsBarComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route
    * @param {Dates} dateUtils Date Utils
    */
-  constructor(
-    private homeService: HomeService,
-    private route: ActivatedRoute,
-    private dateUtils: Dates
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { offices: any }) => {
       this.officeData = data.offices;
     });
@@ -253,11 +277,11 @@ export class ClientTrendsBarComponent implements OnInit {
           responsive: true,
           scales: {
             y: {
-              beginAtZero: true,
-              scaleLabel: {
+              min: 0,
+              title: {
                 display: true,
-                labelString: 'Values',
-                fontColor: '#1074B9'
+                text: 'Values',
+                color: '#1074B9'
               }
             }
           }

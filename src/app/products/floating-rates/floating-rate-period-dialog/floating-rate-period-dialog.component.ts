@@ -1,8 +1,26 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { SettingsService } from 'app/settings/settings.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Floating Rate Period Dialog Component.
@@ -10,25 +28,27 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-floating-rate-period-dialog',
   templateUrl: './floating-rate-period-dialog.component.html',
-  styleUrls: ['./floating-rate-period-dialog.component.scss']
+  styleUrls: ['./floating-rate-period-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatCheckbox,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class FloatingRatePeriodDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<FloatingRatePeriodDialogComponent>>(MatDialogRef);
+  formBuilder = inject(UntypedFormBuilder);
+  private settingsService = inject(SettingsService);
+  data = inject(MAT_DIALOG_DATA);
+
   /** Floating Rate Period Form. */
   floatingRatePeriodForm: UntypedFormGroup;
   /** Minimum floating rate period date allowed. */
   minDate = new Date();
-
-  /**
-   * @param {MatDialogRef} dialogRef Component reference to dialog.
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {any} data Provides values for the form (if available).
-   */
-  constructor(
-    public dialogRef: MatDialogRef<FloatingRatePeriodDialogComponent>,
-    public formBuilder: UntypedFormBuilder,
-    private settingsService: SettingsService,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
 
   /**
    * Creates the floating rate period form.

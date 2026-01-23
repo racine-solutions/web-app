@@ -1,11 +1,20 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { DelinquencyBucket, LoanProduct } from '../../models/loan-product.model';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { AccountingMappingDTO, DelinquencyBucket, LoanProduct } from '../../models/loan-product.model';
 import {
   AccountingMapping,
   Charge,
-  ChargeOffReasonCodeValue,
+  CodeValue,
   ChargeOffReasonToExpenseAccountMapping,
   ChargeToIncomeAccountMapping,
+  ClassificationToIncomeAccountMapping,
   GLAccount,
   PaymentChannelToFundSourceMapping,
   PaymentType,
@@ -19,13 +28,59 @@ import {
 import { LoanProducts } from '../../loan-products';
 import { CodeName, OptionData, StringEnumOptionData } from '../../../../shared/models/option-data.model';
 import { Accounting } from 'app/core/utils/accounting';
+import { DecimalPipe } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatAccordion } from '@angular/material/expansion';
+import { ViewAdvancePaymenyAllocationComponent } from '../../view-loan-product/shared/view-advance-paymeny-allocation/view-advance-paymeny-allocation.component';
+import { GlAccountDisplayComponent } from '../../../../shared/accounting/gl-account-display/gl-account-display.component';
+import { ChargesPenaltyFilterPipe } from '../../../../pipes/charges-penalty-filter.pipe';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { YesnoPipe } from '../../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-product-summary',
   templateUrl: './loan-product-summary.component.html',
-  styleUrls: ['./loan-product-summary.component.scss']
+  styleUrls: ['./loan-product-summary.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDivider,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatAccordion,
+    ViewAdvancePaymenyAllocationComponent,
+    GlAccountDisplayComponent,
+    DecimalPipe,
+    ChargesPenaltyFilterPipe,
+    DateFormatPipe,
+    FormatNumberPipe,
+    YesnoPipe
+  ]
 })
 export class LoanProductSummaryComponent implements OnInit, OnChanges {
+  private accounting = inject(Accounting);
+
   @Input() action: string;
   @Input() loanProduct: LoanProduct;
   @Input() loanProductsTemplate: any | null;
@@ -70,8 +125,9 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
   feeToIncomeAccountMappings: ChargeToIncomeAccountMapping[] = [];
   penaltyToIncomeAccountMappings: ChargeToIncomeAccountMapping[] = [];
   chargeOffReasonToExpenseAccountMappings: ChargeOffReasonToExpenseAccountMapping[] = [];
-
-  constructor(private accounting: Accounting) {}
+  buydownFeeClassificationToIncomeAccountMappings: ClassificationToIncomeAccountMapping[] = [];
+  capitalizedIncomeClassificationToIncomeAccountMappings: ClassificationToIncomeAccountMapping[] = [];
+  writeOffReasonsToExpenseMappings: ChargeOffReasonToExpenseAccountMapping[] = [];
 
   ngOnInit() {
     this.accountingRuleData = this.accounting.getAccountingRulesForLoans();
@@ -101,6 +157,11 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
       this.feeToIncomeAccountMappings = this.loanProduct.feeToIncomeAccountMappings || [];
       this.penaltyToIncomeAccountMappings = this.loanProduct.penaltyToIncomeAccountMappings || [];
       this.chargeOffReasonToExpenseAccountMappings = this.loanProduct.chargeOffReasonToExpenseAccountMappings || [];
+      this.buydownFeeClassificationToIncomeAccountMappings =
+        this.loanProduct.buydownFeeClassificationToIncomeAccountMappings || [];
+      this.capitalizedIncomeClassificationToIncomeAccountMappings =
+        this.loanProduct.capitalizedIncomeClassificationToIncomeAccountMappings || [];
+      this.writeOffReasonsToExpenseMappings = this.loanProduct.writeOffReasonsToExpenseMappings || [];
     } else {
       this.accountingMappings = {};
 
@@ -115,6 +176,10 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
         const assetAndLiabilityAccountData =
           this.loanProductsTemplate.accountingMappingOptions.assetAndLiabilityAccountOptions || [];
         const chargeOffReasonOptions: any = this.loanProductsTemplate.chargeOffReasonOptions || [];
+        const writeOffReasonOptions: any = this.loanProductsTemplate.writeOffReasonOptions || [];
+        const buydownFeeClassificationOptions: any = this.loanProductsTemplate.buydownFeeClassificationOptions || [];
+        const capitalizedIncomeClassificationOptions: any =
+          this.loanProductsTemplate.capitalizedIncomeClassificationOptions || [];
 
         this.accountingMappings = {
           fundSourceAccount: this.glAccountLookUp(this.loanProduct.fundSourceAccountId, assetAndLiabilityAccountData),
@@ -152,14 +217,27 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
             this.loanProduct.incomeFromChargeOffPenaltyAccountId,
             incomeAccountData
           ),
+          incomeFromCapitalizationAccount: this.glAccountLookUp(
+            this.loanProduct.incomeFromCapitalizationAccountId,
+            incomeAccountData
+          ),
+          incomeFromBuyDownAccount: this.glAccountLookUp(
+            this.loanProduct.incomeFromBuyDownAccountId,
+            incomeAccountData
+          ),
 
           writeOffAccount: this.glAccountLookUp(this.loanProduct.writeOffAccountId, expenseAccountData),
           goodwillCreditAccount: this.glAccountLookUp(this.loanProduct.goodwillCreditAccountId, expenseAccountData),
           chargeOffExpenseAccount: this.glAccountLookUp(this.loanProduct.writeOffAccountId, expenseAccountData),
           chargeOffFraudExpenseAccount: this.glAccountLookUp(this.loanProduct.writeOffAccountId, expenseAccountData),
+          buyDownExpenseAccount: this.glAccountLookUp(this.loanProduct.buyDownExpenseAccountId, expenseAccountData),
 
           overpaymentLiabilityAccount: this.glAccountLookUp(
             this.loanProduct.overpaymentLiabilityAccountId,
+            liabilityAccountData
+          ),
+          deferredIncomeLiabilityAccount: this.glAccountLookUp(
+            this.loanProduct.deferredIncomeLiabilityAccountId,
             liabilityAccountData
           )
         };
@@ -202,13 +280,61 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
               let optionData = this.optionDataLookUp(m.chargeOffReasonCodeValueId, chargeOffReasonOptions);
               this.chargeOffReasonToExpenseAccountMappings.push({
                 expenseAccount: this.glAccountLookUp(m.expenseAccountId, expenseAccountData),
-                chargeOffReasonCodeValue: {
+                reasonCodeValue: {
                   id: optionData.id,
                   name: optionData.value
-                } as ChargeOffReasonCodeValue
+                } as CodeValue
               });
             }
           );
+        }
+
+        this.buydownFeeClassificationToIncomeAccountMappings = [];
+        if (this.loanProduct.buydownfeeClassificationToIncomeAccountMappings?.length > 0) {
+          this.loanProduct.buydownfeeClassificationToIncomeAccountMappings.forEach((m: any) => {
+            let optionData = this.optionDataLookUp(m.classificationCodeValueId, buydownFeeClassificationOptions);
+            if (optionData !== null) {
+              this.buydownFeeClassificationToIncomeAccountMappings.push({
+                incomeAccount: this.glAccountLookUp(m.incomeAccountId, incomeAccountData),
+                classificationCodeValue: {
+                  id: optionData.id,
+                  name: optionData.value
+                } as CodeValue
+              });
+            }
+          });
+        }
+
+        this.capitalizedIncomeClassificationToIncomeAccountMappings = [];
+        if (this.loanProduct.capitalizedIncomeClassificationToIncomeAccountMappings?.length > 0) {
+          this.loanProduct.capitalizedIncomeClassificationToIncomeAccountMappings.forEach((m: any) => {
+            let optionData = this.optionDataLookUp(m.classificationCodeValueId, capitalizedIncomeClassificationOptions);
+            if (optionData !== null) {
+              this.capitalizedIncomeClassificationToIncomeAccountMappings.push({
+                incomeAccount: this.glAccountLookUp(m.incomeAccountId, incomeAccountData),
+                classificationCodeValue: {
+                  id: optionData.id,
+                  name: optionData.value
+                } as CodeValue
+              });
+            }
+          });
+        }
+
+        this.writeOffReasonsToExpenseMappings = [];
+        if (this.loanProduct.writeOffReasonsToExpenseMappings?.length > 0) {
+          this.loanProduct.writeOffReasonsToExpenseMappings.forEach((m: any) => {
+            let optionData = this.optionDataLookUp(m.writeOffReasonCodeValueId, writeOffReasonOptions);
+            if (optionData !== null) {
+              this.writeOffReasonsToExpenseMappings.push({
+                expenseAccount: this.glAccountLookUp(m.expenseAccountId, expenseAccountData),
+                reasonCodeValue: {
+                  id: optionData.id,
+                  name: optionData.value
+                } as CodeValue
+              });
+            }
+          });
         }
       }
 
@@ -275,6 +401,47 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
         this.loanProductsTemplate.daysInYearTypeOptions
       );
       this.loanProduct.daysInYearType = optionValue;
+      if (this.isAdvancedPaymentAllocation && this.loanProduct.daysInYearType?.id == 1) {
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.daysInYearCustomStrategy,
+          this.loanProductsTemplate.daysInYearCustomStrategyOptions
+        );
+      }
+      this.loanProduct.daysInYearCustomStrategy = optionValue;
+      if (this.isAdvancedPaymentAllocation && this.loanProduct.enableIncomeCapitalization) {
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.capitalizedIncomeCalculationType,
+          this.loanProductsTemplate.capitalizedIncomeCalculationTypeOptions
+        );
+        this.loanProduct.capitalizedIncomeCalculationType = optionValue;
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.capitalizedIncomeStrategy,
+          this.loanProductsTemplate.capitalizedIncomeStrategyOptions
+        );
+        this.loanProduct.capitalizedIncomeStrategy = optionValue;
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.capitalizedIncomeType,
+          this.loanProductsTemplate.capitalizedIncomeTypeOptions
+        );
+        this.loanProduct.capitalizedIncomeType = optionValue;
+      }
+      if (this.isAdvancedPaymentAllocation && this.loanProduct.enableBuyDownFee) {
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.buyDownFeeCalculationType,
+          this.loanProductsTemplate.buyDownFeeCalculationTypeOptions
+        );
+        this.loanProduct.buyDownFeeCalculationType = optionValue;
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.buyDownFeeStrategy,
+          this.loanProductsTemplate.buyDownFeeStrategyOptions
+        );
+        this.loanProduct.buyDownFeeStrategy = optionValue;
+        optionValue = this.optionDataLookUp(
+          this.loanProduct.buyDownFeeIncomeType,
+          this.loanProductsTemplate.buyDownFeeIncomeTypeOptions
+        );
+        this.loanProduct.buyDownFeeIncomeType = optionValue;
+      }
       optionValue = this.optionDataLookUp(
         this.loanProduct.interestRateFrequencyType,
         this.loanProductsTemplate.interestRateFrequencyTypeOptions
@@ -355,7 +522,7 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
   }
 
   optionDataLookUp(itemId: any, optionsData: any[]): OptionData {
-    let optionData: OptionData | null;
+    let optionData: OptionData | null = null;
     optionsData.some((o: any) => {
       if (o.id === itemId) {
         optionData = {
@@ -478,7 +645,10 @@ export class LoanProductSummaryComponent implements OnInit, OnChanges {
       this.loanProduct.paymentChannelToFundSourceMappings?.length > 0 ||
       this.loanProduct.feeToIncomeAccountMappings?.length > 0 ||
       this.loanProduct.penaltyToIncomeAccountMappings?.length > 0 ||
-      this.loanProduct.chargeOffReasonToExpenseAccountMappings?.length > 0
+      this.loanProduct.chargeOffReasonToExpenseAccountMappings?.length > 0 ||
+      this.loanProduct.buydownfeeClassificationToIncomeAccountMappings?.length > 0 ||
+      this.loanProduct.capitalizedIncomeClassificationToIncomeAccountMappings?.length > 0 ||
+      this.loanProduct.writeOffReasonsToExpenseMappings?.length > 0
     );
   }
 

@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -28,6 +36,7 @@ import { ViewRecieptComponent } from './loans-view/transactions/view-reciept/vie
 import { ExportTransactionsComponent } from './loans-view/transactions/export-transactions/export-transactions.component';
 import { GlimAccountComponent } from './glim-account/glim-account.component';
 import { CreateGlimAccountComponent } from './glim-account/create-glim-account/create-glim-account.component';
+import { LoanBuyDownFeesTabComponent } from './loans-view/loan-buy-down-fees-tab/loan-buy-down-fees-tab.component';
 
 /** Custom Resolvers */
 import { LoanDetailsResolver } from './common-resolvers/loan-details.resolver';
@@ -62,6 +71,9 @@ import { LoanDelinquencyDataResolver } from './common-resolvers/loan-delinquency
 import { LoanDelinquencyActionsResolver } from './common-resolvers/loan-delinquency-actions.resolver';
 import { LoanTermVariationsTabComponent } from './loans-view/loan-term-variations-tab/loan-term-variations-tab.component';
 import { LoanTermVariationsResolver } from './common-resolvers/loan-term-variations.resolver';
+import { LoanDeferredIncomeTabComponent } from './loans-view/loan-deferred-income-tab/loan-deferred-income-tab.component';
+import { LoanDeferredIncomeDataResolver } from './common-resolvers/loan-deferred-income-data.resolver';
+import { LoanBuyDownFeesDataResolver } from './common-resolvers/loan-buy-down-fees-data.resolver';
 
 /** Loans Route. */
 const routes: Routes = [
@@ -127,6 +139,19 @@ const routes: Routes = [
               {
                 path: 'export',
                 component: ExportTransactionsComponent
+              }
+            ]
+          },
+          {
+            path: 'deferred-income',
+            data: { title: 'Loans Deferred Income', breadcrumb: 'Deferred income', routeParamBreadcrumb: false },
+            resolve: {
+              loanDeferredIncomeData: LoanDeferredIncomeDataResolver
+            },
+            children: [
+              {
+                path: '',
+                component: LoanDeferredIncomeTabComponent
               }
             ]
           },
@@ -245,6 +270,14 @@ const routes: Routes = [
                 }
               }
             ]
+          },
+          {
+            path: 'buy-down-fees',
+            component: LoanBuyDownFeesTabComponent,
+            data: { title: 'Buy Down Fees', breadcrumb: 'Buy Down Fees', routeParamBreadcrumb: false },
+            resolve: {
+              loanBuyDownFeesData: LoanBuyDownFeesDataResolver
+            }
           }
         ]
       },
@@ -351,7 +384,6 @@ const routes: Routes = [
         component: CreateGlimAccountComponent,
         resolve: {
           loansAccountTemplate: GLIMLoanTemplateResolver,
-          gsimData: GSIMAccountsResolver,
           groupsData: GroupViewResolver
         }
       },
@@ -392,7 +424,9 @@ const routes: Routes = [
     GLIMLoanTemplateResolver,
     ExternalAssetOwnerResolver,
     LoanDelinquencyDataResolver,
-    LoanTermVariationsResolver
+    LoanTermVariationsResolver,
+    LoanDeferredIncomeDataResolver,
+    LoanBuyDownFeesDataResolver
   ]
 })
 export class LoansRoutingModule {}

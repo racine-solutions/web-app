@@ -1,9 +1,19 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+
 /**
  * Clients service.
  */
@@ -11,10 +21,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ClientsService {
-  /**
-   * @param {HttpClient} http Http Client to send requests.
-   */
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getFilteredClients(
     orderBy: string,
@@ -170,9 +177,23 @@ export class ClientsService {
 
   getClientProfileImage(clientId: string) {
     const httpParams = new HttpParams().set('maxHeight', '150');
+    // Keep it simple since our interceptor will handle the 404 errors
     return this.http
-      .skipErrorHandler()
-      .get(`/clients/${clientId}/images`, { params: httpParams, responseType: 'text' });
+      .get(`/clients/${clientId}/images`, {
+        params: httpParams,
+        responseType: 'text'
+      })
+      .pipe(
+        // Handle the error here and return null when no image is found (404)
+        catchError((error) => {
+          if (error.status === 404) {
+            // Client has no profile image - return null without propagating error
+            return of(null);
+          }
+          // For other errors, rethrow the error
+          return throwError(() => error);
+        })
+      );
   }
 
   uploadClientProfileImage(clientId: string, image: File) {
@@ -338,7 +359,7 @@ export class ClientsService {
 
   retrieveClientReportTemplate(templateId: string, clientId: string) {
     const httpParams = new HttpParams().set('clientId', clientId);
-    return this.http.post(`/templates/${templateId}`, {}, { params: httpParams, responseType: 'text' });
+    return this.http.get(`/templates/${templateId}`, { params: httpParams, responseType: 'text' });
   }
 
   /**

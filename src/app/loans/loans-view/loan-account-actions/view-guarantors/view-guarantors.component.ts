@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,6 +18,23 @@ import { LoansService } from 'app/loans/loans.service';
 /** Dialog Components */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { LoansAccountViewGuarantorDetailsDialogComponent } from 'app/loans/custom-dialog/loans-account-view-guarantor-details-dialog/loans-account-view-guarantor-details-dialog.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { ExternalIdentifierComponent } from '../../../../shared/external-identifier/external-identifier.component';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { AccountsFilterPipe } from '../../../../pipes/accounts-filter.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View Guarantors Action
@@ -17,9 +42,31 @@ import { LoansAccountViewGuarantorDetailsDialogComponent } from 'app/loans/custo
 @Component({
   selector: 'mifosx-view-guarantors',
   templateUrl: './view-guarantors.component.html',
-  styleUrls: ['./view-guarantors.component.scss']
+  styleUrls: ['./view-guarantors.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    ExternalIdentifierComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    AccountsFilterPipe,
+    FormatNumberPipe
+  ]
 })
 export class ViewGuarantorsComponent implements OnInit {
+  dialog = inject(MatDialog);
+  loansService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   @Input() dataObject: any;
   guarantorDetails: any;
   showDeletedGuarantorsAccounts = false;
@@ -41,17 +88,25 @@ export class ViewGuarantorsComponent implements OnInit {
    * @param {route} Route Route
    * @param {router} Router Router
    */
-  constructor(
-    public dialog: MatDialog,
-    public loansService: LoansService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.loanId = this.route.snapshot.params['loanId'];
   }
 
   ngOnInit() {
     this.guarantorDetails = this.dataObject.guarantors;
+
+    // Get delinquency data for available disbursement amount with over applied
+    this.loansService.getLoanDelinquencyDataForTemplate(this.loanId).subscribe((delinquencyData: any) => {
+      // Check if the field is at root level
+      if (delinquencyData.availableDisbursementAmountWithOverApplied !== undefined) {
+        this.dataObject.availableDisbursementAmountWithOverApplied =
+          delinquencyData.availableDisbursementAmountWithOverApplied;
+      }
+      // Also check if it's in delinquent object
+      if (delinquencyData.delinquent) {
+        this.dataObject.delinquent = delinquencyData.delinquent;
+      }
+    });
   }
 
   toggleGuarantorsDetailsOverview() {

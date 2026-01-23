@@ -1,7 +1,37 @@
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges, inject } from '@angular/core';
 import { trigger, state, transition, animate, style } from '@angular/animations';
 import { Accounting } from 'app/core/utils/accounting';
 import { OptionData } from 'app/shared/models/option-data.model';
+import { MatDivider } from '@angular/material/divider';
+
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { ViewSavingsAccountingDetailsComponent } from '../../../../shared/accounting/view-savings-accounting-details/view-savings-accounting-details.component';
+import { MatStepperPrevious } from '@angular/material/stepper';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { YesnoPipe } from '../../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-fixed-deposit-product-preview-step',
@@ -11,11 +41,34 @@ import { OptionData } from 'app/shared/models/option-data.model';
     trigger('expandChartSlab', [
       state('collapsed', style({ height: '0px', minHeight: '0' })),
       state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))])
-
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ])
+  ],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDivider,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    FaIconComponent,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    ViewSavingsAccountingDetailsComponent,
+    MatStepperPrevious,
+    FindPipe,
+    DateFormatPipe,
+    FormatNumberPipe,
+    YesnoPipe
   ]
 })
 export class FixedDepositProductPreviewStepComponent implements OnInit, OnChanges {
+  private accounting = inject(Accounting);
+
   @Input() fixedDepositProductsTemplate: any;
   @Input() chartSlabsDisplayedColumns: any[];
   @Input() accountingRuleData: any;
@@ -50,8 +103,6 @@ export class FixedDepositProductPreviewStepComponent implements OnInit, OnChange
 
   accountingMappings: any = {};
   accountingRule: OptionData;
-
-  constructor(private accounting: Accounting) {}
 
   ngOnInit() {
     this.setCurrentValues();

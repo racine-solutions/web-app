@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
@@ -8,6 +16,8 @@ import { OrganizationService } from 'app/organization/organization.service';
 
 /** Custom Components */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View Adhoc Query Component.
@@ -15,9 +25,18 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 @Component({
   selector: 'mifosx-view-adhoc-query',
   templateUrl: './view-adhoc-query.component.html',
-  styleUrls: ['./view-adhoc-query.component.scss']
+  styleUrls: ['./view-adhoc-query.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent
+  ]
 })
 export class ViewAdhocQueryComponent {
+  private organizationService = inject(OrganizationService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+
   /** Adhoc query data. */
   adhocQueryData: any;
 
@@ -28,12 +47,7 @@ export class ViewAdhocQueryComponent {
    * @param {Router} router Router for navigation.
    * @param {MatDialog} dialog Dialog reference.
    */
-  constructor(
-    private organizationService: OrganizationService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { adhocQuery: any }) => {
       this.adhocQueryData = data.adhocQuery;
     });

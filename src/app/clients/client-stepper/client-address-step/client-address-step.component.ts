@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Models */
@@ -11,6 +19,18 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+  MatExpansionPanelDescription
+} from '@angular/material/expansion';
+import { MatDivider } from '@angular/material/divider';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Client Address Step Component
@@ -18,9 +38,25 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 @Component({
   selector: 'mifosx-client-address-step',
   templateUrl: './client-address-step.component.html',
-  styleUrls: ['./client-address-step.component.scss']
+  styleUrls: ['./client-address-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    MatDivider,
+    MatSlideToggle,
+    MatStepperPrevious,
+    MatStepperNext
+  ]
 })
 export class ClientAddressStepComponent {
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** Client Address Field Config */
   @Input() clientAddressFieldConfig: any;
   /** Client Template */
@@ -33,10 +69,7 @@ export class ClientAddressStepComponent {
    * @param {MatDialog} dialog Mat Dialog
    * @param {TranslateService} translateService Translate Service.
    */
-  constructor(
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.clientAddressData = [];
   }
 

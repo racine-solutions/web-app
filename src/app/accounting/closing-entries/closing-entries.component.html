@@ -1,4 +1,12 @@
-<div class="container m-b-20" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="20px">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container m-b-20 layout-row align-end gap-20px">
   <div #buttonCreateClosure>
     <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_GLCLOSURE'">
       <fa-icon icon="plus" class="m-r-10"></fa-icon>
@@ -7,8 +15,8 @@
   </div>
 </div>
 
-<div #filter class="container" fxLayout="row">
-  <mat-form-field fxFlex>
+<div #filter class="container layout-row">
+  <mat-form-field class="flex-fill">
     <mat-label>{{ 'labels.inputs.Office Name' | translate }}</mat-label>
     <input matInput [formControl]="officeName" [matAutocomplete]="officeNameAutocomplete" />
   </mat-form-field>
@@ -16,9 +24,11 @@
 
 <!-- Autocomplete data -->
 <mat-autocomplete autoActiveFirstOption #officeNameAutocomplete="matAutocomplete">
-  <mat-option *ngFor="let office of filteredOfficeData | async" [value]="office.name">
-    {{ office.name }}
-  </mat-option>
+  @for (office of filteredOfficeData | async; track office) {
+    <mat-option [value]="office.name">
+      {{ office.name }}
+    </mat-option>
+  }
 </mat-autocomplete>
 
 <div class="container">
@@ -60,7 +70,7 @@
 <ng-template #templateButtonCreateClosure let-popover="popover">
   <h2>{{ 'labels.heading.Create Closure' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Create new closure' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -79,7 +89,7 @@
 
 <ng-template #templateFilter let-popover="popover">
   <h4>{{ 'labels.heading.Search bar to filter closures by office.' | translate }}</h4>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -103,11 +113,11 @@
 <ng-template #templateClosuresTable let-popover="popover">
   <h4>
     {{ 'labels.heading.List of closures. To know more click' | translate }}:
-    <a href="https://mifosforge.jira.com/wiki/spaces/docs/pages/67895316/Closing+Entries" target="_blank">{{
+    <a [href]="'closingEntries' | documentationLink" target="_blank" rel="noopener noreferrer">{{
       'labels.inputs.Closing Entries' | translate
     }}</a>
   </h4>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>

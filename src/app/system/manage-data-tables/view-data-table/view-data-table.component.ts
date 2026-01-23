@@ -1,17 +1,41 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
-import { SystemService } from '../../system.service';
+import { SystemService } from 'app/system/system.service';
+import { Datatables } from 'app/core/utils/datatables';
 
 /** Custom Components */
 import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View Data Table Component
@@ -19,9 +43,34 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 @Component({
   selector: 'mifosx-view-data-table',
   templateUrl: './view-data-table.component.html',
-  styleUrls: ['./view-data-table.component.scss']
+  styleUrls: ['./view-data-table.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class ViewDataTableComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private systemService = inject(SystemService);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+  public datatables = inject(Datatables);
+
   /** Data Table Data */
   dataTableData: any;
   /** Column Data */
@@ -52,13 +101,7 @@ export class ViewDataTableComponent implements OnInit {
    * @param {MatDialog} dialog Dialog reference.
    *  @param {TranslateService} translateService Translate Service.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private systemService: SystemService,
-    private router: Router,
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { dataTable: any }) => {
       this.dataTableData = data.dataTable;
       this.columnsData = this.dataTableData.columnHeaderData;
@@ -70,6 +113,13 @@ export class ViewDataTableComponent implements OnInit {
    */
   ngOnInit() {
     this.setColumnsTable();
+  }
+
+  /**
+   * Get display name for field (e.g., "Actividad" from "ADDRESS_TYPE_cd_ACTIVIDAD")
+   */
+  getFieldDisplayName(columnName: string): string {
+    return this.datatables.toDisplayLabel(columnName);
   }
 
   /**

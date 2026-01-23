@@ -1,3 +1,11 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div class="tab-content mat-typography">
   <mat-list>
     <mat-list-item> {{ 'labels.inputs.Campaign Name' | translate }} : {{ campaign.campaignName }} </mat-list-item>
@@ -17,13 +25,13 @@
       {{ campaign.editFlag ? campaign.reportName : campaign.paramValue?.reportName }}
     </mat-list-item>
 
-    <div fxLayout="column" fxLayoutGap="10px" class="template-message">
+    <div class="layout-column gap-10px template-message">
       <h3>{{ 'labels.heading.Campaign Message' | translate }} :</h3>
       <textarea matInput disabled>{{ campaign.editFlag ? editedCampaignMessage : campaign.message }}</textarea>
     </div>
   </mat-list>
 
-  <div fxLayout="row" class="margin-t" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="2%">
+  <div class="layout-row align-center gap-2percent margin-t responsive-column">
     <button mat-raised-button [routerLink]="['../']">
       {{ 'labels.buttons.Cancel' | translate }}
     </button>

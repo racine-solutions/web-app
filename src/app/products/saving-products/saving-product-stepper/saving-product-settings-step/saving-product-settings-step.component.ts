@@ -1,13 +1,43 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
-import { TooltipPosition } from '@angular/material/tooltip';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDivider } from '@angular/material/divider';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-saving-product-settings-step',
   templateUrl: './saving-product-settings-step.component.html',
-  styleUrls: ['./saving-product-settings-step.component.scss']
+  styleUrls: ['./saving-product-settings-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    MatCheckbox,
+    MatDivider,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class SavingProductSettingsStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+
   @Input() savingProductsTemplate: any;
 
   savingProductSettingsForm: UntypedFormGroup;
@@ -15,7 +45,7 @@ export class SavingProductSettingsStepComponent implements OnInit {
   lockinPeriodFrequencyTypeData: any;
   taxGroupData: any;
 
-  constructor(private formBuilder: UntypedFormBuilder) {
+  constructor() {
     this.createSavingProductSettingsForm();
     this.setConditionalControls();
   }
@@ -24,12 +54,12 @@ export class SavingProductSettingsStepComponent implements OnInit {
     this.lockinPeriodFrequencyTypeData = this.savingProductsTemplate.lockinPeriodFrequencyTypeOptions;
     this.taxGroupData = this.savingProductsTemplate.taxGroupOptions;
 
+    const hasLockinPeriod =
+      this.savingProductsTemplate.lockinPeriodFrequency && this.savingProductsTemplate.lockinPeriodFrequency > 0;
+
     this.savingProductSettingsForm.patchValue({
       minRequiredOpeningBalance: this.savingProductsTemplate.minRequiredOpeningBalance,
-      lockinPeriodFrequency: this.savingProductsTemplate.lockinPeriodFrequency,
-      lockinPeriodFrequencyType:
-        this.savingProductsTemplate.lockinPeriodFrequencyType &&
-        this.savingProductsTemplate.lockinPeriodFrequencyType.id,
+      enableLockinPeriod: hasLockinPeriod,
       withdrawalFeeForTransfers: this.savingProductsTemplate.withdrawalFeeForTransfers,
       minBalanceForInterestCalculation: this.savingProductsTemplate.minBalanceForInterestCalculation,
       enforceMinRequiredBalance: this.savingProductsTemplate.enforceMinRequiredBalance,
@@ -45,13 +75,24 @@ export class SavingProductSettingsStepComponent implements OnInit {
       daysToDormancy: this.savingProductsTemplate.daysToDormancy,
       daysToEscheat: this.savingProductsTemplate.daysToEscheat
     });
+
+    if (hasLockinPeriod) {
+      this.savingProductSettingsForm.patchValue({
+        lockinPeriodFrequency: this.savingProductsTemplate.lockinPeriodFrequency,
+        lockinPeriodFrequencyType:
+          this.savingProductsTemplate.lockinPeriodFrequencyType &&
+          this.savingProductsTemplate.lockinPeriodFrequencyType.id
+      });
+    }
   }
 
   createSavingProductSettingsForm() {
     this.savingProductSettingsForm = this.formBuilder.group({
-      minRequiredOpeningBalance: [''],
-      lockinPeriodFrequency: [''],
-      lockinPeriodFrequencyType: [''],
+      minRequiredOpeningBalance: [
+        '',
+        [Validators.min(0)]
+      ],
+      enableLockinPeriod: [false],
       withdrawalFeeForTransfers: [false],
       minBalanceForInterestCalculation: [''],
       enforceMinRequiredBalance: [false],
@@ -63,6 +104,26 @@ export class SavingProductSettingsStepComponent implements OnInit {
   }
 
   setConditionalControls() {
+    this.savingProductSettingsForm.get('enableLockinPeriod').valueChanges.subscribe((enableLockinPeriod: any) => {
+      if (enableLockinPeriod) {
+        this.savingProductSettingsForm.addControl(
+          'lockinPeriodFrequency',
+          new UntypedFormControl('', [
+            Validators.required,
+            Validators.min(1),
+            Validators.pattern('^[1-9]\\d*$')
+          ])
+        );
+        this.savingProductSettingsForm.addControl(
+          'lockinPeriodFrequencyType',
+          new UntypedFormControl('', Validators.required)
+        );
+      } else {
+        this.savingProductSettingsForm.removeControl('lockinPeriodFrequency');
+        this.savingProductSettingsForm.removeControl('lockinPeriodFrequencyType');
+      }
+    });
+
     this.savingProductSettingsForm.get('allowOverdraft').valueChanges.subscribe((allowOverdraft: any) => {
       if (allowOverdraft) {
         this.savingProductSettingsForm.addControl('minOverdraftForInterestCalculation', new UntypedFormControl(''));
@@ -99,6 +160,8 @@ export class SavingProductSettingsStepComponent implements OnInit {
   }
 
   get savingProductSettings() {
-    return this.savingProductSettingsForm.value;
+    const formValue = { ...this.savingProductSettingsForm.value };
+    delete formValue.enableLockinPeriod;
+    return formValue;
   }
 }

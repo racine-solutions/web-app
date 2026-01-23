@@ -1,5 +1,19 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div class="container">
-  <mat-horizontal-stepper class="mat-elevation-z8" labelPosition="bottom" #savingProductStepper>
+  <mat-stepper
+    orientation="vertical"
+    [linear]="false"
+    class="mat-elevation-z8"
+    labelPosition="bottom"
+    #savingProductStepper
+  >
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -68,21 +82,22 @@
         [accountingRuleData]="accountingRuleData"
         [isDormancyTrackingActive]="savingProductSettingsForm.get('isDormancyTrackingActive')"
         [savingProductFormValid]="savingProductFormValid"
+        [allowOverdraft]="savingProductSettingsForm.get('allowOverdraft')"
       >
       </mifosx-saving-product-accounting-step>
     </mat-step>
-
-    <mat-step state="preview" *ngIf="savingProductFormValid" completed>
-      <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
-
-      <mifosx-saving-product-preview-step
-        [savingProductsTemplate]="savingProductsTemplate"
-        [accountingRuleData]="accountingRuleData"
-        [savingProduct]="savingProduct"
-        [taskPermission]="'CREATE_SAVINGSPRODUCT'"
-        (submitEvent)="submit()"
-      >
-      </mifosx-saving-product-preview-step>
-    </mat-step>
-  </mat-horizontal-stepper>
+    @if (savingProductFormValid) {
+      <mat-step state="preview" completed>
+        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <mifosx-saving-product-preview-step
+          [savingProductsTemplate]="savingProductsTemplate"
+          [accountingRuleData]="accountingRuleData"
+          [savingProduct]="savingProduct"
+          [taskPermission]="'CREATE_SAVINGSPRODUCT'"
+          (submitEvent)="submit()"
+        >
+        </mifosx-saving-product-preview-step>
+      </mat-step>
+    }
+  </mat-stepper>
 </div>

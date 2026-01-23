@@ -1,27 +1,79 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormControl, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTable } from '@angular/material/table';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { SystemService } from 'app/system/system.service';
-import { JobStep } from './workflow-diagram/workflow-diagram.component';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { WorkflowDiagramComponent } from './workflow-diagram/workflow-diagram.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+export interface JobStep {
+  stepName: string;
+  stepDescription: string;
+  order: number;
+}
 
 @Component({
   selector: 'mifosx-workflow-jobs',
   templateUrl: './workflow-jobs.component.html',
-  styleUrls: ['./workflow-jobs.component.scss']
+  styleUrls: ['./workflow-jobs.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    CdkDropList,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    CdkDrag,
+    WorkflowDiagramComponent
+  ]
 })
 export class WorkflowJobsComponent implements OnInit {
+  private systemService = inject(SystemService);
+  dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   stepOrderHasChanged = false;
 
   jobNameOptions: any = [];
   jobStepsData: any = [];
-  jobAvailableStepsData: any = [];
+  jobAvailableStepsData: JobStep[] = [];
   jobStepsDataBase: any = [];
   jobStepName: String = null;
 
@@ -35,12 +87,6 @@ export class WorkflowJobsComponent implements OnInit {
     'stepOrder',
     'actions'
   ];
-
-  constructor(
-    private systemService: SystemService,
-    public dialog: MatDialog,
-    private translateService: TranslateService
-  ) {}
 
   ngOnInit(): void {
     this.systemService
@@ -131,7 +177,6 @@ export class WorkflowJobsComponent implements OnInit {
                 options: { label: 'stepDescription', value: 'stepName', data: this.jobAvailableStepsData },
                 order: 1
               })
-
             ];
             const data = {
               title: this.translateService.instant('labels.text.Add Job Step to Workflow'),

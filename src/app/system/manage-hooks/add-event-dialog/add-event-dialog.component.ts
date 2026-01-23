@@ -1,7 +1,24 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Add Event Dialog Component.
@@ -9,26 +26,27 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 @Component({
   selector: 'mifosx-add-event-dialog',
   templateUrl: './add-event-dialog.component.html',
-  styleUrls: ['./add-event-dialog.component.scss']
+  styleUrls: ['./add-event-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class AddEventDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<AddEventDialogComponent>>(MatDialogRef);
+  formBuilder = inject(UntypedFormBuilder);
+  data = inject(MAT_DIALOG_DATA);
+
   /** Event Form. */
   eventForm: UntypedFormGroup;
   /** Entity Data. */
   entityData: Array<any> = new Array<any>();
   /** Action Data. */
   actionData: Array<any> = new Array<any>();
-
-  /**
-   * @param {MatDialogRef} dialogRef Component reference to dialog.
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {any} data Provides grouping, entities and actions data to fill dropdowns.
-   */
-  constructor(
-    public dialogRef: MatDialogRef<AddEventDialogComponent>,
-    public formBuilder: UntypedFormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
 
   /**
    * Creates add event form.

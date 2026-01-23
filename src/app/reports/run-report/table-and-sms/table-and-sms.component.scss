@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 .table-output {
   overflow: auto;
 }
@@ -27,17 +35,6 @@ $color: #e2e4ec;
 .loader {
   margin-bottom: 39px;
   overflow: auto;
-}
-
-.loading {
-  position: absolute;
-  width: $bar;
-  height: 8px;
-  background: linear-gradient(125deg, rgb(255 255 255), #c4d2e9, rgb(255 255 255));
-  animation:
-    grow 4s linear infinite,
-    move 4s linear infinite;
-  top: 82px;
 }
 
 .sidenav {

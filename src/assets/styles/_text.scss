@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 html,
 body {
   -webkit-font-smoothing: antialiased;
@@ -8,11 +16,25 @@ html {
 }
 
 body {
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 14px;
   color: rgb(0 0 0 / 87%);
   line-height: 1.5;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  letter-spacing: normal;
+}
+
+.mat-h1,
+.mat-headline,
+.mat-typography .mat-h1,
+.mat-typography .mat-headline,
+.mat-typography h1 {
+  font:
+    400 24px/32px Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  letter-spacing: normal;
+  margin: 0 0 16px;
 }
 
 .lh-1 {
@@ -235,4 +257,13 @@ body {
 
 .label-field {
   margin-top: 32px;
+}
+
+.wrap-content {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.no-break-content {
+  overflow-wrap: anywhere !important;
 }

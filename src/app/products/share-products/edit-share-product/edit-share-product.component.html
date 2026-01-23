@@ -1,5 +1,19 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div class="container">
-  <mat-horizontal-stepper class="mat-elevation-z8" labelPosition="bottom" #shareProductStepper>
+  <mat-stepper
+    orientation="vertical"
+    [linear]="false"
+    class="mat-elevation-z8"
+    labelPosition="bottom"
+    #shareProductStepper
+  >
     <ng-template matStepperIcon="number">
       <fa-icon icon="pencil-alt" size="sm"></fa-icon>
     </ng-template>
@@ -81,17 +95,18 @@
       </mifosx-share-product-accounting-step>
     </mat-step>
 
-    <mat-step state="preview" *ngIf="shareProductFormValidAndNotPristine" completed>
-      <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
-
-      <mifosx-share-product-preview-step
-        [shareProductsTemplate]="shareProductAndTemplate"
-        [accountingRuleData]="accountingRuleData"
-        [shareProduct]="shareProduct"
-        [taskPermission]="'UPDATE_SHAREPRODUCT'"
-        (submitEvent)="submit()"
-      >
-      </mifosx-share-product-preview-step>
-    </mat-step>
-  </mat-horizontal-stepper>
+    @if (shareProductFormValidAndNotPristine) {
+      <mat-step state="preview" completed>
+        <ng-template matStepLabel>{{ 'labels.inputs.PREVIEW' | translate }}</ng-template>
+        <mifosx-share-product-preview-step
+          [shareProductsTemplate]="shareProductAndTemplate"
+          [accountingRuleData]="accountingRuleData"
+          [shareProduct]="shareProduct"
+          [taskPermission]="'UPDATE_SHAREPRODUCT'"
+          (submitEvent)="submit()"
+        >
+        </mifosx-share-product-preview-step>
+      </mat-step>
+    }
+  </mat-stepper>
 </div>

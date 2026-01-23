@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, AfterViewInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { Component, AfterViewInit, inject } from '@angular/core';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Dialogs */
@@ -10,13 +18,34 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { CentersService } from 'app/centers/centers.service';
 import { GroupsService } from 'app/groups/groups.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatAutocompleteTrigger, MatAutocomplete, MatOption } from '@angular/material/autocomplete';
+import { MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatListSubheaderCssMatStyler, MatNavList } from '@angular/material/list';
+import { MatLine } from '@angular/material/grid-list';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-manage-groups',
   templateUrl: './manage-groups.component.html',
-  styleUrls: ['./manage-groups.component.scss']
+  styleUrls: ['./manage-groups.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatIconButton,
+    FaIconComponent,
+    MatListSubheaderCssMatStyler,
+    MatNavList,
+    MatLine
+  ]
 })
 export class ManageGroupsComponent implements AfterViewInit {
+  private route = inject(ActivatedRoute);
+  private centersService = inject(CentersService);
+  private groupsService = inject(GroupsService);
+  dialog = inject(MatDialog);
+
   /** Center Data */
   centerData: any;
   /** Group data. */
@@ -33,12 +62,7 @@ export class ManageGroupsComponent implements AfterViewInit {
    * @param {GroupsService} groupsService Groups Service
    * @param {MatDialog} dialog Mat Dialog
    */
-  constructor(
-    private route: ActivatedRoute,
-    private centersService: CentersService,
-    private groupsService: GroupsService,
-    public dialog: MatDialog
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { centersActionData: any }) => {
       this.centerData = data.centersActionData;
       this.groupMembers = data.centersActionData.groupMembers;

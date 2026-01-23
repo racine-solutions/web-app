@@ -1,10 +1,19 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ProductsService } from '../../products.service';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Product mix component.
@@ -12,9 +21,17 @@ import { ProductsService } from '../../products.service';
 @Component({
   selector: 'mifosx-create-product-mix',
   templateUrl: './create-product-mix.component.html',
-  styleUrls: ['./create-product-mix.component.scss']
+  styleUrls: ['./create-product-mix.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class CreateProductMixComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private productsService = inject(ProductsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Product mix form. */
   productMixForm: UntypedFormGroup;
   /** Products mix template data. */
@@ -31,12 +48,7 @@ export class CreateProductMixComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private productsService: ProductsService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { productsMixTemplate: any }) => {
       this.productsMixTemplateData = data.productsMixTemplate;
     });
@@ -100,7 +112,7 @@ export class CreateProductMixComponent implements OnInit {
       this.router.navigate(
         [
           '../',
-          response.resourceId
+          response.productId
         ],
         { relativeTo: this.route }
       );

@@ -1,6 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +19,8 @@ import { CentersService } from '../centers.service';
  * center datatables resolver.
  */
 @Injectable()
-export class CenterDatatablesResolver implements Resolve<Object> {
-  /**
-   * @param {centersService} centersService centers service.
-   */
-  constructor(private centersService: CentersService) {}
+export class CenterDatatablesResolver {
+  private centersService = inject(CentersService);
 
   /**
    * Returns the center datatables.

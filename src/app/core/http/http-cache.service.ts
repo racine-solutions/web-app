@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
@@ -107,7 +115,8 @@ export class HttpCacheService {
    */
   setPersistence(persistence?: 'local' | 'session') {
     this.cleanCache();
-    this.storage = persistence === 'local' || persistence === 'session' ? window[persistence + 'Storage'] : null;
+    this.storage =
+      persistence === 'local' ? window.localStorage : persistence === 'session' ? window.sessionStorage : null;
     this.loadCacheData();
   }
 

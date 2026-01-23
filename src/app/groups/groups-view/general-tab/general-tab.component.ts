@@ -1,6 +1,33 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { StatusLookupPipe } from '../../../pipes/status-lookup.pipe';
+import { AccountsFilterPipe } from '../../../pipes/accounts-filter.pipe';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { GroupsService } from '../../groups.service';
 
 /**
  * Groups View General Tab Component.
@@ -8,9 +35,30 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'mifosx-general-tab',
   templateUrl: './general-tab.component.html',
-  styleUrls: ['./general-tab.component.scss']
+  styleUrls: ['./general-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    NgClass,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    StatusLookupPipe,
+    AccountsFilterPipe,
+    DateFormatPipe
+  ]
 })
 export class GeneralTabComponent {
+  private route = inject(ActivatedRoute);
+  private groupsService = inject(GroupsService);
+
   /** Group's all accounts data */
   groupAccountData: any;
   /** Group's loan accounts data */
@@ -87,11 +135,7 @@ export class GeneralTabComponent {
   /** Boolean for toggling savings accounts table */
   showClosedSavingAccounts = false;
 
-  /**
-   * Fetches group's related data from `resolve`
-   * @param {ActivatedRoute} route Activated Route.
-   */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe(
       (data: { groupAccountsData: any; groupClientMembers: any; groupSummary: any; glimData: any; gsimData: any }) => {
         this.glimAccounts = data.glimData;
@@ -104,6 +148,18 @@ export class GeneralTabComponent {
     );
     this.route.parent.data.subscribe((data: { groupViewData: any }) => {
       this.groupClientMembers = data.groupViewData.clientMembers;
+    });
+  }
+
+  /**
+   * Refreshes group account data from backend (for GSIM/GLIM status/balance update)
+   */
+  refreshAccounts(groupId: string) {
+    this.groupsService.getGroupAccountsData(groupId).subscribe((data: any) => {
+      this.groupAccountData = data;
+      this.savingAccounts = data.savingsAccounts;
+      this.loanAccounts = data.loanAccounts;
+      // If GSIM/GLIM data is separate, fetch and update here as well
     });
   }
 

@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 /** Custom Components */
@@ -10,6 +18,10 @@ import { CampaignMessageStepComponent } from '../sms-campaign-stepper/campaign-m
 import { OrganizationService } from 'app/organization/organization.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { CampaignPreviewStepComponent } from '../sms-campaign-stepper/campaign-preview-step/campaign-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create SMS Campaign Component
@@ -17,9 +29,26 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-create-campaign',
   templateUrl: './create-campaign.component.html',
-  styleUrls: ['./create-campaign.component.scss']
+  styleUrls: ['./create-campaign.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    SmsCampaignStepComponent,
+    CampaignMessageStepComponent,
+    CampaignPreviewStepComponent
+  ]
 })
 export class CreateCampaignComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private organizationService = inject(OrganizationService);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+
   /** SMS Campaign Template */
   smsCampaignTemplate: any;
   /** Run report headers */
@@ -38,13 +67,7 @@ export class CreateCampaignComponent {
    * @param {SettingsService} settingsService Settings Service
    * @param {Dates} dateUtils Date Utils
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private organizationService: OrganizationService,
-    private settingsService: SettingsService,
-    private dateUtils: Dates
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { smsCampaignTemplate: any }) => {
       this.smsCampaignTemplate = data.smsCampaignTemplate;
     });

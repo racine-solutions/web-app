@@ -1,4 +1,12 @@
-<div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column" class="container m-b-20">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="layout-row align-end gap-2px responsive-column container m-b-20">
   <div #buttonEdit class="in-block">
     <button
       mat-raised-button
@@ -15,56 +23,60 @@
 <div class="container">
   <mat-card>
     <ng-container>
-      <div fxLayout="row">
-        <div #mcTable fxFlex="30" fxLayout="column">
+      <div class="layout-row">
+        <div #mcTable class="layout-column flex-30">
           <mat-list>
-            <mat-list-item
-              [ngClass]="selectedItem === grouping ? 'active' : 'inactive'"
-              *ngFor="let grouping of groupings"
-              (click)="showPermissions(grouping)"
-            >
-              <span class="grouping-name">
-                {{ formatName(grouping) }}
-              </span>
-            </mat-list-item>
+            @for (grouping of groupings; track grouping) {
+              <mat-list-item
+                [ngClass]="selectedItem === grouping ? 'active' : 'inactive'"
+                (click)="showPermissions(grouping)"
+              >
+                <span class="grouping-name">
+                  {{ formatName(grouping) }}
+                </span>
+              </mat-list-item>
+            }
           </mat-list>
         </div>
 
         <mat-divider [vertical]="true"></mat-divider>
-
-        <div fxFlex="70" fxLayout="column" class="list-permission">
+        <div class="list-permission layout-column flex-70">
           <form [formGroup]="formGroup" (submit)="submit()">
-            <div *ngFor="let permission of permissions.permissions" class="display-permissions">
-              <div formArrayName="roster">
-                <div [formGroupName]="permission.id">
-                  <mat-checkbox name="cp" id="{{ permission.code }}" formControlName="selected">
-                    {{ permissionName(permission.code) }}
-                  </mat-checkbox>
+            <div formArrayName="roster">
+              @for (permission of permissions.permissions; track permission; let i = $index) {
+                <div class="display-permissions">
+                  <div [formGroupName]="i">
+                    <mat-checkbox name="cp" id="{{ permission.code }}" formControlName="selected">
+                      {{ permissionName(permission.code) }}
+                    </mat-checkbox>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </form>
         </div>
       </div>
     </ng-container>
 
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px" *ngIf="!isDisabled">
-      <mat-card-actions>
-        <button type="button" mat-raised-button (click)="cancel(); restoreCheckboxes()">
-          {{ 'labels.buttons.Cancel' | translate }}
-        </button>
-        <button mat-raised-button color="primary" (click)="submit()" *mifosxHasPermission="'UPDATE_PERMISSION'">
-          {{ 'labels.buttons.Submit' | translate }}
-        </button>
-      </mat-card-actions>
-    </div>
+    @if (!isDisabled) {
+      <div class="layout-row layout-align-center gap-5px layout-xs-column">
+        <mat-card-actions>
+          <button type="button" mat-raised-button (click)="cancel(); restoreCheckboxes()">
+            {{ 'labels.buttons.Cancel' | translate }}
+          </button>
+          <button mat-raised-button color="primary" (click)="submit()" *mifosxHasPermission="'UPDATE_PERMISSION'">
+            {{ 'labels.buttons.Submit' | translate }}
+          </button>
+        </mat-card-actions>
+      </div>
+    }
   </mat-card>
 </div>
 
 <ng-template #templateButtonEdit let-popover="popover">
   <h2>{{ 'labels.heading.Edit' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.To add or remove a task from the Maker-Checker list' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -84,13 +96,11 @@
 <ng-template #templateMcTable let-popover="popover">
   <h4 class="mw300">
     {{ 'labels.heading.List of all maker checker tasks' | translate }}:
-    <a
-      href="https://mifosforge.jira.com/wiki/spaces/docs/pages/67895359/Configure+Maker-Checker+Tasks"
-      target="_blank"
-      >{{ 'labels.inputs.Configure Maker-Checker Tasks' | translate }}</a
-    >
+    <a [href]="'configureMakerCheckerTasks' | documentationLink" target="_blank" rel="noopener noreferrer">{{
+      'labels.inputs.Configure Maker-Checker Tasks' | translate
+    }}</a>
   </h4>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>

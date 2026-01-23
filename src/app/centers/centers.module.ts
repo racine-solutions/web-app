@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 
@@ -25,6 +33,13 @@ import { EditCenterMeetingScheduleComponent } from './centers-view/center-action
 import { ManageGroupsComponent } from './centers-view/center-actions/manage-groups/manage-groups.component';
 import { StaffAssignmentHistoryComponent } from './centers-view/center-actions/staff-assignment-history/staff-assignment-history.component';
 import { EditCenterComponent } from './edit-center/edit-center.component';
+import { CenterViewResolver } from './common-resolvers/center-view.resolver';
+import { CenterDatatablesResolver } from './common-resolvers/center-datatables.resolver';
+import { CenterDatatableResolver } from './common-resolvers/center-datatable.resolver';
+import { CenterSummaryResolver } from './common-resolvers/center-summary.resolver';
+import { CenterResourceResolver } from './common-resolvers/center-resource.resolver';
+import { SavingsAccountResolver } from './common-resolvers/savings-account.resolver';
+import { CenterNotesResolver } from './common-resolvers/center-notes.resolver';
 
 /**
  * Centers Module
@@ -36,9 +51,7 @@ import { EditCenterComponent } from './edit-center/edit-center.component';
     SharedModule,
     CentersRoutingModule,
     PipesModule,
-    DirectivesModule
-  ],
-  declarations: [
+    DirectivesModule,
     CentersComponent,
     CreateCenterComponent,
     CentersViewComponent,
@@ -56,6 +69,15 @@ import { EditCenterComponent } from './edit-center/edit-center.component';
     ManageGroupsComponent,
     StaffAssignmentHistoryComponent,
     EditCenterComponent
+  ],
+  providers: [
+    CenterViewResolver,
+    CenterDatatableResolver,
+    CenterDatatablesResolver,
+    CenterSummaryResolver,
+    CenterResourceResolver,
+    SavingsAccountResolver,
+    CenterNotesResolver
   ]
 })
 export class CentersModule {}

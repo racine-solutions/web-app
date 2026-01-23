@@ -1,6 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 
 /** Custom Services */
@@ -8,6 +23,8 @@ import { ClientsService } from 'app/clients/clients.service';
 
 /** Node Types */
 import { Buffer } from 'buffer';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View signature dialog component.
@@ -15,9 +32,25 @@ import { Buffer } from 'buffer';
 @Component({
   selector: 'mifosx-view-signature-dialog',
   templateUrl: './view-signature-dialog.component.html',
-  styleUrls: ['./view-signature-dialog.component.scss']
+  styleUrls: ['./view-signature-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class ViewSignatureDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ViewSignatureDialogComponent>>(MatDialogRef);
+  private clientsService = inject(ClientsService);
+  private sanitizer = inject(DomSanitizer);
+  data = inject<{
+    documents: any[];
+    id: string;
+  }>(MAT_DIALOG_DATA);
+
   /** Id of client signature in documents */
   signatureId: any;
   /** Signature Image */
@@ -29,12 +62,7 @@ export class ViewSignatureDialogComponent implements OnInit {
    * @param {MatDialogRef} dialogRef Component reference to dialog.
    * @param {any} data Documents data
    */
-  constructor(
-    public dialogRef: MatDialogRef<ViewSignatureDialogComponent>,
-    private clientsService: ClientsService,
-    private sanitizer: DomSanitizer,
-    @Inject(MAT_DIALOG_DATA) public data: { documents: any[]; id: string }
-  ) {
+  constructor() {
     const signature = this.data.documents.find((document: any) => document.name === 'clientSignature') || {};
     this.signatureId = signature.id;
     this.clientId = this.data.id;

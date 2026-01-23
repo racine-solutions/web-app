@@ -1,17 +1,51 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { LoanProducts } from '../../loan-products';
 import { rangeValidator } from 'app/shared/validators/percentage.validator';
 import { GlobalConfiguration } from 'app/system/configurations/global-configurations-tab/configuration.model';
 import { CodeName, OptionData, StringEnumOptionData } from 'app/shared/models/option-data.model';
 import { ProcessingStrategyService } from '../../services/processing-strategy.service';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDivider } from '@angular/material/divider';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-product-settings-step',
   templateUrl: './loan-product-settings-step.component.html',
-  styleUrls: ['./loan-product-settings-step.component.scss']
+  styleUrls: ['./loan-product-settings-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    MatCheckbox,
+    MatDivider,
+    MatIconButton,
+    FaIconComponent,
+    MatStepperPrevious,
+    MatStepperNext
+  ]
 })
 export class LoanProductSettingsStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private processingStrategyService = inject(ProcessingStrategyService);
+
   DAYS_BEFORE_REPAYMENT_IS_DUE = LoanProducts.DAYS_BEFORE_REPAYMENT_IS_DUE;
   DAYS_AFTER_REPAYMENT_IS_OVERDUE = LoanProducts.DAYS_AFTER_REPAYMENT_IS_OVERDUE;
 
@@ -45,14 +79,13 @@ export class LoanProductSettingsStepComponent implements OnInit {
   useDueForRepaymentsConfigurations = false;
   rescheduleStrategyTypeDisabled = false;
   chargeOffBehaviourData: StringEnumOptionData[] = [];
+  daysInYearCustomStrategyOptions: OptionData[] = [];
+  useDaysInYearCustomStrategy = false;
 
   /** Values to Days for Repayments */
   defaultConfigValues: GlobalConfiguration[] = [];
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private processingStrategyService: ProcessingStrategyService
-  ) {
+  constructor() {
     this.createLoanProductSettingsForm();
     this.setConditionalControls();
   }
@@ -88,8 +121,7 @@ export class LoanProductSettingsStepComponent implements OnInit {
     this.loanScheduleTypeData = this.loanProductsTemplate.loanScheduleTypeOptions;
     this.loanScheduleProcessingTypeData = this.loanProductsTemplate.loanScheduleProcessingTypeOptions;
     this.chargeOffBehaviourData = this.loanProductsTemplate.chargeOffBehaviourOptions;
-
-    // this.useDueForRepaymentsConfigurations = (!this.loanProduct.dueDaysForRepaymentEvent && !this.loanProduct.overDueDaysForRepaymentEvent);
+    this.daysInYearCustomStrategyOptions = this.loanProductsTemplate.daysInYearCustomStrategyOptions;
 
     const transactionProcessingStrategyCode: string =
       this.loanProductsTemplate.transactionProcessingStrategyCode || this.transactionProcessingStrategyData[0].code;
@@ -122,6 +154,7 @@ export class LoanProductSettingsStepComponent implements OnInit {
       multiDisburseLoan: this.loanProductsTemplate.multiDisburseLoan,
       maxTrancheCount: this.loanProductsTemplate.maxTrancheCount,
       outstandingLoanBalance: this.loanProductsTemplate.outstandingLoanBalance,
+      allowFullTermForTranche: this.loanProductsTemplate.allowFullTermForTranche,
       enableDownPayment: this.loanProductsTemplate.enableDownPayment,
       enableInstallmentLevelDelinquency: this.loanProductsTemplate.enableInstallmentLevelDelinquency,
       loanScheduleType: this.loanProductsTemplate.loanScheduleType.code,
@@ -267,10 +300,22 @@ export class LoanProductSettingsStepComponent implements OnInit {
         '',
         Validators.required
       ],
-      graceOnPrincipalPayment: [''],
-      graceOnInterestPayment: [''],
-      graceOnInterestCharged: [''],
-      inArrearsTolerance: [''],
+      graceOnPrincipalPayment: [
+        '',
+        [Validators.min(0)]
+      ],
+      graceOnInterestPayment: [
+        '',
+        [Validators.min(0)]
+      ],
+      graceOnInterestCharged: [
+        '',
+        [Validators.min(0)]
+      ],
+      inArrearsTolerance: [
+        '',
+        [Validators.min(0)]
+      ],
       daysInYearType: [
         '',
         Validators.required
@@ -280,16 +325,26 @@ export class LoanProductSettingsStepComponent implements OnInit {
         Validators.required
       ],
       canDefineInstallmentAmount: [false],
-      graceOnArrearsAgeing: [''],
-      overdueDaysForNPA: [''],
+      graceOnArrearsAgeing: [
+        '',
+        [Validators.min(0)]
+      ],
+      overdueDaysForNPA: [
+        '',
+        [Validators.min(0)]
+      ],
       accountMovesOutOfNPAOnlyOnArrearsCompletion: [false],
-      principalThresholdForLastInstallment: [''],
+      principalThresholdForLastInstallment: [
+        '',
+        [Validators.min(0)]
+      ],
       allowVariableInstallments: [false],
       disallowExpectedDisbursements: [false],
       canUseForTopup: [false],
       isInterestRecalculationEnabled: [false],
       holdGuaranteeFunds: [false],
       multiDisburseLoan: [false],
+      allowFullTermForTranche: [false],
       allowAttributeConfiguration: [true],
       allowPartialPeriodInterestCalculation: [false],
       allowAttributeOverrides: this.formBuilder.group({
@@ -306,8 +361,14 @@ export class LoanProductSettingsStepComponent implements OnInit {
       enableDownPayment: [false],
       enableInstallmentLevelDelinquency: [false],
       useDueForRepaymentsConfigurations: [false],
-      dueDaysForRepaymentEvent: [''],
-      overDueDaysForRepaymentEvent: [''],
+      dueDaysForRepaymentEvent: [
+        '',
+        [Validators.min(0)]
+      ],
+      overDueDaysForRepaymentEvent: [
+        '',
+        [Validators.min(0)]
+      ],
       loanScheduleType: [
         LoanProducts.LOAN_SCHEDULE_TYPE_CUMULATIVE,
         Validators.required
@@ -318,6 +379,23 @@ export class LoanProductSettingsStepComponent implements OnInit {
 
   setConditionalControls() {
     const allowAttributeOverrides = this.loanProductSettingsForm.get('allowAttributeOverrides');
+
+    this.loanProductSettingsForm.get('daysInYearType').valueChanges.subscribe((daysInYearType: any) => {
+      if (this.isAdvancedTransactionProcessingStrategy) {
+        this.useDaysInYearCustomStrategy = daysInYearType == 1;
+        if (this.useDaysInYearCustomStrategy) {
+          const daysInYearCustomStrategy: string = this.loanProductsTemplate.daysInYearCustomStrategy?.id
+            ? this.loanProductsTemplate.daysInYearCustomStrategy.id
+            : this.daysInYearCustomStrategyOptions[0].id;
+          this.loanProductSettingsForm.addControl(
+            'daysInYearCustomStrategy',
+            new UntypedFormControl(daysInYearCustomStrategy, Validators.required)
+          );
+        } else {
+          this.loanProductSettingsForm.removeControl('daysInYearCustomStrategy');
+        }
+      }
+    });
 
     this.loanProductSettingsForm
       .get('interestCalculationPeriodType')
@@ -338,7 +416,6 @@ export class LoanProductSettingsStepComponent implements OnInit {
           this.loanProductSettingsForm.removeControl('maximumGap');
         }
       });
-
     this.loanProductSettingsForm
       .get('isInterestRecalculationEnabled')
       .valueChanges.subscribe((isInterestRecalculationEnabled: any) => {
@@ -512,7 +589,10 @@ export class LoanProductSettingsStepComponent implements OnInit {
       } else {
         this.loanProductSettingsForm.removeControl('maxTrancheCount');
         this.loanProductSettingsForm.removeControl('outstandingLoanBalance');
-        this.loanProductSettingsForm.patchValue({ disallowExpectedDisbursements: false });
+        this.loanProductSettingsForm.patchValue({
+          disallowExpectedDisbursements: false,
+          allowFullTermForTranche: false
+        });
       }
     });
 
@@ -522,7 +602,8 @@ export class LoanProductSettingsStepComponent implements OnInit {
           'disbursedAmountPercentageForDownPayment',
           new UntypedFormControl(0, [
             Validators.required,
-            rangeValidator(0, 100)])
+            rangeValidator(0, 100)
+          ])
         );
         this.loanProductSettingsForm.addControl('enableAutoRepaymentForDownPayment', new UntypedFormControl(false, []));
       } else {
@@ -605,6 +686,7 @@ export class LoanProductSettingsStepComponent implements OnInit {
         this.advancedTransactionProcessingStrategyDisabled = false;
         this.isAdvancedTransactionProcessingStrategy = false;
         this.loanProductSettingsForm.removeControl('chargeOffBehaviour');
+        this.loanProductSettingsForm.patchValue({ allowFullTermForTranche: false });
       } else {
         // Only Advanced Payment Allocation Strategy
         this.transactionProcessingStrategyDataBase.some((cn: CodeName) => {
@@ -621,6 +703,7 @@ export class LoanProductSettingsStepComponent implements OnInit {
           'chargeOffBehaviour',
           new UntypedFormControl(this.loanProductsTemplate.chargeOffBehaviour.id)
         );
+        this.validateAdvancedPaymentStrategyControls();
       }
       if (this.loanProductSettingsForm.value.isInterestRecalculationEnabled) {
         this.setRescheduleStrategies();
@@ -701,6 +784,7 @@ export class LoanProductSettingsStepComponent implements OnInit {
 
   private validateAdvancedPaymentStrategyControls(): void {
     if (this.isAdvancedTransactionProcessingStrategy) {
+      const daysInYearType: any = this.loanProductSettingsForm.get('daysInYearType').value;
       this.loanProductSettingsForm.addControl(
         'loanScheduleProcessingType',
         new UntypedFormControl(
@@ -709,8 +793,20 @@ export class LoanProductSettingsStepComponent implements OnInit {
           [Validators.required]
         )
       );
+      this.useDaysInYearCustomStrategy = daysInYearType === 1;
+      if (this.useDaysInYearCustomStrategy) {
+        const daysInYearCustomStrategy: string = this.loanProductsTemplate.daysInYearCustomStrategy?.id
+          ? this.loanProductsTemplate.daysInYearCustomStrategy.id
+          : this.daysInYearCustomStrategyOptions[0].id;
+        this.loanProductSettingsForm.addControl(
+          'daysInYearCustomStrategy',
+          new UntypedFormControl(daysInYearCustomStrategy, Validators.required)
+        );
+      }
     } else {
+      this.useDaysInYearCustomStrategy = false;
       this.loanProductSettingsForm.removeControl('loanScheduleProcessingType');
+      this.loanProductSettingsForm.removeControl('daysInYearCustomStrategy');
     }
   }
 }

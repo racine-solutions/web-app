@@ -1,7 +1,15 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { UntypedFormControl } from '@angular/forms';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { NavigationService } from './navigation.service';
@@ -12,6 +20,7 @@ import { StaffNavigationComponent } from './staff-navigation/staff-navigation.co
 import { CenterNavigationComponent } from './center-navigation/center-navigation.component';
 import { GroupNavigationComponent } from './group-navigation/group-navigation.component';
 import { ClientNavigationComponent } from './client-navigation/client-navigation.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Navigation component.
@@ -19,9 +28,21 @@ import { ClientNavigationComponent } from './client-navigation/client-navigation
 @Component({
   selector: 'mifosx-navigation',
   templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
+  styleUrls: ['./navigation.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    OfficeNavigationComponent,
+    StaffNavigationComponent,
+    CenterNavigationComponent,
+    GroupNavigationComponent,
+    ClientNavigationComponent
+  ]
 })
 export class NavigationComponent implements OnInit {
+  private navigationService = inject(NavigationService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Navigation Components */
   @ViewChild(OfficeNavigationComponent) officeNavigationComponent: OfficeNavigationComponent;
   @ViewChild(StaffNavigationComponent) staffNavigationComponent: StaffNavigationComponent;
@@ -65,11 +86,7 @@ export class NavigationComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private navigationService: NavigationService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { offices: any }) => {
       this.officeData = data.offices;
     });

@@ -1,13 +1,63 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { Accounting } from 'app/core/utils/accounting';
 import { OptionData } from 'app/shared/models/option-data.model';
+import { MatDivider } from '@angular/material/divider';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ViewSavingsAccountingDetailsComponent } from '../../../../shared/accounting/view-savings-accounting-details/view-savings-accounting-details.component';
+import { MatStepperPrevious } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { YesnoPipe } from '../../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-saving-product-preview-step',
   templateUrl: './saving-product-preview-step.component.html',
-  styleUrls: ['./saving-product-preview-step.component.scss']
+  styleUrls: ['./saving-product-preview-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDivider,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    ViewSavingsAccountingDetailsComponent,
+    MatStepperPrevious,
+    FaIconComponent,
+    FindPipe,
+    FormatNumberPipe,
+    YesnoPipe
+  ]
 })
 export class SavingProductPreviewStepComponent implements OnInit, OnChanges {
+  private accounting = inject(Accounting);
+
   @Input() savingProductsTemplate: any;
   @Input() accountingRuleData: any;
   @Input() savingProduct: any;
@@ -32,8 +82,6 @@ export class SavingProductPreviewStepComponent implements OnInit, OnChanges {
   accountingMappings: any = {};
   accountingRule: OptionData;
 
-  constructor(private accounting: Accounting) {}
-
   ngOnInit() {
     this.setCurrentValues();
   }
@@ -44,6 +92,7 @@ export class SavingProductPreviewStepComponent implements OnInit, OnChanges {
 
   setCurrentValues(): void {
     this.accountingRule = this.accounting.getAccountingRuleFrom(this.savingProduct.accountingRule);
+
     if (this.isCashOrAccrualAccounting()) {
       const assetAccountData = this.savingProductsTemplate.accountingMappingOptions.assetAccountOptions || [];
       const incomeAccountData = this.savingProductsTemplate.accountingMappingOptions.incomeAccountOptions || [];
@@ -102,10 +151,10 @@ export class SavingProductPreviewStepComponent implements OnInit, OnChanges {
   }
 
   isCashOrAccrualAccounting(): boolean {
-    return this.accounting.isAccrualAccountingRuleId(this.savingProduct.accountingRule);
+    return this.accounting.isCashOrAccrualAccounting(this.accountingRule);
   }
 
   isAccrualAccounting(): boolean {
-    return this.accounting.isAccrualAccounting(this.savingProduct.accountingRule);
+    return this.accounting.isAccrualAccounting(this.accountingRule);
   }
 }

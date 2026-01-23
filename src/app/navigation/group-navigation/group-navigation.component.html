@@ -1,4 +1,12 @@
-<mat-card-header fxLayout="row" fxLayoutGap="5%">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<mat-card-header class="layout-row gap-5percent">
   <fa-icon class="main-icon" icon="users" size="3x"></fa-icon>
   <mat-card-title-group>
     <div class="mat-typography">
@@ -28,79 +36,81 @@
 <mat-card-content>
   <mat-tab-group>
     <mat-tab label="Details">
-      <div fxLayout="row wrap" class="content">
-        <div fxFlex="50%" class="mat-body-strong">
+      <div class="layout-row-wrap">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Activation Date' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ groupData.activationDate | dateFormat }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Associated Officer' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ groupData.staffName }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong" *ngIf="groupData.centerName">
-          {{ 'labels.inputs.Associated Center' | translate }}
-        </div>
+        @if (groupData.centerName) {
+          <div class="flex-50 mat-body-strong">
+            {{ 'labels.inputs.Associated Center' | translate }}
+          </div>
+        }
 
-        <div fxFlex="50%" *ngIf="groupData.centerName">
-          {{ groupData.centerName }}
-        </div>
+        @if (groupData.centerName) {
+          <div class="flex-50">
+            {{ groupData.centerName }}
+          </div>
+        }
 
-        <div
-          fxFlex="50%"
-          class="mat-body-strong"
-          *ngIf="groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.nextTenRecurringDates[0]"
-        >
-          {{ 'labels.inputs.Next Meeting Date' | translate }}
-        </div>
+        @if (groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.nextTenRecurringDates[0]) {
+          <div class="mat-body-strong flex-50">
+            {{ 'labels.inputs.Next Meeting Date' | translate }}
+          </div>
+        }
 
-        <div
-          fxFlex="50%"
-          *ngIf="groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.nextTenRecurringDates[0]"
-        >
-          {{ groupData.collectionMeetingCalendar.nextTenRecurringDates[0] | dateFormat }}
-        </div>
+        @if (groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.nextTenRecurringDates[0]) {
+          <div class="flex-50">
+            {{ groupData.collectionMeetingCalendar.nextTenRecurringDates[0] | dateFormat }}
+          </div>
+        }
 
-        <div
-          fxFlex="50%"
-          class="mat-body-strong"
-          *ngIf="groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.humanReadable"
-        >
-          {{ 'labels.inputs.Meeting Frequency' | translate }}
-        </div>
+        @if (groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.humanReadable) {
+          <div class="mat-body-strong flex-50">
+            {{ 'labels.inputs.Meeting Frequency' | translate }}
+          </div>
+        }
 
-        <div
-          fxFlex="50%"
-          *ngIf="groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.humanReadable"
-        >
-          {{ groupData.collectionMeetingCalendar.humanReadable }}
-        </div>
+        @if (groupData.collectionMeetingCalendar && groupData.collectionMeetingCalendar.humanReadable) {
+          <div class="flex-50">
+            {{ groupData.collectionMeetingCalendar.humanReadable }}
+          </div>
+        }
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Number of Clients' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ clientData ? clientData.length : '' }}
         </div>
       </div>
     </mat-tab>
 
-    <mat-tab label="Loan Accounts" *ngIf="groupAccountsData && groupAccountsData.loanAccounts">
-      <mifosx-loan-account-table [loanAccountData]="groupAccountsData.loanAccounts"></mifosx-loan-account-table>
-    </mat-tab>
+    @if (groupAccountsData && groupAccountsData.loanAccounts) {
+      <mat-tab label="Loan Accounts">
+        <mifosx-loan-account-table [loanAccountData]="groupAccountsData.loanAccounts"></mifosx-loan-account-table>
+      </mat-tab>
+    }
 
-    <mat-tab label="Savings Accounts" *ngIf="groupAccountsData && groupAccountsData.savingsAccounts">
-      <mifosx-savings-account-table
-        [savingsAccountData]="groupAccountsData.savingsAccounts"
-      ></mifosx-savings-account-table>
-    </mat-tab>
+    @if (groupAccountsData && groupAccountsData.savingsAccounts) {
+      <mat-tab label="Savings Accounts">
+        <mifosx-savings-account-table
+          [savingsAccountData]="groupAccountsData.savingsAccounts"
+        ></mifosx-savings-account-table>
+      </mat-tab>
+    }
   </mat-tab-group>
 </mat-card-content>

@@ -1,18 +1,51 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
 import { SavingsService } from 'app/savings/savings.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Currency } from 'app/shared/models/general.model';
 import { SystemService } from 'app/system/system.service';
+import { MatCard, MatCardTitle, MatCardContent, MatCardActions } from '@angular/material/card';
+import { InputAmountComponent } from '../../../shared/input-amount/input-amount.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+type TransactionCommandType = 'holdamount' | 'blockaccount' | 'blockdeposit' | 'blockwithdrawal';
+
+interface TransactionType {
+  holdamount: boolean;
+  blockaccount: boolean;
+  blockdeposit: boolean;
+  blockwithdrawal: boolean;
+}
 
 @Component({
   selector: 'mifosx-manage-savings-account',
   templateUrl: './manage-savings-account.component.html',
-  styleUrls: ['./manage-savings-account.component.scss']
+  styleUrls: ['./manage-savings-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCardTitle,
+    InputAmountComponent
+  ]
 })
 export class ManageSavingsAccountComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private savingsService = inject(SavingsService);
+  private dateUtils = inject(Dates);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private systemService = inject(SystemService);
+  private settingsService = inject(SettingsService);
+
   @Input() currency: Currency;
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -22,16 +55,11 @@ export class ManageSavingsAccountComponent implements OnInit {
   manageSavingsAccountForm: UntypedFormGroup;
   /** Savings Account Id */
   savingAccountId: string;
-  transactionCommand: string;
+  transactionCommand: TransactionCommandType;
 
   reasonOptions: any = [];
 
-  transactionType: {
-    holdamount: boolean;
-    blockaccount: boolean;
-    blockdeposit: boolean;
-    blockwithdrawal: boolean;
-  } = {
+  transactionType: TransactionType = {
     holdamount: false,
     blockaccount: false,
     blockdeposit: false,
@@ -46,15 +74,7 @@ export class ManageSavingsAccountComponent implements OnInit {
    * @param {Router} router Router
    * @param {SettingsService} settingsService Setting service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private savingsService: SavingsService,
-    private dateUtils: Dates,
-    private route: ActivatedRoute,
-    private router: Router,
-    private systemService: SystemService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.transactionCommand = this.route.snapshot.params['name'].toLowerCase().replaceAll(' ', '');
     this.transactionType[this.transactionCommand] = true;
     this.savingAccountId = this.route.snapshot.params['savingAccountId'];
@@ -130,7 +150,7 @@ export class ManageSavingsAccountComponent implements OnInit {
 
   submit() {
     let command = '';
-    let payload = {};
+    let payload: { transactionAmount?: number; [key: string]: any } = {};
 
     if (this.transactionType.holdamount) {
       const manageSavingsAccountFormData = this.manageSavingsAccountForm.value;

@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 
 /** rxjs Imports */
@@ -10,7 +18,7 @@ import { environment } from '../../../environments/environment';
 import { SettingsService } from 'app/settings/settings.service';
 
 /** Http request (default) options headers. */
-const httpOptions = {
+const httpOptions: { headers: { [key: string]: string } } = {
   headers: {
     'Fineract-Platform-TenantId': environment.fineractPlatformTenantId
   }
@@ -27,7 +35,7 @@ const twoFactorAccessTokenHeader = 'Fineract-Platform-TFA-Token';
  */
 @Injectable()
 export class AuthenticationInterceptor implements HttpInterceptor {
-  constructor(private settingsService: SettingsService) {}
+  private settingsService = inject(SettingsService);
 
   /**
    * Intercepts a Http request and sets the request headers.

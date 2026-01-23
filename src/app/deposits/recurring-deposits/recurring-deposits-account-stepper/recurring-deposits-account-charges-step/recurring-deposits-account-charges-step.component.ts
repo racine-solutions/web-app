@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -14,6 +22,24 @@ import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { Charge, Currency } from 'app/shared/models/general.model';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Recurring Deposit Account Charges Step
@@ -21,9 +47,32 @@ import { Charge, Currency } from 'app/shared/models/general.model';
 @Component({
   selector: 'mifosx-recurring-deposits-account-charges-step',
   templateUrl: './recurring-deposits-account-charges-step.component.html',
-  styleUrls: ['./recurring-deposits-account-charges-step.component.scss']
+  styleUrls: ['./recurring-deposits-account-charges-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    DateFormatPipe,
+    FormatNumberPipe
+  ]
 })
 export class RecurringDepositsAccountChargesStepComponent implements OnInit, OnChanges {
+  dialog = inject(MatDialog);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+
   @Input() recurringDepositsAccountTemplate: any;
   @Input() recurringDepositsAccountProductTemplate: any;
   @Input() currencyCode: UntypedFormControl;
@@ -49,12 +98,6 @@ export class RecurringDepositsAccountChargesStepComponent implements OnInit, OnC
   isChargesPatched = false;
   /** Currency Code */
   currency: Currency | null = null;
-
-  constructor(
-    public dialog: MatDialog,
-    private dateUtils: Dates,
-    private settingsService: SettingsService
-  ) {}
 
   ngOnInit() {
     this.chargesDataSource = [];
@@ -104,7 +147,6 @@ export class RecurringDepositsAccountChargesStepComponent implements OnInit, OnC
         type: 'number',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Amount',
@@ -135,7 +177,6 @@ export class RecurringDepositsAccountChargesStepComponent implements OnInit, OnC
         type: 'datetime-local',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Date',
@@ -177,7 +218,6 @@ export class RecurringDepositsAccountChargesStepComponent implements OnInit, OnC
         type: 'text',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Fee Interval',

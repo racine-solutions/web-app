@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +20,8 @@ import { FixedDepositsService } from '../fixed-deposits.service';
  * Fixed Deposits Account Transaction data resolver.
  */
 @Injectable()
-export class FixedDepositsAccountTransactionResolver implements Resolve<Object> {
-  /**
-   * @param {FixedDepositsService} fixedDepositsService Savings service.
-   */
-  constructor(private fixedDepositsService: FixedDepositsService) {}
+export class FixedDepositsAccountTransactionResolver {
+  private fixedDepositsService = inject(FixedDepositsService);
 
   /**
    * Returns the Fixed Deposits Account Transaction data.

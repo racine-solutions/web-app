@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 @use '@angular/material' as mat;
 @use 'sass:map';
 
@@ -8,6 +16,17 @@
     .login-container {
       background-color: #424242;
       box-shadow: 1px 1px 50px white;
+
+      .img-container {
+        max-width: 20rem;
+        padding: 0;
+        margin: 0;
+        content: url('../assets/images/white-mifos.png');
+      }
+
+      .logo-section {
+        margin: 4rem 0 3rem !important;
+      }
     }
 
     .cover {
@@ -45,6 +64,7 @@
   }
 
   mifosx-clients-view,
+  mifosx-centers-view,
   mifosx-fixed-deposit-account-view,
   mifosx-loans-view,
   mifosx-shares-account-view,
@@ -52,7 +72,7 @@
   mifosx-savings-account-view {
     .account-card {
       margin: 0 auto;
-      max-width: 80rem;
+      max-width: 90rem;
       width: 90%;
       padding: 0;
 
@@ -62,7 +82,7 @@
       }
 
       .header {
-        background-color: mat.get-color-from-palette($primary, 500);
+        background-color: mat.m2-get-color-from-palette($primary, 500);
         padding: 1%;
       }
 
@@ -96,7 +116,7 @@
         }
 
         .signature {
-          background-color: mat.get-color-from-palette($primary, 500);
+          background-color: mat.m2-get-color-from-palette($primary, 500);
         }
       }
 
@@ -161,6 +181,13 @@ body.dark-theme {
   .mat-input-element,
   .mat-form-field-label {
     color: white !important;
+  }
+
+  // Override Material typography heading colors for dark theme
+  h2.mat-h2,
+  h3.mat-h3,
+  h4.mat-h4 {
+    color: rgb(255 255 255 / 87%) !important;
   }
 
   mifosx-popover,
@@ -238,7 +265,145 @@ body.dark-theme {
     }
   }
 
+  .copy-label {
+    color: var(--md-sys-color-on-surface-variant, #c4c6d0);
+
+    p {
+      color: white !important;
+    }
+  }
+
   .external-asset-owner-status {
     color: white;
+  }
+
+  // Home page logo styling for dark mode
+  mifosx-home {
+    [src*='mifos_lg-logo.jpg'],
+    [src$='_home.png'] {
+      content: url('../assets/images/white-mifos.png');
+    }
+  }
+
+  // Table row hover effect for dark mode
+  .mat-mdc-row:hover,
+  tr.select-row:hover,
+  .select-row:hover {
+    background-color: rgb(255 255 255 / 8%) !important;
+  }
+
+  // Documents section dark theme styling
+  mifosx-entity-documents-tab {
+    .document-card {
+      background: #2d2d2d;
+      border-color: #444;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+
+      &:hover {
+        box-shadow: 0 4px 12px rgb(0 0 0 / 50%);
+      }
+    }
+
+    .thumb {
+      background: #1a1a1a;
+    }
+
+    .preview-overlay {
+      background: rgb(45 45 45 / 95%);
+      color: #0098ff;
+    }
+
+    .placeholder {
+      color: #b0b0b0;
+
+      fa-icon {
+        color: #888;
+      }
+    }
+
+    .card-body {
+      .title {
+        color: rgb(255 255 255 / 87%);
+      }
+
+      .meta {
+        color: #aaa;
+      }
+
+      .description {
+        color: rgb(255 255 255 / 70%);
+      }
+    }
+
+    .empty-state {
+      background: #2d2d2d;
+      border-color: #555;
+      color: rgb(255 255 255 / 70%);
+
+      .muted {
+        color: #888;
+      }
+    }
+  }
+
+  // Notes section dark theme styling
+  mifosx-entity-notes-tab {
+    .tab-container {
+      h3 {
+        color: rgb(255 255 255 / 87%);
+      }
+    }
+
+    .note-card {
+      background-color: #2d2d2d;
+      border-color: #444;
+      box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+
+      &:hover {
+        box-shadow: 0 4px 8px rgb(0 0 0 / 50%);
+        border-color: #555;
+      }
+    }
+
+    .note-content {
+      color: rgb(255 255 255 / 87%);
+    }
+
+    .note-footer {
+      border-top-color: #444;
+    }
+
+    .note-meta {
+      color: #aaa;
+    }
+
+    .created-by {
+      color: #0098ff;
+    }
+
+    .created-date {
+      color: #bbb;
+    }
+
+    .empty-state {
+      background-color: #2d2d2d;
+      color: rgb(255 255 255 / 70%);
+      border-color: #555;
+    }
+  }
+
+  // Configuration wizard dark theme styling
+  mifosx-configuration-wizard {
+    .config-wizard-content {
+      .description {
+        color: white !important;
+      }
+
+      .progress-section {
+        .progress-label {
+          color: white !important;
+        }
+      }
+    }
   }
 }

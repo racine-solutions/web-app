@@ -1,17 +1,42 @@
-import { Component, Input, OnInit } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
 import { LoansService } from 'app/loans/loans.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Currency } from 'app/shared/models/general.model';
+import { InputAmountComponent } from '../../../../shared/input-amount/input-amount.component';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-disburse-to-savings-account',
   templateUrl: './disburse-to-savings-account.component.html',
-  styleUrls: ['./disburse-to-savings-account.component.scss']
+  styleUrls: ['./disburse-to-savings-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    InputAmountComponent,
+    CdkTextareaAutosize,
+    FormatNumberPipe
+  ]
 })
 export class DisburseToSavingsAccountComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private loanService = inject(LoansService);
+  private settingsService = inject(SettingsService);
+
   @Input() dataObject: any;
 
   /** Minimum Date allowed. */
@@ -22,29 +47,26 @@ export class DisburseToSavingsAccountComponent implements OnInit {
   disbursementForm: UntypedFormGroup;
   currency: Currency;
 
-  /**
-   * Get data from `Resolver`.
-   * @param {FormBuilder} formBuilder FormBuilder.
-   * @param {ActivatedRoute} route ActivatedRoute.
-   * @param {Router} router Router.
-   * @param {LoansService} loanService Loan Service.
-   * @param {SettingsService} settingsService Settings Service
-   */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private loanService: LoansService,
-    private settingsService: SettingsService
-  ) {}
-
   ngOnInit() {
     this.maxDate = this.settingsService.businessDate;
     this.setDisbursementToSavingsForm();
     if (this.dataObject.currency) {
       this.currency = this.dataObject.currency;
     }
+
+    // Get delinquency data for available disbursement amount with over applied
+    const loanId = this.route.snapshot.params['loanId'];
+    this.loanService.getLoanDelinquencyDataForTemplate(loanId).subscribe((delinquencyData: any) => {
+      // Check if the field is at root level
+      if (delinquencyData.availableDisbursementAmountWithOverApplied !== undefined) {
+        this.dataObject.availableDisbursementAmountWithOverApplied =
+          delinquencyData.availableDisbursementAmountWithOverApplied;
+      }
+      // Also check if it's in delinquent object
+      if (delinquencyData.delinquent) {
+        this.dataObject.delinquent = delinquencyData.delinquent;
+      }
+    });
   }
 
   /**

@@ -1,11 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
 import { Dates } from 'app/core/utils/dates';
 import { SettingsService } from 'app/settings/settings.service';
+import { DisbursementData } from './models/loan-account.model';
 
 /**
  * Loans service.
@@ -14,11 +23,10 @@ import { SettingsService } from 'app/settings/settings.service';
   providedIn: 'root'
 })
 export class LoansService {
-  constructor(
-    private http: HttpClient,
-    private settingsService: SettingsService,
-    private dateUtils: Dates
-  ) {}
+  private http = inject(HttpClient);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+
   /**
    * @param {string} loanId loanId of the loan.
    * @returns {Observable<any>}
@@ -28,7 +36,17 @@ export class LoansService {
   }
 
   getLoanActionTemplate(loanId: string, command: string): Observable<any> {
-    const httpParams = new HttpParams().set('command', command);
+    let httpParams = new HttpParams().set('command', command);
+    // Add associations for specific commands that need delinquency data
+    if (command === 'disburse' || command === 'disbursetosavings') {
+      httpParams = httpParams.set('associations', 'delinquency');
+    }
+
+    return this.http.get(`/loans/${loanId}/transactions/template`, { params: httpParams });
+  }
+
+  getLoanTransactionActionTemplate(loanId: string, command: string, transactionId: string): Observable<any> {
+    const httpParams = new HttpParams().set('command', command).set('transactionId', transactionId);
     return this.http.get(`/loans/${loanId}/transactions/template`, { params: httpParams });
   }
 
@@ -86,12 +104,30 @@ export class LoansService {
     return this.http.get(`/loans/${loanId}`, { params: httpParams });
   }
 
+  /**
+   * Get Loan Delinquency Data for template usage
+   * @param {string} loanId Loan Id
+   * @returns {Observable<any>}
+   */
+  getLoanDelinquencyDataForTemplate(loanId: string): Observable<any> {
+    const httpParams = new HttpParams().set('associations', 'delinquency');
+    return this.http.get(`/loans/${loanId}`, { params: httpParams });
+  }
+
   getDelinquencyActions(loanId: string) {
     return this.http.get(`/loans/${loanId}/delinquency-actions`);
   }
 
   createDelinquencyActions(loanId: string, delinquencyActions: any) {
     return this.http.post(`/loans/${loanId}/delinquency-actions`, delinquencyActions);
+  }
+
+  getDeferredIncomeData(loanId: string) {
+    return this.http.get(`/loans/${loanId}/deferredincome`);
+  }
+
+  getBuyDownFeeData(loanId: string): Observable<any> {
+    return this.http.get(`/loans/${loanId}/buydown-fees`);
   }
 
   /**
@@ -210,6 +246,42 @@ export class LoansService {
   submitLoanActionButton(loanId: string, data: any, command: any) {
     const httpParams = new HttpParams().set('command', command);
     return this.http.post(`/loans/${loanId}/transactions`, data, { params: httpParams });
+  }
+
+  /**
+   * Get Re-Age preview with repayment schedule
+   * @param loanId Loan Id
+   * @param data Re-Age data
+   * @returns Observable with repayment schedule preview
+   */
+  getReAgePreview(loanId: string, data: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    Object.keys(data).forEach((key) => {
+      if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+        httpParams = httpParams.set(key, data[key].toString());
+      }
+    });
+
+    return this.http.get(`/loans/${loanId}/transactions/reage-preview`, { params: httpParams });
+  }
+
+  /**
+   * Get Re-Amortize preview with repayment schedule
+   * @param loanId Loan Id
+   * @param data Re-Amortize data
+   * @returns Observable with repayment schedule preview
+   */
+  getReAmortizePreview(loanId: string, data: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    Object.keys(data).forEach((key) => {
+      if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+        httpParams = httpParams.set(key, data[key].toString());
+      }
+    });
+
+    return this.http.get(`/loans/${loanId}/transactions/reamortization-preview`, { params: httpParams });
   }
 
   getLoanScreenReportsData(): Observable<any> {
@@ -446,7 +518,7 @@ export class LoansService {
 
   getTemplateData(templateId: any, loanId: any): Observable<any> {
     const httpParams = new HttpParams().set('loanId', loanId);
-    return this.http.post(`/templates/${templateId}`, {}, { params: httpParams, responseType: 'text' });
+    return this.http.get(`/templates/${templateId}`, { params: httpParams, responseType: 'text' });
   }
 
   /**
@@ -455,13 +527,21 @@ export class LoansService {
    * @returns {Observable<any>}
    */
   getLoanApprovalTemplate(loanId: string): Observable<any> {
-    const httpParams = new HttpParams().set('templateType', 'approval');
+    const httpParams = new HttpParams().set('templateType', 'approval').set('associations', 'delinquency');
     return this.http.get(`/loans/${loanId}/template`, { params: httpParams });
   }
 
   guarantorAccountResource(loanId: string, clientId: any): Observable<any> {
     const httpParams = new HttpParams().set('clientId', clientId);
     return this.http.get(`/loans/${loanId}/guarantors/accounts/template`, { params: httpParams });
+  }
+
+  /**
+   * @param {string} loanId Loan Id
+   * @returns {Observable<any>} All charges for the loan
+   */
+  getLoanCharges(loanId: string): Observable<any> {
+    return this.http.get(`/loans/${loanId}/charges`);
   }
 
   /**
@@ -563,13 +643,15 @@ export class LoansService {
   getGLIMLoanAccountTemplate(groupId: any): Observable<any> {
     const httpParams = new HttpParams()
       .set('groupId', groupId)
-      .set('lendingStrategy', '300')
+      // Commenting parameter, because it doesn't exist:
+      // https://localhost:8443/fineract-provider/swagger-ui/index.html#/Loans/template_10
+      //   .set('lendingStrategy', '300')
       .set('templateType', 'jlgbulk');
     return this.http.get('/loans/template', { params: httpParams });
   }
 
-  createGlimAccount(glimAccount: any): Observable<any> {
-    return this.http.post('/batches?enclosingTransaction=true', glimAccount);
+  createGlimAccount(payload: any): Observable<any> {
+    return this.http.post('/batches?enclosingTransaction=true', payload);
   }
 
   calculateLoanSchedule(payload: any): Observable<any> {
@@ -593,15 +675,31 @@ export class LoansService {
   ): any {
     const loansAccountData = {
       ...loansAccount,
-      charges: loansAccount.charges.map((charge: any) => ({
-        chargeId: charge.id,
-        amount: charge.amount,
-        dueDate: charge.dueDate && this.dateUtils.formatDate(charge.dueDate, dateFormat)
-      })),
-      collateral: loansAccount.collateral.map((collateralEle: any) => ({
-        clientCollateralId: collateralEle.type.collateralId,
-        quantity: collateralEle.value
-      })),
+      charges: (loansAccount.charges ?? [])
+        .map((charge: any) => {
+          const chargeId = charge.chargeId ?? charge.id;
+          if (chargeId == null) {
+            return null;
+          }
+          const mappedCharge: any = {
+            chargeId,
+            amount: charge.amount
+          };
+          if (charge.id && charge.id !== chargeId) {
+            mappedCharge.id = charge.id;
+          }
+          if (charge.dueDate) {
+            mappedCharge.dueDate = this.dateUtils.formatDate(charge.dueDate, dateFormat);
+          }
+          if (charge.feeInterval !== undefined) {
+            mappedCharge.feeInterval = charge.feeInterval;
+          }
+          if (charge.feeOnMonthDay !== undefined) {
+            mappedCharge.feeOnMonthDay = charge.feeOnMonthDay;
+          }
+          return mappedCharge;
+        })
+        .filter(Boolean),
       disbursementData: loansAccount.disbursementData.map((item: any) => ({
         expectedDisbursementDate: this.dateUtils.formatDate(item.expectedDisbursementDate, dateFormat),
         principal: item.principal
@@ -613,7 +711,19 @@ export class LoansService {
       dateFormat,
       locale
     };
-    if (loansAccountTemplate.clientId) {
+
+    if (loansAccount.collateral) {
+      loansAccountData.collateral = loansAccount.collateral.map((collateralEle: any) => ({
+        clientCollateralId: collateralEle.type.collateralId,
+        quantity: collateralEle.value
+      }));
+    }
+
+    if (loansAccountTemplate.clientId && loansAccountTemplate.group?.id) {
+      loansAccountData.clientId = loansAccountTemplate.clientId;
+      loansAccountData.groupId = loansAccountTemplate.group.id;
+      loansAccountData.loanType = 'glim';
+    } else if (loansAccountTemplate.clientId) {
       loansAccountData.clientId = loansAccountTemplate.clientId;
       loansAccountData.loanType = 'individual';
     } else {
@@ -649,9 +759,16 @@ export class LoansService {
 
     // In Fineract, the POST and PUT endpoints for /v1/loans have a typo in the field
     // allowPartialPeriodInterestCalculation. Until that is fixed, we need to replace the field name in the payload.
-    loansAccountData.allowPartialPeriodInterestCalcualtion = loansAccountData.allowPartialPeriodInterestCalculation;
+    loansAccountData.allowPartialPeriodInterestCalculation = loansAccountData.allowPartialPeriodInterestCalculation;
     delete loansAccountData.allowPartialPeriodInterestCalculation;
-
     return loansAccountData;
+  }
+
+  saveLoanDisbursementDetailsData(disbursementData: DisbursementData[]): void {
+    localStorage.setItem('disbursementData', JSON.stringify(disbursementData));
+  }
+
+  getLoanDisbursementDetailsData(): DisbursementData[] {
+    return JSON.parse(localStorage.getItem('disbursementData'));
   }
 }

@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 /** Custom Components */
@@ -14,13 +22,38 @@ import { SavingProductAccountingStepComponent } from '../saving-product-stepper/
 import { ProductsService } from 'app/products/products.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Accounting } from 'app/core/utils/accounting';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { SavingProductPreviewStepComponent } from '../saving-product-stepper/saving-product-preview-step/saving-product-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-create-saving-product',
   templateUrl: './create-saving-product.component.html',
-  styleUrls: ['./create-saving-product.component.scss']
+  styleUrls: ['./create-saving-product.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    SavingProductDetailsStepComponent,
+    SavingProductCurrencyStepComponent,
+    SavingProductTermsStepComponent,
+    SavingProductSettingsStepComponent,
+    SavingProductChargesStepComponent,
+    SavingProductAccountingStepComponent,
+    SavingProductPreviewStepComponent
+  ]
 })
 export class CreateSavingProductComponent {
+  private route = inject(ActivatedRoute);
+  private productsService = inject(ProductsService);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+  private accounting = inject(Accounting);
+
   @ViewChild(SavingProductDetailsStepComponent, { static: true })
   savingProductDetailsStep: SavingProductDetailsStepComponent;
   @ViewChild(SavingProductCurrencyStepComponent, { static: true })
@@ -43,13 +76,7 @@ export class CreateSavingProductComponent {
    * @param {SettingsService} settingsService Settings Service.
    */
 
-  constructor(
-    private route: ActivatedRoute,
-    private productsService: ProductsService,
-    private router: Router,
-    private settingsService: SettingsService,
-    private accounting: Accounting
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { savingProductsTemplate: any }) => {
       this.savingProductsTemplate = data.savingProductsTemplate;
     });

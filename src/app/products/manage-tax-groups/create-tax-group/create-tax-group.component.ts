@@ -1,7 +1,22 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  FormControl,
+  FormArray,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
@@ -16,6 +31,23 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { FindPipe } from '../../../pipes/find.pipe';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Tax Group component.
@@ -23,9 +55,35 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'mifosx-create-tax-group',
   templateUrl: './create-tax-group.component.html',
-  styleUrls: ['./create-tax-group.component.scss']
+  styleUrls: ['./create-tax-group.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FindPipe,
+    DateFormatPipe
+  ]
 })
 export class CreateTaxGroupComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private productsService = inject(ProductsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private dialog = inject(MatDialog);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+
   /** Minimum start date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum start date allowed. */
@@ -56,16 +114,7 @@ export class CreateTaxGroupComponent implements OnInit {
    * @param {MatDialog} dialog Dialog reference.
    * @param {SettingsService} settingsService Settings Service.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private productsService: ProductsService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private dialog: MatDialog,
-    private settingsService: SettingsService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { taxGroupTemplate: any }) => {
       this.taxGroupTemplateData = data.taxGroupTemplate;
       this.taxComponentOptions = this.taxGroupTemplateData.taxComponents;
@@ -107,7 +156,6 @@ export class CreateTaxGroupComponent implements OnInit {
         maxDate: this.maxDate,
         order: 2
       })
-
     ];
     const data = {
       title:
@@ -145,7 +193,6 @@ export class CreateTaxGroupComponent implements OnInit {
         maxDate: this.maxDate,
         order: 2
       })
-
     ];
     const data = {
       title: 'Edit Tax Component',

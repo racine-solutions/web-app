@@ -1,6 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +19,8 @@ import { TasksService } from '../tasks.service';
  * Maker Checker Template resolver.
  */
 @Injectable()
-export class MakerCheckerTemplate implements Resolve<Object> {
-  /**
-   * @param {TasksService} tasksService Tasks service.
-   */
-  constructor(private tasksService: TasksService) {}
+export class MakerCheckerTemplate {
+  private tasksService = inject(TasksService);
 
   /**
    * Returns the maker checker template data.

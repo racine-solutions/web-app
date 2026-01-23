@@ -1,25 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
 import { Alert } from 'app/core/alert/alert.model';
 import { AlertService } from 'app/core/alert/alert.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Subscription } from 'rxjs';
 import { SystemService } from '../system.service';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { GlobalConfigurationsTabComponent } from './global-configurations-tab/global-configurations-tab.component';
+import { BusinessDateTabComponent } from './business-date-tab/business-date-tab.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-configurations',
   templateUrl: './configurations.component.html',
-  styleUrls: ['./configurations.component.scss']
+  styleUrls: ['./configurations.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTabGroup,
+    MatTab,
+    GlobalConfigurationsTabComponent,
+    BusinessDateTabComponent
+  ]
 })
 export class ConfigurationsComponent implements OnInit {
+  private alertService = inject(AlertService);
+  private systemService = inject(SystemService);
+
   /** Subscription to alerts. */
   alert$: Subscription;
 
   isBusinessDateEnabled = false;
-
-  constructor(
-    private alertService: AlertService,
-    private systemService: SystemService
-  ) {}
 
   ngOnInit(): void {
     this.alert$ = this.alertService.alertEvent.subscribe((alertEvent: Alert) => {

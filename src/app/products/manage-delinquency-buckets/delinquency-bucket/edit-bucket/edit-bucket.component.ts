@@ -1,20 +1,69 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ProductsService } from 'app/products/products.service';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-edit-bucket',
   templateUrl: './edit-bucket.component.html',
-  styleUrls: ['./edit-bucket.component.scss']
+  styleUrls: ['./edit-bucket.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FindPipe
+  ]
 })
 export class EditBucketComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private productsService = inject(ProductsService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** Delinquency Bucket form. */
   bucketForm: UntypedFormGroup;
   /** Delinquency Bucket template data. */
@@ -39,14 +88,7 @@ export class EditBucketComponent implements OnInit {
     'actions'
   ];
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private productsService: ProductsService,
-    private router: Router,
-    private route: ActivatedRoute,
-    public dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { delinquencyBucket: any; delinquencyRanges: any }) => {
       this.delinquencyRangesData = data.delinquencyRanges;
       this.rangesDataSource = [];
@@ -97,7 +139,6 @@ export class EditBucketComponent implements OnInit {
         options: { label: 'classification', value: 'id', data: delinquencyRanges },
         order: 1
       })
-
     ];
     const data = {
       title: 'Add Delinquency Range',

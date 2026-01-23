@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 /** Custom Components */
@@ -15,13 +23,39 @@ import { FixedDepositProductAccountingStepComponent } from '../fixed-deposit-pro
 import { ProductsService } from 'app/products/products.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Accounting } from 'app/core/utils/accounting';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { FixedDepositProductPreviewStepComponent } from '../fixed-deposit-product-stepper/fixed-deposit-product-preview-step/fixed-deposit-product-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-edit-fixed-deposit-product',
   templateUrl: './edit-fixed-deposit-product.component.html',
-  styleUrls: ['./edit-fixed-deposit-product.component.scss']
+  styleUrls: ['./edit-fixed-deposit-product.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    FixedDepositProductDetailsStepComponent,
+    FixedDepositProductCurrencyStepComponent,
+    FixedDepositProductTermsStepComponent,
+    FixedDepositProductSettingsStepComponent,
+    FixedDepositProductInterestRateChartStepComponent,
+    FixedDepositProductChargesStepComponent,
+    FixedDepositProductAccountingStepComponent,
+    FixedDepositProductPreviewStepComponent
+  ]
 })
 export class EditFixedDepositProductComponent {
+  private route = inject(ActivatedRoute);
+  private productsService = inject(ProductsService);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+  private accounting = inject(Accounting);
+
   @ViewChild(FixedDepositProductDetailsStepComponent, { static: true })
   fixedDepositProductDetailsStep: FixedDepositProductDetailsStepComponent;
   @ViewChild(FixedDepositProductCurrencyStepComponent, { static: true })
@@ -47,13 +81,7 @@ export class EditFixedDepositProductComponent {
    * @param {SettingsService} settingsService Settings Service
    */
 
-  constructor(
-    private route: ActivatedRoute,
-    private productsService: ProductsService,
-    private router: Router,
-    private settingsService: SettingsService,
-    private accounting: Accounting
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { fixedDepositProductAndTemplate: any }) => {
       this.fixedDepositProductsTemplate = data.fixedDepositProductAndTemplate;
     });

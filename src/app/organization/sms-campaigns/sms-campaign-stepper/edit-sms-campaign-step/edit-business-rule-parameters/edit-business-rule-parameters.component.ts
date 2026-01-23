@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnChanges, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { Validators, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import { Component, OnChanges, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Validators, UntypedFormGroup, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 
 /** Rxjs Imports */
 import { distinctUntilChanged } from 'rxjs/operators';
@@ -13,6 +21,11 @@ import { SettingsService } from 'app/settings/settings.service';
 import { ReportParameter } from 'app/reports/common-models/report-parameter.model';
 import { SelectOption } from 'app/reports/common-models/select-option.model';
 import { Dates } from 'app/core/utils/dates';
+import { MatDivider } from '@angular/material/divider';
+import { NgFor, NgSwitch, NgIf, NgSwitchCase } from '@angular/common';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Business Rule Parameters.
@@ -20,9 +33,22 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-edit-business-rule-parameters',
   templateUrl: './edit-business-rule-parameters.component.html',
-  styleUrls: ['./edit-business-rule-parameters.component.scss']
+  styleUrls: ['./edit-business-rule-parameters.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDivider,
+    NgSwitch,
+    NgSwitchCase,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class EditBusinessRuleParametersComponent implements OnInit, OnChanges {
+  private reportsService = inject(ReportsService);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+
   /** Run Report Parameters Data */
   @Input() paramData: any;
   /** SMS Campaign */
@@ -40,16 +66,6 @@ export class EditBusinessRuleParametersComponent implements OnInit, OnChanges {
   minDate = new Date(2000, 0, 1);
   /** Maximum Date allowed. */
   maxDate = new Date();
-
-  /**
-   * @param {ReportsService} reportsService Reports Service
-   * @param {SettingsService} settingsService Settings Service.
-   */
-  constructor(
-    private reportsService: ReportsService,
-    private settingsService: SettingsService,
-    private dateUtils: Dates
-  ) {}
 
   ngOnInit(): void {
     this.maxDate = this.settingsService.businessDate;

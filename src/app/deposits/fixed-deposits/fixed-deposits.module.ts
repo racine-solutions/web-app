@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 
@@ -46,7 +54,11 @@ import { FixedDepositsCashTransactionComponent } from './fixed-deposits-account-
  * All components related to fixed deposits functions should be declared here.
  */
 @NgModule({
-  declarations: [
+  imports: [
+    SharedModule,
+    PipesModule,
+    DirectivesModule,
+    FixedDepositsRoutingModule,
     FixedDepositAccountViewComponent,
     TransactionsTabComponent,
     ChargesTabComponent,
@@ -78,12 +90,6 @@ import { FixedDepositsCashTransactionComponent } from './fixed-deposits-account-
     EditFixedDepositAccountComponent,
     GeneralTabComponent,
     FixedDepositsCashTransactionComponent
-  ],
-  imports: [
-    SharedModule,
-    PipesModule,
-    DirectivesModule,
-    FixedDepositsRoutingModule
   ],
   providers: []
 })

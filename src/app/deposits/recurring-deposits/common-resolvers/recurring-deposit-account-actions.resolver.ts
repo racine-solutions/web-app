@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -13,15 +21,9 @@ import { RecurringDepositsService } from '../recurring-deposits.service';
  * Recurring Deposits Account Actions data resolver.
  */
 @Injectable()
-export class RecurringDepositsAccountActionsResolver implements Resolve<Object> {
-  /**
-   * @param {SavingsService} SavingsService Savings service.
-   * @param {RecurringDepositsService} recurringDepositsService Recurring Deposits Service.
-   */
-  constructor(
-    private savingsService: SavingsService,
-    private recurringDepositsService: RecurringDepositsService
-  ) {}
+export class RecurringDepositsAccountActionsResolver {
+  private savingsService = inject(SavingsService);
+  private recurringDepositsService = inject(RecurringDepositsService);
 
   /**
    * Returns the Recurring deposits account actions data.

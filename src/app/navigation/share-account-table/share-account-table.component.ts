@@ -1,18 +1,63 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 
 /** Custom Pipes */
 import { AccountsFilterPipe } from '../../pipes/accounts-filter.pipe';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-share-account-table',
   templateUrl: './share-account-table.component.html',
-  styleUrls: ['./share-account-table.component.scss']
+  styleUrls: ['./share-account-table.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    FaIconComponent,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    StatusLookupPipe
+  ]
 })
 export class ShareAccountTableComponent {
+  private accountsFilterPipe = inject(AccountsFilterPipe);
+
   /** Columns to be displayed in the share accounts table. */
   displayedColumns: string[] = [
     'accountNo',
@@ -45,11 +90,6 @@ export class ShareAccountTableComponent {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-
-  /**
-   * @param {AccountsFilterPipe} accountsFilterPipe Accounts Filter Pipe.
-   */
-  constructor(private accountsFilterPipe: AccountsFilterPipe) {}
 
   /**
    * Filters data in users table based on passed value.

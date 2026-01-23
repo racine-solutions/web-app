@@ -1,10 +1,28 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Data Imports */
 import { columnTypeData } from '../column-type-data';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Column Dialog Component.
@@ -12,24 +30,26 @@ import { columnTypeData } from '../column-type-data';
 @Component({
   selector: 'mifosx-column-dialog',
   templateUrl: './column-dialog.component.html',
-  styleUrls: ['./column-dialog.component.scss']
+  styleUrls: ['./column-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatCheckbox,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class ColumnDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ColumnDialogComponent>>(MatDialogRef);
+  formBuilder = inject(UntypedFormBuilder);
+  data = inject(MAT_DIALOG_DATA);
+
   /** Column Form. */
   columnForm: UntypedFormGroup;
   /** Column Type Data */
   columnTypeData = columnTypeData;
-
-  /**
-   * @param {MatDialogRef} dialogRef Component reference to dialog.
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {any} data Provides the column codes and values for the form (if available).
-   */
-  constructor(
-    public dialogRef: MatDialogRef<ColumnDialogComponent>,
-    public formBuilder: UntypedFormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
 
   /**
    * Creates the add column form.
@@ -50,7 +70,6 @@ export class ColumnDialogComponent implements OnInit {
           disabled: this.data.type === 'existing'
         },
         Validators.required
-
       ],
       length: [
         {
@@ -58,7 +77,6 @@ export class ColumnDialogComponent implements OnInit {
           disabled: this.getColumnType(this.data.columnDisplayType) !== 'String' || this.data.type === 'existing'
         },
         Validators.required
-
       ],
       mandatory: [{ value: this.data.isColumnNullable, disabled: this.data.type === 'existing' }],
       unique: [
@@ -70,7 +88,6 @@ export class ColumnDialogComponent implements OnInit {
           disabled: this.getColumnType(this.data.columnDisplayType) !== 'Dropdown' || this.data.type === 'existing'
         },
         Validators.required
-
       ]
     });
     this.onColumnTypeChanges();

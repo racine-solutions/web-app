@@ -18,19 +18,28 @@
       },
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
             "aot": true,
-            "outputPath": "dist/web-app",
+            "outputPath": {
+              "base": "dist/web-app"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts",
+              "@angular/localize/init"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/robots.txt",
               "src/manifest.json",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce",
+                "output": "assets/tinymce"
+              }
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
@@ -45,9 +54,15 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "lodash",
-              "@ckeditor/ckeditor5-build-classic",
+              "tinymce",
               "moment"
-            ]
+            ],
+            "browser": "src/main.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -74,66 +89,43 @@
               "namedChunks": true,
               "outputHashing": "all",
               "extractLicenses": true,
-              "aot": true,
-              "buildOptimizer": true,
-              "vendorChunk": false
+              "aot": true
             },
             "development": {
               "optimization": false,
               "sourceMap": true,
               "namedChunks": true,
               "extractLicenses": true,
-              "aot": true,
-              "buildOptimizer": true,
-              "vendorChunk": false
+              "aot": true
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
-            "browserTarget": "mifosx-web-app:build"
+            "buildTarget": "mifosx-web-app:build"
           },
           "configurations": {
             "development": {
-              "browserTarget": "mifosx-web-app:build:development"
+              "buildTarget": "mifosx-web-app:build:development"
             },
             "production": {
-              "browserTarget": "mifosx-web-app:build:production"
+              "buildTarget": "mifosx-web-app:build:production"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
-            "browserTarget": "mifosx-web-app:build"
+            "buildTarget": "mifosx-web-app:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular-builders/jest:run",
           "options": {
-            "browsers": "ChromeHeadless",
-            "main": "src/test.ts",
-            "karmaConfig": "src/karma.conf.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [],
-            "styles": [
-              "src/main.scss",
-              {
-                "inject": false,
-                "input": "src/theme/mifosx-theme.scss",
-                "bundleName": "mifosx-theme"
-              }
-            ],
-            "assets": [
-              "src/favicon.ico",
-              "src/robots.txt",
-              "src/manifest.json",
-              "src/assets"
-            ]
+            "configPath": "./jest.config.ts"
           }
         },
         "lint": {
@@ -232,5 +224,37 @@
     "schematicCollections": [
       "@angular-eslint/schematics"
     ]
+  },
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
+    },
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
   }
 }

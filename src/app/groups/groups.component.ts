@@ -1,9 +1,18 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
+
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { UntypedFormControl } from '@angular/forms';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 
 /** rxjs Imports */
 import { merge } from 'rxjs';
@@ -14,6 +23,22 @@ import { GroupsService } from './groups.service';
 
 /** Custom Data Source */
 import { GroupsDataSource } from './groups.datasource';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { NgClass, AsyncPipe } from '@angular/common';
+import { StatusLookupPipe } from '../pipes/status-lookup.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Groups component.
@@ -21,9 +46,32 @@ import { GroupsDataSource } from './groups.datasource';
 @Component({
   selector: 'mifosx-app-groups',
   templateUrl: './groups.component.html',
-  styleUrls: ['./groups.component.scss']
+  styleUrls: ['./groups.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgClass,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    AsyncPipe,
+    StatusLookupPipe
+  ]
 })
 export class GroupsComponent implements OnInit, AfterViewInit {
+  private groupsService = inject(GroupsService);
+
   @ViewChild('showClosedGroups', { static: true }) showClosedGroups: MatCheckbox;
 
   /** Name form control. */
@@ -50,11 +98,6 @@ export class GroupsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   /** Sorter for groups table. */
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-
-  /**
-   * @param {GroupsService} groupsService Groups Service
-   */
-  constructor(private groupsService: GroupsService) {}
 
   ngOnInit() {
     this.getGroups();

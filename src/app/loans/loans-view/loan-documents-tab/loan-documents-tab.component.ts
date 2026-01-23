@@ -1,11 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Services */
-import { environment } from 'environments/environment';
+import { environment } from '../../../../environments/environment';
 import { LoansService } from 'app/loans/loans.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { EntityDocumentsTabComponent } from '../../../shared/tabs/entity-documents-tab/entity-documents-tab.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Overdue charges tab component
@@ -13,9 +23,17 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-loan-documents-tab',
   templateUrl: './loan-documents-tab.component.html',
-  styleUrls: ['./loan-documents-tab.component.scss']
+  styleUrls: ['./loan-documents-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    EntityDocumentsTabComponent
+  ]
 })
-export class LoanDocumentsTabComponent {
+export class LoanDocumentsTabComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private loansService = inject(LoansService);
+  private settingsService = inject(SettingsService);
+
   /** Stores the resolved loan documents data */
   entityDocuments: any;
   /** Loan account Id */
@@ -26,15 +44,17 @@ export class LoanDocumentsTabComponent {
    * Retrieves the loans data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private loansService: LoansService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.entityId = this.route.parent.snapshot.params['loanId'];
 
     this.route.data.subscribe((data: { loanDocuments: any }) => {
       this.getLoanDocumentsData(data.loanDocuments);
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.parent.params.subscribe((params) => {
+      this.entityId = params['loanId'];
     });
   }
 
@@ -64,13 +84,6 @@ export class LoanDocumentsTabComponent {
       }
     });
     this.entityDocuments = data;
-  }
-
-  downloadDocument(documentId: string) {
-    this.loansService.downloadLoanDocument(this.entityId, documentId).subscribe((res) => {
-      const url = window.URL.createObjectURL(res);
-      window.open(url);
-    });
   }
 
   uploadDocument(formData: FormData): any {

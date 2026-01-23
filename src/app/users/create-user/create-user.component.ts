@@ -1,7 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
@@ -13,6 +27,8 @@ import { PasswordsUtility } from 'app/core/utils/passwords-utility';
 import { confirmPasswordValidator } from 'app/login/reset-password/confirm-password.validator';
 import { ConfigurationWizardService } from 'app/configuration-wizard/configuration-wizard.service';
 import { ContinueSetupDialogComponent } from 'app/configuration-wizard/continue-setup-dialog/continue-setup-dialog.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create user component.
@@ -20,9 +36,22 @@ import { ContinueSetupDialogComponent } from 'app/configuration-wizard/continue-
 @Component({
   selector: 'mifosx-create-user',
   templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss']
+  styleUrls: ['./create-user.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox
+  ]
 })
 export class CreateUserComponent implements OnInit, AfterViewInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private usersService = inject(UsersService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private popoverService = inject(PopoverService);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private dialog = inject(MatDialog);
+  private passwordsUtility = inject(PasswordsUtility);
+
   /** User form. */
   userForm: UntypedFormGroup;
   /** Offices data. */
@@ -46,16 +75,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
    * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
    * @param {PopoverService} popoverService PopoverService.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private usersService: UsersService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private popoverService: PopoverService,
-    private configurationWizardService: ConfigurationWizardService,
-    private dialog: MatDialog,
-    private passwordsUtility: PasswordsUtility
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { usersTemplate: any }) => {
       this.officesData = data.usersTemplate.allowedOffices;
       this.rolesData = data.usersTemplate.availableRoles;
@@ -92,13 +112,15 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
           '',
           [
             Validators.required,
-            Validators.pattern('(^[A-z]).*')]
+            Validators.pattern('(^[A-z]).*')
+          ]
         ],
         lastname: [
           '',
           [
             Validators.required,
-            Validators.pattern('(^[A-z]).*')]
+            Validators.pattern('(^[A-z]).*')
+          ]
         ],
         sendPasswordToEmail: [true],
         passwordNeverExpires: [false],
@@ -146,7 +168,8 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
           'repeatPassword',
           new UntypedFormControl('', [
             Validators.required,
-            this.passwordsUtility.confirmPassword('password')])
+            this.passwordsUtility.confirmPassword('password')
+          ])
         );
         this.userForm.get('email').setValidators([Validators.email]);
       }

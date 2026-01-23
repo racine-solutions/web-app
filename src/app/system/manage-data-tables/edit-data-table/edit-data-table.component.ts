@@ -1,11 +1,31 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { SystemService } from '../../system.service';
@@ -18,6 +38,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { ColumnDialogComponent } from '../column-dialog/column-dialog.component';
 import { DatatableColumn } from '../datatable-column.model';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Data Table Component.
@@ -25,9 +49,35 @@ import { DatatableColumn } from '../datatable-column.model';
 @Component({
   selector: 'mifosx-edit-data-table',
   templateUrl: './edit-data-table.component.html',
-  styleUrls: ['./edit-data-table.component.scss']
+  styleUrls: ['./edit-data-table.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class EditDataTableComponent implements OnInit {
+  private systemService = inject(SystemService);
+  private formBuilder = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** Data Table Form. */
   dataTableForm: UntypedFormGroup;
   /** Data Table Data. */
@@ -109,21 +159,20 @@ export class EditDataTableComponent implements OnInit {
    * @param {FormBuilder} formBuilder Form Builder.
    * @param {MatDialog} dialog Dialog Reference.
    */
-  constructor(
-    private systemService: SystemService,
-    private formBuilder: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { dataTable: any; columnCodes: any }) => {
       this.dataTableData = data.dataTable;
+
+      // Get the relationship column name based on application table
+      const relationshipColumnName = this.getRelationshipColumnName(this.dataTableData.applicationTableName);
+
       this.dataTableData.columnHeaderData.forEach((item: any) => {
+        // Mark system columns (id, created_at, updated_at) and relationship column as system
         item.system = [
-          'created_at',
-          'updated_at'
-        ].includes(item.columnName);
+            'id',
+            'created_at',
+            'updated_at'
+          ].includes(item.columnName) || item.columnName === relationshipColumnName;
       });
       this.columnData = this.dataTableData.columnHeaderData;
       this.dataForDialog.columnCodes = data.columnCodes;
@@ -131,7 +180,30 @@ export class EditDataTableComponent implements OnInit {
   }
 
   /**
-   * Creates and sets data table form and columns table.
+   * Gets the relationship column name.
+   * @param {string} appTableName Application table name.
+   * @returns {string} Relationship column name.
+   */
+  getRelationshipColumnName(appTableName: string): string {
+    // Map application table names to their relationship column names
+    const tableToColumnMap: { [key: string]: string } = {
+      m_client: 'client_id',
+      m_group: 'group_id',
+      m_center: 'center_id',
+      m_office: 'office_id',
+      m_loan: 'loan_id',
+      m_savings_account: 'savings_account_id',
+      m_savings_account_transaction: 'savings_transaction_id',
+      m_product_loan: 'product_loan_id',
+      m_savings_product: 'savings_product_id',
+      m_share_product: 'share_product_id'
+    };
+
+    return tableToColumnMap[appTableName] || '';
+  }
+
+  /**
+   * Create and set data table form and columns table.
    */
   ngOnInit() {
     this.initData();
@@ -155,7 +227,12 @@ export class EditDataTableComponent implements OnInit {
    * Initializes data table changes and column data.
    */
   initData() {
-    this.columnData.shift();
+    // Remove the 'id' column if it exists (primary key for multi-row datatables)
+    // but keep the relationship column visible (it's already marked as system)
+    if (this.columnData.length > 0 && this.columnData[0].columnName === 'id') {
+      this.columnData.shift();
+    }
+
     this.dataTableChangesData.apptableName = this.dataTableData.applicationTableName;
     this.dataTableChangesData.entitySubType = this.dataTableData.entitySubType;
     for (let index = 0; index < this.columnData.length; index++) {

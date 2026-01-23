@@ -1,9 +1,30 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Component } from '@angular/core';
+import { MatNavList, MatListItem } from '@angular/material/list';
+import { MatIcon } from '@angular/material/icon';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatLine } from '@angular/material/grid-list';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-manage-delinquency-buckets',
   templateUrl: './manage-delinquency-buckets.component.html',
-  styleUrls: ['./manage-delinquency-buckets.component.scss']
+  styleUrls: ['./manage-delinquency-buckets.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatNavList,
+    MatListItem,
+    MatIcon,
+    FaIconComponent,
+    MatLine
+  ]
 })
 export class ManageDelinquencyBucketsComponent {
   // Initialize an array of 2 boolean values, all set to false

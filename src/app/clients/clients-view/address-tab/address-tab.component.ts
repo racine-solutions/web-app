@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
@@ -12,6 +20,17 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+  MatExpansionPanelDescription
+} from '@angular/material/expansion';
+import { MatDivider } from '@angular/material/divider';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Clients Address Tab Component
@@ -19,9 +38,25 @@ import { ClientsService } from '../../clients.service';
 @Component({
   selector: 'mifosx-address-tab',
   templateUrl: './address-tab.component.html',
-  styleUrls: ['./address-tab.component.scss']
+  styleUrls: ['./address-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    MatDivider,
+    MatSlideToggle
+  ]
 })
 export class AddressTabComponent {
+  private route = inject(ActivatedRoute);
+  private clientService = inject(ClientsService);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** Client Address Data */
   clientAddressData: any;
   /** Client Address Field Config */
@@ -37,12 +72,7 @@ export class AddressTabComponent {
    * @param {MatDialog} dialog Mat Dialog
    * @param {TranslateService} translateService Translate Service.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private clientService: ClientsService,
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe(
       (data: { clientAddressData: any; clientAddressFieldConfig: any; clientAddressTemplateData: any }) => {
         this.clientAddressData = data.clientAddressData;
@@ -156,7 +186,7 @@ export class AddressTabComponent {
 
     for (let index = 0; index < this.clientAddressTemplate.addressTypeIdOptions.length; index++) {
       this.clientAddressTemplate.addressTypeIdOptions[index].name = this.translateService.instant(
-        `${this.clientAddressTemplate.addressTypeIdOptions[index].name}`
+        `labels.catalogs.${this.clientAddressTemplate.addressTypeIdOptions[index].name}`
       );
     }
 

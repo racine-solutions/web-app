@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -8,6 +16,11 @@ import { LoansService } from 'app/loans/loans.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { Currency } from 'app/shared/models/general.model';
+import { InputAmountComponent } from '../../../../shared/input-amount/input-amount.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Disburse Loan Option
@@ -15,9 +28,23 @@ import { Currency } from 'app/shared/models/general.model';
 @Component({
   selector: 'mifosx-disburse',
   templateUrl: './disburse.component.html',
-  styleUrls: ['./disburse.component.scss']
+  styleUrls: ['./disburse.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    InputAmountComponent,
+    MatSlideToggle,
+    CdkTextareaAutosize,
+    FormatNumberPipe
+  ]
 })
 export class DisburseComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private loanService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+
   @Input() dataObject: any;
   /** Loan Id */
   loanId: string;
@@ -40,14 +67,7 @@ export class DisburseComponent implements OnInit {
    * @param {Router} router Router for navigation.
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private loanService: LoansService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.loanId = this.route.snapshot.params['loanId'];
   }
 
@@ -62,6 +82,19 @@ export class DisburseComponent implements OnInit {
     if (this.dataObject.currency) {
       this.currency = this.dataObject.currency;
     }
+
+    // Get delinquency data for available disbursement amount with over applied
+    this.loanService.getLoanDelinquencyDataForTemplate(this.loanId).subscribe((delinquencyData: any) => {
+      // Check if the field is at root level
+      if (delinquencyData.availableDisbursementAmountWithOverApplied !== undefined) {
+        this.dataObject.availableDisbursementAmountWithOverApplied =
+          delinquencyData.availableDisbursementAmountWithOverApplied;
+      }
+      // Also check if it's in delinquent object
+      if (delinquencyData.delinquent) {
+        this.dataObject.delinquent = delinquencyData.delinquent;
+      }
+    });
   }
 
   /**

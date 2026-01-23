@@ -1,12 +1,27 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { CentersService } from '../centers.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Center component.
@@ -14,9 +29,19 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-edit-center',
   templateUrl: './edit-center.component.html',
-  styleUrls: ['./edit-center.component.scss']
+  styleUrls: ['./edit-center.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class EditCenterComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private centersService = inject(CentersService);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+
   /** Center Data */
   centerData: any;
   /** Staffs Data */
@@ -37,14 +62,7 @@ export class EditCenterComponent implements OnInit {
    * @param {GroupsService} groupService GroupsService.
    * @param {Dates} dateUtils Date Utils to format date.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private centersService: CentersService,
-    private settingsService: SettingsService,
-    private dateUtils: Dates
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { centerData: any }) => {
       this.centerData = data.centerData;
       this.staffs = this.centerData.staffOptions;
@@ -69,7 +87,8 @@ export class EditCenterComponent implements OnInit {
         this.centerData.name,
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')]
+          Validators.pattern('(^[A-z]).*')
+        ]
       ],
       staffId: [this.centerData.staffId],
       externalId: [this.centerData.externalId]

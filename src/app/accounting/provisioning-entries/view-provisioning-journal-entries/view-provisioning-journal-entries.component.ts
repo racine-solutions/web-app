@@ -1,9 +1,30 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View provisioning journal entries component.
@@ -11,9 +32,27 @@ import { MatTableDataSource } from '@angular/material/table';
 @Component({
   selector: 'mifosx-view-provisioning-journal-entries',
   templateUrl: './view-provisioning-journal-entries.component.html',
-  styleUrls: ['./view-provisioning-journal-entries.component.scss']
+  styleUrls: ['./view-provisioning-journal-entries.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class ViewProvisioningJournalEntriesComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   /** Provisioning journal entry data. */
   provisioningJournalEntryData: any;
   /** Columns to be displayed in provisioning journal entries table. */
@@ -41,7 +80,7 @@ export class ViewProvisioningJournalEntriesComponent implements OnInit {
    * Retrieves the provisioning journal entries data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { provisioningJournalEntry: any }) => {
       this.provisioningJournalEntryData = data.provisioningJournalEntry.pageItems;
     });

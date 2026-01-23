@@ -1,12 +1,22 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, FormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { OrganizationService } from 'app/organization/organization.service';
+import { UntypedFormGroup, UntypedFormBuilder, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ProductsService } from '../../products.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Collateral component.
@@ -14,9 +24,19 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-create-collateral',
   templateUrl: './create-collateral.component.html',
-  styleUrls: ['./create-collateral.component.scss']
+  styleUrls: ['./create-collateral.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class CreateCollateralComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private productsService = inject(ProductsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+  private organizationService = inject(OrganizationService);
+
   /** Collateral form */
   collateralForm: UntypedFormGroup;
   /** Charges Template data */
@@ -30,15 +50,16 @@ export class CreateCollateralComponent implements OnInit {
    * @param {Router} router Router for navigation.
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private productsService: ProductsService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { collateralTemplate: any }) => {
-      this.collateralTemplateData = data.collateralTemplate;
+      this.organizationService.getCurrencies().subscribe((orgCurrencies: any) => {
+        let orgCurrencyList = Array.isArray(orgCurrencies.selectedCurrencyOptions)
+          ? orgCurrencies.selectedCurrencyOptions
+          : [];
+        this.collateralTemplateData = data.collateralTemplate.filter((currency: any) =>
+          orgCurrencyList.some((orgCurrency: any) => orgCurrency.code === currency.code)
+        );
+      });
     });
   }
 

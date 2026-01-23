@@ -1,8 +1,27 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, QueryList, ViewChildren, inject } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
 import { CustomParametersTableComponent } from './custom-parameters-table/custom-parameters-table.component';
 import { SystemService } from 'app/system/system.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgClass } from '@angular/common';
+import { MatList, MatListItem } from '@angular/material/list';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 interface SelectedJobsDataType {
   selectedJobs: SelectionModel<JobDataType>;
@@ -44,9 +63,25 @@ interface JobDataType {
 @Component({
   selector: 'mifosx-custom-parameters-popover',
   templateUrl: './custom-parameters-popover.component.html',
-  styleUrls: ['./custom-parameters-popover.component.scss']
+  styleUrls: ['./custom-parameters-popover.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    CustomParametersTableComponent,
+    MatList,
+    MatListItem,
+    NgClass,
+    MatDialogActions,
+    FaIconComponent,
+    MatDialogClose
+  ]
 })
 export class CustomParametersPopoverComponent implements OnInit {
+  private systemService = inject(SystemService);
+  data = inject<SelectedJobsDataType>(MAT_DIALOG_DATA);
+
   /* Job table childer */
   @ViewChildren(CustomParametersTableComponent) tableComponents: QueryList<CustomParametersTableComponent>;
 
@@ -57,15 +92,10 @@ export class CustomParametersPopoverComponent implements OnInit {
   /* API call response message */
   messages: { message: string; status: number }[] = [];
 
-  constructor(
-    private systemService: SystemService,
-    @Inject(MAT_DIALOG_DATA) public data: SelectedJobsDataType
-  ) {}
-
   ngOnInit(): void {
     this.selectedJobs = this.data.selectedJobs.selected.map((jobJSON) => ({
       ...jobJSON,
-      jobParameters: []
+      jobParameters: [] as JobParameterType[]
     }));
   }
 

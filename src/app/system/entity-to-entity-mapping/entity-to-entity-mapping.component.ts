@@ -1,13 +1,33 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Services */
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { SettingsService } from 'app/settings/settings.service';
 import { SystemService } from 'app/system/system.service';
 
@@ -19,6 +39,12 @@ import { DatepickerBase } from 'app/shared/form-dialog/formfield/model/datepicke
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.component';
+import { MatCard, MatCardTitle, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Entity to Entity Mapping Component
@@ -26,9 +52,36 @@ import { DeleteDialogComponent } from '../../shared/delete-dialog/delete-dialog.
 @Component({
   selector: 'mifosx-entity-to-entity-mapping',
   templateUrl: './entity-to-entity-mapping.component.html',
-  styleUrls: ['./entity-to-entity-mapping.component.scss']
+  styleUrls: ['./entity-to-entity-mapping.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatCardTitle,
+    MatIconButton,
+    MatTooltip,
+    FaIconComponent,
+    MatPaginator,
+    DateFormatPipe
+  ]
 })
 export class EntityToEntityMappingComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private formBuilder = inject(UntypedFormBuilder);
+  private systemService = inject(SystemService);
+  private dateUtils = inject(Dates);
+  private dialog = inject(MatDialog);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+
   /** Stores entity to entity mapping data */
   entityMappings: string[] = [];
   /** Stores Id of selected mapping type */
@@ -86,15 +139,7 @@ export class EntityToEntityMappingComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {TranslateService} translateService Translate Service.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private formBuilder: UntypedFormBuilder,
-    private systemService: SystemService,
-    private dateUtils: Dates,
-    private dialog: MatDialog,
-    private settingsService: SettingsService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { entityMappings: any }) => {
       this.entityMappings = data.entityMappings;
     });
@@ -253,7 +298,6 @@ export class EntityToEntityMappingComponent implements OnInit {
         type: 'date',
         required: false
       })
-
     ];
     const data = {
       title:
@@ -308,7 +352,6 @@ export class EntityToEntityMappingComponent implements OnInit {
         type: 'date',
         required: false
       })
-
     ];
     const data = {
       title:

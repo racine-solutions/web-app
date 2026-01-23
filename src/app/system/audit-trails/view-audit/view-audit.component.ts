@@ -1,9 +1,32 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { DatetimeFormatPipe } from '../../../pipes/datetime-format.pipe';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View Audit Component.
@@ -11,9 +34,28 @@ import { MatTableDataSource } from '@angular/material/table';
 @Component({
   selector: 'mifosx-view-audit',
   templateUrl: './view-audit.component.html',
-  styleUrls: ['./view-audit.component.scss']
+  styleUrls: ['./view-audit.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    DatetimeFormatPipe,
+    TranslatePipe
+  ]
 })
 export class ViewAuditComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   /** Audit Trail Data. */
   auditTrailData: any;
   /** Columns to be displayed in audit trail table. */
@@ -33,7 +75,7 @@ export class ViewAuditComponent implements OnInit {
    * Retrieves the audit trail data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { auditTrail: any }) => {
       this.auditTrailData = data.auditTrail;
     });
@@ -50,12 +92,25 @@ export class ViewAuditComponent implements OnInit {
    * Initalizes Audit Trail Commands Data.
    */
   get auditTrailCommandsData() {
-    return Object.entries(JSON.parse(this.auditTrailData.commandAsJson)).map(
-      ([
-        key,
-        value
-      ]) => ({ command: key, commandValue: value })
-    );
+    if (!this.auditTrailData || !this.auditTrailData.commandAsJson) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(this.auditTrailData.commandAsJson);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return Object.entries(parsed).map(
+          ([
+            key,
+            value
+          ]) => ({ command: key, commandValue: value })
+        );
+      }
+      return [];
+    } catch (err) {
+      console.error('Invalid commandAsJson in audit trail:', err);
+      return [];
+    }
   }
 
   /**

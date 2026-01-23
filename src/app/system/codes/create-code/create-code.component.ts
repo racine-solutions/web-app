@@ -1,20 +1,39 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { SystemService } from '../../system.service';
 import { PopoverService } from '../../../configuration-wizard/popover/popover.service';
 import { PopoverRef } from '../../../configuration-wizard/popover/popover-ref';
 import { ConfigurationWizardService } from '../../../configuration-wizard/configuration-wizard.service';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-create-code',
   templateUrl: './create-code.component.html',
-  styleUrls: ['./create-code.component.scss']
+  styleUrls: ['./create-code.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class CreateCodeComponent implements OnInit, AfterViewInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private systemService = inject(SystemService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+
   /** Code form. */
   codeForm: UntypedFormGroup;
 
@@ -22,23 +41,6 @@ export class CreateCodeComponent implements OnInit, AfterViewInit {
   @ViewChild('codeFormRef') codeFormRef: ElementRef<any>;
   /* Template for popover on create code form */
   @ViewChild('templateCodeFormRef') templateCodeFormRef: TemplateRef<any>;
-
-  /**
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {SystemService} systemService Accounting Service.
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {Router} router Router for navigation.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private systemService: SystemService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {}
 
   /**
    * Creates the code form.

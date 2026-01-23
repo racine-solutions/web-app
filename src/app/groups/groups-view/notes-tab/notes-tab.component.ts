@@ -1,10 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Services */
 import { AuthenticationService } from '../../../core/authentication/authentication.service';
 import { GroupsService } from '../../groups.service';
+import { EntityNotesTabComponent } from '../../../shared/tabs/entity-notes-tab/entity-notes-tab.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /** Custom Dialogs */
 
@@ -14,9 +24,17 @@ import { GroupsService } from '../../groups.service';
 @Component({
   selector: 'mifosx-notes-tab',
   templateUrl: './notes-tab.component.html',
-  styleUrls: ['./notes-tab.component.scss']
+  styleUrls: ['./notes-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    EntityNotesTabComponent
+  ]
 })
 export class NotesTabComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private authenticationService = inject(AuthenticationService);
+  private groupsService = inject(GroupsService);
+
   /** Group ID */
   entityId: string;
   /** Username */
@@ -30,11 +48,7 @@ export class NotesTabComponent implements OnInit {
    * @param {GroupsService} groupsService Groups Service
    * @param {AuthenticationService} authenticationService Authentication Service.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private authenticationService: AuthenticationService,
-    private groupsService: GroupsService
-  ) {
+  constructor() {
     this.entityId = this.route.parent.snapshot.params['groupId'];
     this.addNote = this.addNote.bind(this);
   }

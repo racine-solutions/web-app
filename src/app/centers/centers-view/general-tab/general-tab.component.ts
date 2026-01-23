@@ -1,6 +1,32 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+import { MatTooltip } from '@angular/material/tooltip';
+import { StatusLookupPipe } from '../../../pipes/status-lookup.pipe';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Center General Tab Component
@@ -8,9 +34,29 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'mifosx-general-tab',
   templateUrl: './general-tab.component.html',
-  styleUrls: ['./general-tab.component.scss']
+  styleUrls: ['./general-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    NgClass,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    StatusLookupPipe,
+    DateFormatPipe
+  ]
 })
 export class GeneralTabComponent {
+  private route = inject(ActivatedRoute);
+
   /** Savings Account Table Columns */
   savingsAccountColumns: string[] = [
     'Account No',
@@ -38,7 +84,7 @@ export class GeneralTabComponent {
    * Retrieves the data for centers
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { centerSummaryData: any; centerViewData: any; savingsAccountData: any }) => {
       this.centerSummaryData = data.centerSummaryData[0];
       this.centerViewData = data.centerViewData;

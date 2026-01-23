@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +20,8 @@ import { GroupsService } from '../groups.service';
  * GSIM Accounts data resolver.
  */
 @Injectable()
-export class GSIMAccountsResolver implements Resolve<Object> {
-  /**
-   * @param {GroupsService} groupsService Groups service.
-   */
-  constructor(private groupsService: GroupsService) {}
+export class GSIMAccountsResolver {
+  private groupsService = inject(GroupsService);
 
   /**
    * Returns the Group's GSIM Acccounts data.

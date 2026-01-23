@@ -110,12 +110,26 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     ViewAuditComponent
   ],
   declarations: [
-    CodesComponent,
-    SystemComponent,
-    CreateCodeComponent,
-    ExternalServicesComponent,
-    ManageDataTablesComponent,
-    CreateDataTableComponent
+    RolesAndPermissionsComponent,
+    AddRoleComponent,
+    ManageSurveysComponent,
+    ViewSurveyComponent,
+    CreateSurveyComponent,
+    EditConfigurationComponent,
+    AmazonS3Component,
+    EmailComponent,
+    SMSComponent,
+    NotificationComponent,
+    AccountNumberPreferencesComponent,
+    CreateAccountNumberPreferenceComponent,
+    ViewAccountNumberPreferenceComponent,
+    EditAccountNumberPreferenceComponent,
+    ManageReportsComponent,
+    ViewReportComponent,
+    CreateReportComponent,
+    EditReportComponent,
+    AuditTrailsComponent,
+    ViewAuditComponent
   ]
 })
 export class SystemModule {}

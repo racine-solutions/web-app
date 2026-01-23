@@ -35,17 +35,12 @@ import { ThemingService } from '../shared/theme-toggle/theming.service';
 /** Environment Imports */
 import { environment } from '../../environments/environment';
 import { SettingsService } from 'app/settings/settings.service';
-import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
-import { ThemeToggleComponent } from '../shared/theme-toggle/theme-toggle.component';
-import { ServerSelectorComponent } from '../shared/server-selector/server-selector.component';
 import { TenantSelectorComponent } from '../shared/tenant-selector/tenant-selector.component';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatMenu, MatMenuItem } from '@angular/material/menu';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { M3IconComponent } from '../shared/m3-ui/m3-icon/m3-icon.component';
 
 import { VersionService } from '../system/version.service';
 
@@ -58,18 +53,12 @@ import { VersionService } from '../system/version.service';
   styleUrls: ['./login.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    LanguageSelectorComponent,
-    ThemeToggleComponent,
-    ServerSelectorComponent,
     TenantSelectorComponent,
     LoginFormComponent,
     ResetPasswordComponent,
     TwoFactorAuthenticationComponent,
-    MatMenuTrigger,
-    FaIconComponent,
     MatMenu,
-    MatMenuItem,
-    M3IconComponent
+    MatMenuItem
   ]
 })
 export class LoginComponent implements OnInit, OnDestroy {

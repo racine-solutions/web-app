@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Injectable } from '@angular/core';
 import { AccountingMapping, GLAccount } from 'app/shared/models/general.model';
 import { OptionData } from 'app/shared/models/option-data.model';
@@ -41,7 +49,7 @@ export class Accounting {
         'ACCRUAL (UPFRONT)'
       ].includes(value)) {
       return 'Accrual (upfront)';
-    } else if (value === 'CASH BASED') {
+    } else if (value.startsWith('CASH')) {
       return 'Cash';
     } else if (value === 'NONE') {
       return 'NONE';

@@ -1,12 +1,20 @@
-<div fxLayout="row" fxLayoutAlign="end" class="container m-b-20">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="layout-row align-end container m-b-20">
   <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_PRODUCTMIX'">
     <fa-icon icon="plus" class="m-r-10"></fa-icon>{{ 'labels.buttons.Add' | translate }}
   </button>
 </div>
 
 <div class="container">
-  <div fxLayout="row" fxLayoutGap="20px">
-    <mat-form-field fxFlex>
+  <div class="layout-row gap-20px">
+    <mat-form-field class="flex-fill">
       <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
       <input matInput (keyup)="applyFilter($event.target.value)" />
     </mat-form-field>

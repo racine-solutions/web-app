@@ -1,17 +1,37 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Component, Input } from '@angular/core';
 import { Currency } from '../models/general.model';
 import { UntypedFormControl } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { MatHint } from '@angular/material/form-field';
+import { FormatAmountDirective } from '../../directives/format-amount.directive';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-input-amount',
   templateUrl: './input-amount.component.html',
-  styleUrls: ['./input-amount.component.scss']
+  styleUrls: ['./input-amount.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FormatAmountDirective,
+    MatHint,
+    CurrencyPipe
+  ]
 })
 export class InputAmountComponent {
   @Input() isRequired = false;
   @Input() currency: Currency;
   @Input() inputLabel: string;
   @Input() inputFormControl: UntypedFormControl;
+  @Input() minVal: number;
+  @Input() maxVal: number;
 
   displayHint = false;
 
@@ -28,13 +48,5 @@ export class InputAmountComponent {
       return false;
     }
     return true;
-  }
-
-  inputBlur(): void {
-    this.displayHint = false;
-  }
-
-  inputFocus(): void {
-    this.displayHint = true;
   }
 }

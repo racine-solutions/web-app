@@ -1,10 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { AccountingService } from '../../accounting.service';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit closure component.
@@ -12,9 +22,18 @@ import { AccountingService } from '../../accounting.service';
 @Component({
   selector: 'mifosx-edit-closure',
   templateUrl: './edit-closure.component.html',
-  styleUrls: ['./edit-closure.component.scss']
+  styleUrls: ['./edit-closure.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    CdkTextareaAutosize
+  ]
 })
 export class EditClosureComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private accountingService = inject(AccountingService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Accounting closure form. */
   accountingClosureForm: UntypedFormGroup;
   /** GL Account closure. */
@@ -29,12 +48,7 @@ export class EditClosureComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private accountingService: AccountingService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { glAccountClosure: any }) => {
       this.glAccountClosure = data.glAccountClosure;
     });

@@ -1,28 +1,42 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div class="container">
   <mat-card>
     <form [formGroup]="officeForm" (ngSubmit)="submit()">
       <mat-card-content>
-        <div #createOfficeFormRef fxLayout="column">
+        <div #createOfficeFormRef class="layout-column">
           <mat-form-field>
             <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
             <input required matInput formControlName="name" />
-            <mat-error *ngIf="officeForm.controls.name.hasError('required')">
-              {{ 'labels.inputs.Office' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
+            @if (officeForm.controls.name.hasError('required')) {
+              <mat-error>
+                {{ 'labels.inputs.Office' | translate }} {{ 'labels.commons.is' | translate }}
+                <strong>{{ 'labels.commons.required' | translate }}</strong>
+              </mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>{{ 'labels.inputs.Parent Office' | translate }}</mat-label>
             <mat-select required formControlName="parentId">
-              <mat-option *ngFor="let office of officeData" [value]="office.id">
-                {{ office.name }}
-              </mat-option>
+              @for (office of officeData; track office) {
+                <mat-option [value]="office.id">
+                  {{ office.name }}
+                </mat-option>
+              }
             </mat-select>
-            <mat-error *ngIf="officeForm.controls.parentId.hasError('required')">
-              {{ 'labels.inputs.Parent Office' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
+            @if (officeForm.controls.parentId.hasError('required')) {
+              <mat-error>
+                {{ 'labels.inputs.Parent Office' | translate }} {{ 'labels.commons.is' | translate }}
+                <strong>{{ 'labels.commons.required' | translate }}</strong>
+              </mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field (click)="openedOnDatePicker.open()">
@@ -37,10 +51,12 @@
             />
             <mat-datepicker-toggle matSuffix [for]="openedOnDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #openedOnDatePicker></mat-datepicker>
-            <mat-error *ngIf="officeForm.controls.openingDate.hasError('required')">
-              {{ 'labels.inputs.Opening Date' | translate }} {{ 'labels.commons.is' | translate }}
-              <strong>{{ 'labels.commons.required' | translate }}</strong>
-            </mat-error>
+            @if (officeForm.controls.openingDate.hasError('required')) {
+              <mat-error>
+                {{ 'labels.inputs.Opening Date' | translate }} {{ 'labels.commons.is' | translate }}
+                <strong>{{ 'labels.commons.required' | translate }}</strong>
+              </mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field>
@@ -50,7 +66,7 @@
         </div>
       </mat-card-content>
 
-      <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
+      <mat-card-actions class="layout-row align-center gap-5px responsive-column">
         <button type="button" mat-raised-button [routerLink]="['../']">
           {{ 'labels.buttons.Cancel' | translate }}
         </button>
@@ -66,11 +82,11 @@
   <h2>{{ 'labels.heading.Create Office' | translate }}</h2>
   <p class="mw400">
     {{ 'labels.text.Filling Details' | translate }}
-    <a href="https://mifosforge.jira.com/wiki/spaces/docs/pages/67141727/Manage+Offices" target="_blank">{{
+    <a [href]="'manageOffices' | documentationLink" target="_blank" rel="noopener noreferrer">{{
       'labels.inputs.Manage Offices' | translate
     }}</a>
   </p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>

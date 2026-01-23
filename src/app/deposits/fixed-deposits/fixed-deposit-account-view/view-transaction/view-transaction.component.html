@@ -1,77 +1,90 @@
-<div fxLayoutAlign="end" class="container m-b-20" fxLayoutGap="2%">
-  <span *ngIf="allowUndo()">
-    <button
-      mat-raised-button
-      color="warn"
-      *mifosxHasPermission="'UNDOTRANSACTION_SAVINGSACCOUNT'"
-      (click)="undoTransaction()"
-    >
-      <fa-icon icon="undo" class="m-r-10"></fa-icon>Undo
-    </button>
-  </span>
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container m-b-20 align-end-center gap-2percent">
+  @if (allowUndo()) {
+    <span>
+      <button
+        mat-raised-button
+        color="warn"
+        *mifosxHasPermission="'UNDOTRANSACTION_SAVINGSACCOUNT'"
+        (click)="undoTransaction()"
+      >
+        <fa-icon icon="undo" class="m-r-10"></fa-icon>Undo
+      </button>
+    </span>
+  }
 </div>
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div fxLayout="row wrap" class="content">
-        <div fxFlex="100%" [ngClass]="transactionColor()"></div>
+      <div class="layout-row-wrap">
+        <div class="flex-100" [ngClass]="transactionColor()"></div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Transaction Id' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ transactionData.id }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Type' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ transactionData.transactionType.value }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Transaction Date' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ transactionData.date | dateFormat }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Currency' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ transactionData.currency.displayLabel }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Amount' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ transactionData.amount | currency: transactionData.currency.code : 'symbol-narrow' : '1.2-2' }}
         </div>
 
-        <div fxFlex="50%" *ngIf="transactionData.note" class="mat-body-strong">
-          {{ 'labels.inputs.Note' | translate }}
-        </div>
+        @if (transactionData.note) {
+          <div class="flex-50 mat-body-strong">
+            {{ 'labels.inputs.Note' | translate }}
+          </div>
+        }
 
-        <div fxFlex="50%" *ngIf="transactionData.note">
-          {{ transactionData.note }}
-        </div>
+        @if (transactionData.note) {
+          <div class="flex-50">
+            {{ transactionData.note }}
+          </div>
+        }
 
-        <mifosx-transaction-payment-detail
-          *ngIf="transactionData.paymentDetailData"
-          [paymentDetailData]="transactionData.paymentDetailData"
-        >
-        </mifosx-transaction-payment-detail>
+        @if (transactionData.paymentDetailData) {
+          <mifosx-transaction-payment-detail [paymentDetailData]="transactionData.paymentDetailData">
+          </mifosx-transaction-payment-detail>
+        }
       </div>
 
-      <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="2%" fxLayout.lt-md="column">
+      <div class="layout-row layout-align-center gap-2percent column-on-mobile">
         <button type="button" mat-raised-button color="primary" [routerLink]="['../']">
           {{ 'labels.buttons.Back' | translate }}
         </button>

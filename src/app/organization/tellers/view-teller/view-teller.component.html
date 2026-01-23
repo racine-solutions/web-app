@@ -1,4 +1,12 @@
-<div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column" class="container m-b-20">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="layout-row align-end gap-2px responsive-column container m-b-20">
   <button mat-raised-button color="primary" [routerLink]="['edit']" *mifosxHasPermission="'UPDATE_TELLER'">
     <fa-icon icon="edit" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Edit' | translate }}
@@ -12,52 +20,60 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div fxLayout="row wrap" class="content">
-        <div fxFlex="50%" class="mat-body-strong">
+      <div class="layout-row-wrap">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Teller Name' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ tellerData.name }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Office' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ tellerData.officeName }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong" *ngIf="tellerData.description">
-          {{ 'labels.inputs.Description' | translate }}
-        </div>
+        @if (tellerData.description) {
+          <div class="flex-50 mat-body-strong">
+            {{ 'labels.inputs.Description' | translate }}
+          </div>
+        }
 
-        <div fxFlex="50%" *ngIf="tellerData.description">
-          {{ tellerData.description }}
-        </div>
+        @if (tellerData.description) {
+          <div class="flex-50">
+            {{ tellerData.description }}
+          </div>
+        }
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Start Date' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ tellerData.startDate | dateFormat }}
         </div>
 
-        <div fxFlex="50%" class="mat-body-strong" *ngIf="tellerData.endDate">
-          {{ 'labels.inputs.End Date' | translate }}
-        </div>
+        @if (tellerData.endDate) {
+          <div class="flex-50 mat-body-strong">
+            {{ 'labels.inputs.End Date' | translate }}
+          </div>
+        }
 
-        <div fxFlex="50%" *ngIf="tellerData.endDate">
-          {{ tellerData.endDate | dateFormat }}
-        </div>
+        @if (tellerData.endDate) {
+          <div class="flex-50">
+            {{ tellerData.endDate | dateFormat }}
+          </div>
+        }
 
-        <div fxFlex="50%" class="mat-body-strong">
+        <div class="flex-50 mat-body-strong">
           {{ 'labels.inputs.Status' | translate }}
         </div>
 
-        <div fxFlex="50%">
+        <div class="flex-50">
           {{ tellerData.status | titlecase }}
         </div>
       </div>

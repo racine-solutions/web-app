@@ -1,12 +1,35 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router, ActivatedRoute } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { AccountingService } from '../accounting.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Provisioning entries component.
@@ -14,9 +37,31 @@ import { AccountingService } from '../accounting.service';
 @Component({
   selector: 'mifosx-provisioning-entries',
   templateUrl: './provisioning-entries.component.html',
-  styleUrls: ['./provisioning-entries.component.scss']
+  styleUrls: ['./provisioning-entries.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatCheckbox,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class ProvisioningEntriesComponent implements OnInit {
+  private accountingService = inject(AccountingService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Provisioning entry data. */
   provisioningEntryData: any;
   /** Columns to be displayed in provisioning entries table. */
@@ -42,11 +87,7 @@ export class ProvisioningEntriesComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private accountingService: AccountingService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { provisioningEntries: any }) => {
       this.provisioningEntryData = data.provisioningEntries.pageItems;
     });

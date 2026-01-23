@@ -1,12 +1,34 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 /** rxjs Imports */
 import { of } from 'rxjs';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Loan Provisioning Criteria component.
@@ -14,9 +36,28 @@ import { of } from 'rxjs';
 @Component({
   selector: 'mifosx-loan-provisioning-criteria',
   templateUrl: './loan-provisioning-criteria.component.html',
-  styleUrls: ['./loan-provisioning-criteria.component.scss']
+  styleUrls: ['./loan-provisioning-criteria.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class LoanProvisioningCriteriaComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   /** Loan Provisioning Criteria data. */
   loanProvisioningCriteriaData: any;
   /** Columns to be displayed in loan provisioning criteria table. */
@@ -36,7 +77,7 @@ export class LoanProvisioningCriteriaComponent implements OnInit {
    * Retrieves the loan provisioning criteria data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { loanProvisioningCriterias: any }) => {
       this.loanProvisioningCriteriaData = data.loanProvisioningCriterias;
     });

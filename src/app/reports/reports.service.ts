@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
@@ -18,47 +26,13 @@ import { ChartData } from './common-models/chart-data.model';
   providedIn: 'root'
 })
 export class ReportsService {
-  /**
-   * @param {HttpClient} http Http Client to send requests.
-   */
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   /**
    * @returns {Observable<any>} Reports data
    */
   getReports(): Observable<any> {
     return this.http.get('/reports');
-  }
-
-  /**
-   * @returns {Observable<any>} Mix Taxonomy data
-   */
-  getMixTaxonomyArray(): Observable<any> {
-    return this.http.get('/mixtaxonomy');
-  }
-
-  /**
-   * @returns {Observable<any>} Mix Taxonomy data
-   */
-  getMixMappings(): Observable<any> {
-    return this.http.get('/mixmapping');
-  }
-
-  /**
-   * @param {any} mixMappingData Mix Mapping data to be posted
-   * @returns {Observable<any>} response code
-   */
-  editMixMappings(mixMappingData: any): Observable<any> {
-    return this.http.put('/mixmapping', mixMappingData);
-  }
-
-  /**
-   * @param {any} dates start date and end date
-   * @returns {Observable<any>} Mix Report
-   */
-  getMixReport(dates: any): Observable<any> {
-    const httpParams = new HttpParams().set('startDate', dates.startDate).set('endDate', dates.endDate);
-    return this.http.get('/mixreport', { params: httpParams, responseType: 'text' });
   }
 
   /**

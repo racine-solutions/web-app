@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 /** Custom Components */
@@ -11,6 +19,10 @@ import { SavingsAccountChargesStepComponent } from '../savings-account-stepper/s
 import { SavingsService } from '../savings.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { SavingsAccountPreviewStepComponent } from '../savings-account-stepper/savings-account-preview-step/savings-account-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Savings Account Component
@@ -18,9 +30,27 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-edit-savings-account',
   templateUrl: './edit-savings-account.component.html',
-  styleUrls: ['./edit-savings-account.component.scss']
+  styleUrls: ['./edit-savings-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    SavingsAccountDetailsStepComponent,
+    SavingsAccountTermsStepComponent,
+    SavingsAccountChargesStepComponent,
+    SavingsAccountPreviewStepComponent
+  ]
 })
 export class EditSavingsAccountComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private savingsService = inject(SavingsService);
+  private settingsService = inject(SettingsService);
+
   /** Savings Account Template */
   savingsAccountAndTemplate: any;
   /** Savings Account Product Template */
@@ -44,13 +74,7 @@ export class EditSavingsAccountComponent {
    * @param {SavingsService} savingsService Savings Service
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private savingsService: SavingsService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { savingsAccountAndTemplate: any }) => {
       this.savingsAccountAndTemplate = data.savingsAccountAndTemplate;
     });

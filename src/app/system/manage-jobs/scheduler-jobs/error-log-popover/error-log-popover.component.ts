@@ -1,7 +1,24 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { SchedulerJob } from '../models/scheduler-job.model';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { DatetimeFormatPipe } from '../../../../pipes/datetime-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 interface ErrorJobDataType {
   job: SchedulerJob;
@@ -10,18 +27,25 @@ interface ErrorJobDataType {
 @Component({
   selector: 'mifosx-error-log-popover',
   templateUrl: './error-log-popover.component.html',
-  styleUrls: ['./error-log-popover.component.scss']
+  styleUrls: ['./error-log-popover.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    DatetimeFormatPipe
+  ]
 })
 export class ErrorLogPopoverComponent implements OnInit {
+  data = inject<ErrorJobDataType>(MAT_DIALOG_DATA);
+  private translateService = inject(TranslateService);
+
   show = false;
 
   /* Initialize Selected Job */
   job: SchedulerJob;
-
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: ErrorJobDataType,
-    private translateService: TranslateService
-  ) {}
 
   ngOnInit(): void {
     this.job = this.data.job;

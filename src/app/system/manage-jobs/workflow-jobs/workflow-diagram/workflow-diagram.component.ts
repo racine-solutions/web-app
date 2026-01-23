@@ -1,7 +1,16 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Component, Input, OnInit } from '@angular/core';
-import { DagreNodesOnlyLayout, Edge, Layout, Node } from '@swimlane/ngx-graph';
+import { DagreNodesOnlyLayout, Edge, Layout, Node, GraphModule } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
 import { Subject } from 'rxjs';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 export class JobStep {
   id: number;
@@ -12,7 +21,11 @@ export class JobStep {
 @Component({
   selector: 'mifosx-workflow-diagram',
   templateUrl: './workflow-diagram.component.html',
-  styleUrls: ['./workflow-diagram.component.scss']
+  styleUrls: ['./workflow-diagram.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    GraphModule
+  ]
 })
 export class WorkflowDiagramComponent implements OnInit {
   @Input() jobStepsData: JobStep[] = [];
@@ -70,7 +83,7 @@ export class WorkflowDiagramComponent implements OnInit {
       nodeCounter++;
     }
     // trigger center
-    this.center$.next();
+    this.center$.next(undefined);
   }
 
   public getStyles(node: Node): any {

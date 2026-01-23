@@ -1,10 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { Component, OnInit, inject, Input } from '@angular/core';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
+import { MatFormField, MatLabel, MatPrefix, MatError } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Server Selector Component
@@ -12,9 +23,24 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-server-selector',
   templateUrl: './server-selector.component.html',
-  styleUrls: ['./server-selector.component.scss']
+  styleUrls: ['./server-selector.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatPrefix,
+    MatIcon
+  ]
 })
 export class ServerSelectorComponent implements OnInit {
+  private settingsService = inject(SettingsService);
+  dialog = inject(MatDialog);
+  private formBuilder = inject(UntypedFormBuilder);
+
+  /** Appearance of the form field (fill, outline). Defaults to 'fill'. */
+  @Input() appearance: 'fill' | 'outline' = 'fill';
+
+  /** Show label in the form field. Defaults to true. */
+  @Input() showLabel: boolean = true;
+
   /** Input server. */
   form: any;
 
@@ -26,15 +52,6 @@ export class ServerSelectorComponent implements OnInit {
 
   /** Server list to show */
   existMoreThanOneServer = false;
-
-  /**
-   * @param {SettingsService} settingsService Settings Service
-   */
-  constructor(
-    private settingsService: SettingsService,
-    public dialog: MatDialog,
-    private formBuilder: UntypedFormBuilder
-  ) {}
 
   ngOnInit(): void {
     this.servers = this.settingsService.servers;
@@ -65,9 +82,13 @@ export class ServerSelectorComponent implements OnInit {
    */
   addNewServer(): void {
     let servers;
-    this.settingsService.setServer(this.form.value.url);
+    let url = this.form.value.url;
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    this.settingsService.setServer(url);
     servers = this.settingsService.servers;
-    servers.push(this.form.value.url);
+    servers.push(url);
     this.settingsService.setServers(servers);
     window.location.reload();
   }

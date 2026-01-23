@@ -1,18 +1,44 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, Input, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Dates } from 'app/core/utils/dates';
-import { TooltipPosition } from '@angular/material/tooltip';
 
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-product-details-step',
   templateUrl: './loan-product-details-step.component.html',
-  styleUrls: ['./loan-product-details-step.component.scss']
+  styleUrls: ['./loan-product-details-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    MatCheckbox,
+    CdkTextareaAutosize,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class LoanProductDetailsStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+
   @Input() loanProductsTemplate: any;
 
   loanProductDetailsForm: UntypedFormGroup;
@@ -28,11 +54,7 @@ export class LoanProductDetailsStepComponent implements OnInit {
    * @param {SettingsService} settingsService Settings Service.
    */
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private dateUtils: Dates,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.createLoanProductDetailsForm();
   }
 

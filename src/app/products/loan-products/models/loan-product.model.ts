@@ -1,8 +1,19 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import {
   AccountingMapping,
   ChargeOffReasonToExpenseAccountMapping,
   ChargeToIncomeAccountMapping,
+  ClassificationToIncomeAccountMapping,
+  CodeValue,
   Currency,
+  GLAccount,
   PaymentChannelToFundSourceMapping
 } from 'app/shared/models/general.model';
 import { OptionData, StringEnumOptionData } from 'app/shared/models/option-data.model';
@@ -52,6 +63,7 @@ export interface LoanProduct {
   paymentAllocation?: PaymentAllocation[];
   creditAllocation?: CreditAllocation[];
   daysInMonthType: OptionData;
+  daysInYearCustomStrategy?: OptionData;
   daysInYearType: OptionData;
   isInterestRecalculationEnabled: boolean;
   interestRecalculationData?: InterestRecalculationData;
@@ -65,6 +77,15 @@ export interface LoanProduct {
   isArrearsBasedOnOriginalSchedule?: boolean;
   isCompoundingToBePostedAsTransaction?: boolean;
   recalculationRestFrequencyInterval?: number;
+  enableIncomeCapitalization?: boolean;
+  capitalizedIncomeCalculationType?: OptionData;
+  capitalizedIncomeStrategy?: OptionData;
+  capitalizedIncomeType?: OptionData;
+
+  enableBuyDownFee?: boolean;
+  buyDownFeeCalculationType?: OptionData;
+  buyDownFeeStrategy?: OptionData;
+  buyDownFeeIncomeType?: OptionData;
 
   canDefineInstallmentAmount: boolean;
   graceOnArrearsAgeing?: number;
@@ -84,6 +105,7 @@ export interface LoanProduct {
   creditAllocationAllocationTypes: OptionData[];
   multiDisburseLoan: boolean;
   maxTrancheCount: number;
+  allowFullTermForTranche: boolean;
   disallowExpectedDisbursements: boolean;
   allowApprovedDisbursedAmountsOverApplied: boolean;
   overAppliedNumber: number;
@@ -111,8 +133,11 @@ export interface LoanProduct {
   // Accounting
   accountingRule: any;
   accountingMappings?: { [key: string]: AccountingMapping };
+  buyDownExpenseAccountId?: number;
   fundSourceAccountId?: number;
   goodwillCreditAccountId?: number;
+  incomeFromBuyDownAccountId?: number;
+  incomeFromCapitalizationAccountId?: number;
   incomeFromChargeOffFeesAccountId?: number;
   incomeFromChargeOffInterestAccountId?: number;
   incomeFromChargeOffPenaltyAccountId?: number;
@@ -130,6 +155,7 @@ export interface LoanProduct {
   receivablePenaltyAccountId?: number;
   transfersInSuspenseAccountId?: number;
   writeOffAccountId?: number;
+  deferredIncomeLiabilityAccountId?: number;
   // Advanced Accounting
   paymentChannelToFundSourceMappings?: PaymentChannelToFundSourceMapping[];
   feeToIncomeAccountMappings?: ChargeToIncomeAccountMapping[];
@@ -138,6 +164,10 @@ export interface LoanProduct {
   enableAccrualActivityPosting?: boolean;
   supportedInterestRefundTypes?: StringEnumOptionData[];
   chargeOffBehaviour?: StringEnumOptionData;
+  buydownfeeClassificationToIncomeAccountMappings?: ClassificationToIncomeAccountMapping[];
+  buydownFeeClassificationToIncomeAccountMappings?: ClassificationToIncomeAccountMapping[];
+  capitalizedIncomeClassificationToIncomeAccountMappings?: ClassificationToIncomeAccountMapping[];
+  writeOffReasonsToExpenseMappings?: ChargeOffReasonToExpenseAccountMapping[];
 }
 
 export interface AllowAttributeOverrides {
@@ -178,4 +208,14 @@ export interface InterestRecalculationData {
   preClosureInterestCalculationStrategy: OptionData;
   allowCompoundingOnEod: boolean;
   disallowInterestCalculationOnPastDue: boolean;
+}
+
+export interface AdvancedMappingDTO {
+  formType: string;
+  values: AccountingMappingDTO[];
+}
+
+export interface AccountingMappingDTO {
+  value: CodeValue;
+  glAccount: GLAccount;
 }

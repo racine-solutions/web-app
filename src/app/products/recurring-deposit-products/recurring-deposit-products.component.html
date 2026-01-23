@@ -1,4 +1,12 @@
-<div class="container m-b-20" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="20px">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container m-b-20 layout-row align-end gap-20px">
   <div #buttonCreateRecurringProduct class="in-block">
     <button
       mat-raised-button
@@ -15,8 +23,8 @@
 </div>
 
 <div class="container">
-  <div #filter fxLayout="row" fxLayoutGap="20px">
-    <mat-form-field fxFlex>
+  <div #filter class="layout-row gap-20px">
+    <mat-form-field class="flex-fill">
       <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
       <input
         matInput
@@ -50,7 +58,7 @@
 <ng-template #templateButtonCreateRecurringProduct let-popover="popover">
   <h2>{{ 'labels.heading.Create recurring deposit product' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.This option allows you to create new recurring product.' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -69,7 +77,7 @@
 
 <ng-template #templateFilter let-popover="popover">
   <h4>{{ 'labels.heading.Search bar to filter recurring deposit products.' | translate }}</h4>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -95,11 +103,11 @@
 <ng-template #templateRecurringProductsTable let-popover="popover">
   <h4 class="mw300">
     {{ 'labels.heading.List of recurring deposit products in the organization' | translate }}:
-    <a href="https://mifosforge.jira.com/wiki/spaces/docs/pages/102629552/Recurring+Deposit" target="_blank">{{
+    <a [href]="'recurringDepositProducts' | documentationLink" target="_blank" rel="noopener noreferrer">{{
       'labels.heading.Recurring Deposit Products' | translate
     }}</a>
   </h4>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>

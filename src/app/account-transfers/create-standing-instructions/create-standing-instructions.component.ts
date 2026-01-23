@@ -1,12 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, FormControl } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { AccountTransfersService } from '../account-transfers.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Standing Instructions
@@ -14,9 +23,19 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-create-standing-instructions',
   templateUrl: './create-standing-instructions.component.html',
-  styleUrls: ['./create-standing-instructions.component.scss']
+  styleUrls: ['./create-standing-instructions.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class CreateStandingInstructionsComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private accountTransfersService = inject(AccountTransfersService);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+
   /** Standing Instructions Data */
   standingIntructionsTemplate: any;
   /** Minimum date allowed. */
@@ -75,14 +94,7 @@ export class CreateStandingInstructionsComponent implements OnInit {
    * @param {SettingsService} settingsService Settings Service
    * @param {Dates} dateUtils Date Utils
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private accountTransfersService: AccountTransfersService,
-    private settingsService: SettingsService,
-    private dateUtils: Dates
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { standingIntructionsTemplate: any }) => {
       this.standingIntructionsTemplate = data.standingIntructionsTemplate;
       this.setParams();
@@ -263,7 +275,7 @@ export class CreateStandingInstructionsComponent implements OnInit {
   /** Refine Object
    * Removes the object param with null or '' values
    */
-  refineObject(dataObj: Object) {
+  refineObject(dataObj: { [key: string]: any }) {
     const propNames = Object.getOwnPropertyNames(dataObj);
     for (let i = 0; i < propNames.length; i++) {
       const propName = propNames[i];

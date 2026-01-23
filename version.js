@@ -1,21 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+const { gitDescribeSync } = require('git-describe');
 const { resolve, relative } = require('path');
-const { writeFileSync } = require('fs-extra');
+const { writeFileSync } = require('node:fs');
 const moment = require('moment');
 
-let gitInfo;
-try {
-  const { gitDescribeSync } = require('git-describe');
-  gitInfo = gitDescribeSync({
-    dirtyMark: false,
-    dirtySemver: false
-  });
-} catch (error) {
-  console.log('Warning: Unable to get git information. Using fallback values.');
-  gitInfo = {
-    hash: 'unknown',
-    raw: 'unknown'
-  };
-}
+const gitInfo = gitDescribeSync({
+  dirtyMark: false,
+  dirtySemver: false
+});
 
 gitInfo.version = moment().format('YYMMDD');
 

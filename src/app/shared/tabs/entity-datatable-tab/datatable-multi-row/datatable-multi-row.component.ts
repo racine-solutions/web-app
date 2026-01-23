@@ -1,10 +1,31 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { SelectionModel } from '@angular/cdk/collections';
-import { DecimalPipe } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { DecimalPipe, NgClass } from '@angular/common';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { MatCheckboxChange as MatCheckboxChange, MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTable } from '@angular/material/table';
+import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { Datatables } from 'app/core/utils/datatables';
 import { Dates } from 'app/core/utils/dates';
 import { DateFormatPipe } from 'app/pipes/date-format.pipe';
@@ -15,13 +36,46 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SystemService } from 'app/system/system.service';
 import * as _ from 'lodash';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-datatable-multi-row',
   templateUrl: './datatable-multi-row.component.html',
-  styleUrls: ['./datatable-multi-row.component.scss']
+  styleUrls: ['./datatable-multi-row.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatCard,
+    MatCardContent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatCheckbox,
+    NgClass,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow
+  ]
 })
 export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges {
+  formatTabLabel(label: string): string {
+    return formatTabLabel(label);
+  }
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+  private systemService = inject(SystemService);
+  private settingsService = inject(SettingsService);
+  private dialog = inject(MatDialog);
+  private datatables = inject(Datatables);
+  private dateFormat = inject(DateFormatPipe);
+  private dateTimeFormat = inject(DatetimeFormatPipe);
+  private numberFormat = inject(DecimalPipe);
+
   SELECT_NAME_FIELD = 'select';
   /** Data Object */
   @Input() dataObject: any;
@@ -44,27 +98,6 @@ export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges 
 
   /** Data Table Reference */
   @ViewChild('dataTable') dataTableRef: MatTable<Element>;
-
-  /**
-   * Fetches center Id from parent route params.
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {Dates} dateUtils Date Utils.
-   * @param {SystemService} systemService system Service.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {MatDialog} dialog Mat Dialog.
-   * @param {Datatables} datatables Datatable utils
-   */
-  constructor(
-    private route: ActivatedRoute,
-    private dateUtils: Dates,
-    private systemService: SystemService,
-    private settingsService: SettingsService,
-    private dialog: MatDialog,
-    private datatables: Datatables,
-    private dateFormat: DateFormatPipe,
-    private dateTimeFormat: DatetimeFormatPipe,
-    private numberFormat: DecimalPipe
-  ) {}
 
   /**
    * Fetches data table name from route params.
@@ -134,7 +167,7 @@ export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges 
       dataTableEntryObject
     );
     const data = {
-      title: 'Add ' + this.datatableName + ' for ' + this.entityType,
+      title: 'Add ' + formatTabLabel(this.datatableName) + ' for ' + this.entityType,
       formfields: formfields
     };
     const addDialogRef = this.dialog.open(FormDialogComponent, { data, width: '50rem' });
@@ -161,7 +194,7 @@ export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges 
    */
   delete() {
     const deleteDataTableDialogRef = this.dialog.open(DeleteDialogComponent, {
-      data: { deleteContext: `the contents of ${this.datatableName}` }
+      data: { deleteContext: `the contents of ${formatTabLabel(this.datatableName)}` }
     });
     deleteDataTableDialogRef.afterClosed().subscribe((response: any) => {
       if (response.delete) {
@@ -177,7 +210,9 @@ export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges 
    */
   deleteSelected() {
     const deleteDataTableDialogRef = this.dialog.open(DeleteDialogComponent, {
-      data: { deleteContext: `the ${this.selection.selected.length} items selected of ${this.datatableName}` }
+      data: {
+        deleteContext: `the ${this.selection.selected.length} items selected of ${formatTabLabel(this.datatableName)}`
+      }
     });
     deleteDataTableDialogRef.afterClosed().subscribe((response: any) => {
       if (response.delete) {
@@ -216,6 +251,11 @@ export class DatatableMultiRowComponent implements OnInit, OnDestroy, OnChanges 
           } else if (columnDisplayType === 'INTEGER' || columnDisplayType === 'DECIMAL') {
             if (typeof value === 'number') {
               value = this.numberFormat.transform(value);
+            }
+          } else if (columnDisplayType === 'CODELOOKUP') {
+            if (columnHeader.columnValues && value !== null && value !== undefined) {
+              const codeValue = columnHeader.columnValues.find((cv: any) => cv.id === value);
+              value = codeValue ? codeValue.value : value;
             }
           }
           return true;

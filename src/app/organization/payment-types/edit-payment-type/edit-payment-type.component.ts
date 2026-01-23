@@ -1,10 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { OrganizationService } from 'app/organization/organization.service';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Payment Type component.
@@ -12,9 +23,19 @@ import { OrganizationService } from 'app/organization/organization.service';
 @Component({
   selector: 'mifosx-edit-payment-type',
   templateUrl: './edit-payment-type.component.html',
-  styleUrls: ['./edit-payment-type.component.scss']
+  styleUrls: ['./edit-payment-type.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    CdkTextareaAutosize,
+    MatCheckbox
+  ]
 })
 export class EditPaymentTypeComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private organizationService = inject(OrganizationService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   /** Payment Type form. */
   paymentTypeForm: UntypedFormGroup;
   /** Payment Type Data. */
@@ -27,12 +48,7 @@ export class EditPaymentTypeComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private organizationService: OrganizationService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { paymentType: any }) => {
       this.paymentTypeData = data.paymentType;
     });
@@ -58,7 +74,10 @@ export class EditPaymentTypeComponent implements OnInit {
       isCashPayment: [this.paymentTypeData.isCashPayment],
       position: [
         this.paymentTypeData.position,
-        Validators.required
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
       ]
     });
   }

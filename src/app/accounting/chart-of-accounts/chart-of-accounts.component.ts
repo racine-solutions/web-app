@@ -1,12 +1,40 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import {
+  MatTreeNestedDataSource,
+  MatTree,
+  MatTreeNodeDef,
+  MatTreeNode,
+  MatTreeNodeToggle,
+  MatNestedTreeNode,
+  MatTreeNodeOutlet
+} from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** rxjs Imports */
 import { of } from 'rxjs';
@@ -19,6 +47,11 @@ import { GlAccountTreeService } from './gl-account-tree.service';
 import { PopoverService } from '../../configuration-wizard/popover/popover.service';
 import { ConfigurationWizardService } from '../../configuration-wizard/configuration-wizard.service';
 import { TreeControlService } from 'app/shared/common-logic/tree-control.service';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Chart of accounts component.
@@ -26,9 +59,43 @@ import { TreeControlService } from 'app/shared/common-logic/tree-control.service
 @Component({
   selector: 'mifosx-chart-of-accounts',
   templateUrl: './chart-of-accounts.component.html',
-  styleUrls: ['./chart-of-accounts.component.scss']
+  styleUrls: ['./chart-of-accounts.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    MatTree,
+    MatTreeNodeDef,
+    MatTreeNode,
+    MatTreeNodeToggle,
+    MatIconButton,
+    MatNestedTreeNode,
+    MatTreeNodeOutlet
+  ]
 })
 export class ChartOfAccountsComponent implements AfterViewInit, OnInit {
+  private glAccountTreeService = inject(GlAccountTreeService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private treeControlService = inject(TreeControlService);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+
   /** Button toggle group form control for type of view. (list/tree) */
   viewGroup = new UntypedFormControl('listView');
   /** GL Account data. */
@@ -75,14 +142,9 @@ export class ChartOfAccountsComponent implements AfterViewInit, OnInit {
    * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
    * @param {PopoverService} popoverService PopoverService.
    */
-  constructor(
-    private glAccountTreeService: GlAccountTreeService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private treeControlService: TreeControlService,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {
+  constructor() {
+    const glAccountTreeService = this.glAccountTreeService;
+
     this.route.data.subscribe((data: { chartOfAccounts: any }) => {
       this.glAccountData = data.chartOfAccounts;
       glAccountTreeService.initialize(this.glAccountData);

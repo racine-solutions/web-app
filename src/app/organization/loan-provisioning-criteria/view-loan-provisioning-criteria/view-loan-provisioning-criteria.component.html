@@ -1,4 +1,12 @@
-<div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column" class="container m-b-20">
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="layout-row align-end gap-2px responsive-column container m-b-20">
   <button mat-raised-button color="primary" [routerLink]="['edit']" *mifosxHasPermission="'UPDATE_CRITERIA'">
     <fa-icon icon="edit" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Edit' | translate }}
@@ -12,15 +20,16 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div fxLayout="row wrap" class="content">
-        <h2 class="mat-h2" fxFlexFill>{{ provisioningData.criteriaName }}</h2>
-        <mat-divider [inset]="true"></mat-divider>
-
-        <div fxFlexFill class="loanProduct">
-          <span fxFlex="40%">{{ 'labels.inputs.Loan Product' | translate }}:</span>
-          <span fxFlex="60%">{{ loanProducts }}</span>
-        </div>
+      <div class="layout-row-wrap align-center">
+        <h2 class="mat-h2 criteria-title">
+          {{ provisioningData.criteriaName }}
+        </h2>
+        <span class="loan-product-label">
+          <strong>{{ 'labels.inputs.Loan Product' | translate }}:</strong>
+          <span>{{ loanProducts }}</span>
+        </span>
       </div>
+      <mat-divider [inset]="true"></mat-divider>
 
       <div>
         <table mat-table class="mat-elevation-z1" [dataSource]="dataSource">

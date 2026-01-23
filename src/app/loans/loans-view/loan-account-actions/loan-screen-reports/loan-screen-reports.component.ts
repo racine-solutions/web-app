@@ -1,11 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Renderer2, ViewChild, ElementRef, SecurityContext, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, Renderer2, ViewChild, ElementRef, SecurityContext, Input, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { LoansService } from 'app/loans/loans.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Loans Screen Reports Component.
@@ -13,9 +23,19 @@ import { DomSanitizer } from '@angular/platform-browser';
 @Component({
   selector: 'mifosx-loan-screen-reports',
   templateUrl: './loan-screen-reports.component.html',
-  styleUrls: ['./loan-screen-reports.component.scss']
+  styleUrls: ['./loan-screen-reports.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent
+  ]
 })
 export class LoanScreenReportsComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private loansService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private sanitizer = inject(DomSanitizer);
+  private renderer = inject(Renderer2);
+
   @Input() dataObject: any;
   /** Loan Screen Reportform. */
   loanScreenReportForm: UntypedFormGroup;
@@ -37,13 +57,7 @@ export class LoanScreenReportsComponent implements OnInit {
    * @param {DomSanitizer} sanitizer DOM Sanitizer
    * @param {Renderer2} renderer Renderer 2
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private loansService: LoansService,
-    private route: ActivatedRoute,
-    private sanitizer: DomSanitizer,
-    private renderer: Renderer2
-  ) {
+  constructor() {
     this.loanId = this.route.snapshot.params['loanId'];
   }
 

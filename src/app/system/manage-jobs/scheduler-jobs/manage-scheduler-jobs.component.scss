@@ -1,3 +1,16 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.container {
+  min-width: 84rem;
+  width: 84rem;
+}
+
 table {
   width: 100%;
 
@@ -24,6 +37,10 @@ table {
 
 .errorlog {
   color: #ffa726;
+}
+
+.job-error {
+  background-color: #f7dbb7;
 }
 
 .suspend {

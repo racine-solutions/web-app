@@ -1,10 +1,30 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 
 /** Custom Services */
 import { LoansService } from 'app/loans/loans.service';
@@ -23,13 +43,45 @@ import { Dates } from 'app/core/utils/dates';
 import { SystemService } from 'app/system/system.service';
 import { GlobalConfiguration } from 'app/system/configurations/global-configurations-tab/configuration.model';
 import { TranslateService } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-charges-tab',
   templateUrl: './charges-tab.component.html',
-  styleUrls: ['./charges-tab.component.scss']
+  styleUrls: ['./charges-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    CurrencyPipe,
+    DateFormatPipe
+  ]
 })
 export class ChargesTabComponent implements OnInit {
+  private loansService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+  private router = inject(Router);
+  private translateService = inject(TranslateService);
+  dialog = inject(MatDialog);
+  private settingsService = inject(SettingsService);
+  private systemService = inject(SystemService);
+
   /** Loan Details Data */
   loanDetails: any;
   /** Charges Data */
@@ -64,16 +116,7 @@ export class ChargesTabComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private loansService: LoansService,
-    private route: ActivatedRoute,
-    private dateUtils: Dates,
-    private router: Router,
-    private translateService: TranslateService,
-    public dialog: MatDialog,
-    private settingsService: SettingsService,
-    private systemService: SystemService
-  ) {
+  constructor() {
     this.route.parent.data.subscribe((data: { loanDetailsData: any }) => {
       this.loanDetails = data.loanDetailsData;
     });
@@ -129,7 +172,6 @@ export class ChargesTabComponent implements OnInit {
         type: 'date',
         required: true
       })
-
     ];
     const data = {
       title: `Pay Charge ${chargeId}`,
@@ -194,7 +236,6 @@ export class ChargesTabComponent implements OnInit {
         type: 'number',
         required: true
       })
-
     ];
     const data = {
       title: `Edit Charge ${charge.id}`,

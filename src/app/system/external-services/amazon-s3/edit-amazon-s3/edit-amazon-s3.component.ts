@@ -1,10 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { SystemService } from 'app/system/system.service';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Amazon S3 Component.
@@ -12,9 +23,19 @@ import { SystemService } from 'app/system/system.service';
 @Component({
   selector: 'mifosx-edit-amazon-s3',
   templateUrl: './edit-amazon-s3.component.html',
-  styleUrls: ['./edit-amazon-s3.component.scss']
+  styleUrls: ['./edit-amazon-s3.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatIconButton,
+    FaIconComponent
+  ]
 })
 export class EditAmazonS3Component implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private systemService = inject(SystemService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Amazon S3 Configuration data */
   amazonS3ConfigurationData: any;
   /** Amazon S3 Configuration Form */
@@ -31,12 +52,7 @@ export class EditAmazonS3Component implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private systemService: SystemService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { amazonS3Configuration: any }) => {
       this.amazonS3ConfigurationData = data.amazonS3Configuration;
     });

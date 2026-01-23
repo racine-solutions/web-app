@@ -1,8 +1,16 @@
-<form [formGroup]="fixedDepositProductTermsForm">
-  <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
-    <h4 fxFlex="98%" class="mat-h4">{{ 'labels.inputs.Deposit Amount' | translate }}</h4>
+<!--
+  Copyright since 2025 Mifos Initiative
 
-    <mat-form-field fxFlex="31%">
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<form [formGroup]="fixedDepositProductTermsForm">
+  <div class="layout-row-wrap gap-2px responsive-column">
+    <h4 class="mat-h4 flex-98">{{ 'labels.inputs.Deposit Amount' | translate }}</h4>
+
+    <mat-form-field class="flex-31">
       <mat-label>{{ 'labels.inputs.Minimum' | translate }}</mat-label>
       <input
         type="number"
@@ -12,7 +20,7 @@
       />
     </mat-form-field>
 
-    <mat-form-field fxFlex="31%">
+    <mat-form-field class="flex-31">
       <mat-label>{{ 'labels.inputs.Default' | translate }}</mat-label>
       <input
         type="number"
@@ -27,7 +35,7 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="31%">
+    <mat-form-field class="flex-31">
       <mat-label>{{ 'labels.inputs.Maximum' | translate }}</mat-label>
 
       <input
@@ -38,21 +46,20 @@
       />
     </mat-form-field>
 
-    <mat-divider fxFlex="98%"></mat-divider>
+    <mat-divider class="flex-98"></mat-divider>
 
-    <mat-form-field fxFlex="48%">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Interest Compounding Period' | translate }}</mat-label>
       <mat-select
         formControlName="interestCompoundingPeriodType"
         matTooltip="{{ 'tooltips.The period at which interest rate' | translate }}"
         required
       >
-        <mat-option
-          *ngFor="let interestCompoundingPeriodType of interestCompoundingPeriodTypeData"
-          [value]="interestCompoundingPeriodType.id"
-        >
-          {{ interestCompoundingPeriodType.value }}
-        </mat-option>
+        @for (interestCompoundingPeriodType of interestCompoundingPeriodTypeData; track interestCompoundingPeriodType) {
+          <mat-option [value]="interestCompoundingPeriodType.id">
+            {{ interestCompoundingPeriodType.value }}
+          </mat-option>
+        }
       </mat-select>
       <mat-error>
         {{ 'labels.inputs.Interest Compounding Period' | translate }} {{ 'labels.commons.is' | translate }}
@@ -60,19 +67,18 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="48%">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Interest Posting Period' | translate }}</mat-label>
       <mat-select
         formControlName="interestPostingPeriodType"
         matTooltip="{{ 'tooltips.The period at which interest rate is posted or credited' | translate }}"
         required
       >
-        <mat-option
-          *ngFor="let interestPostingPeriodType of interestPostingPeriodTypeData"
-          [value]="interestPostingPeriodType.id"
-        >
-          {{ interestPostingPeriodType.value }}
-        </mat-option>
+        @for (interestPostingPeriodType of interestPostingPeriodTypeData; track interestPostingPeriodType) {
+          <mat-option [value]="interestPostingPeriodType.id">
+            {{ interestPostingPeriodType.value }}
+          </mat-option>
+        }
       </mat-select>
       <mat-error>
         {{ 'labels.inputs.Interest Posting Period' | translate }} {{ 'labels.commons.is' | translate }}
@@ -80,19 +86,18 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="48%">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Interest Calculated using' | translate }}</mat-label>
       <mat-select
         formControlName="interestCalculationType"
         matTooltip="{{ 'tooltips.The method used to calculate interest' | translate }}"
         required
       >
-        <mat-option
-          *ngFor="let interestCalculationType of interestCalculationTypeData"
-          [value]="interestCalculationType.id"
-        >
-          {{ interestCalculationType.value }}
-        </mat-option>
+        @for (interestCalculationType of interestCalculationTypeData; track interestCalculationType) {
+          <mat-option [value]="interestCalculationType.id">
+            {{ interestCalculationType.value }}
+          </mat-option>
+        }
       </mat-select>
       <mat-error>
         {{ 'labels.inputs.Interest Calculated using' | translate }} {{ 'labels.commons.is' | translate }}
@@ -100,19 +105,21 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field fxFlex="48%">
+    <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Days in Year' | translate }}</mat-label>
       <mat-select
         formControlName="interestCalculationDaysInYearType"
         matTooltip="{{ 'tooltips.The setting for number of days' | translate }}"
         required
       >
-        <mat-option
-          *ngFor="let interestCalculationDaysInYearType of interestCalculationDaysInYearTypeData"
-          [value]="interestCalculationDaysInYearType.id"
-        >
-          {{ interestCalculationDaysInYearType.value }}
-        </mat-option>
+        @for (
+          interestCalculationDaysInYearType of interestCalculationDaysInYearTypeData;
+          track interestCalculationDaysInYearType
+        ) {
+          <mat-option [value]="interestCalculationDaysInYearType.id">
+            {{ interestCalculationDaysInYearType.value }}
+          </mat-option>
+        }
       </mat-select>
       <mat-error>
         {{ 'labels.inputs.Days in Year' | translate }} {{ 'labels.commons.is' | translate }}
@@ -121,7 +128,7 @@
     </mat-form-field>
   </div>
 
-  <div fxLayout="row" class="margin-t" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="2%">
+  <div class="layout-row align-center gap-2percent margin-t responsive-column">
     <button mat-raised-button matStepperPrevious>
       <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
       {{ 'labels.buttons.Previous' | translate }}

@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLinkActive, RouterLink, RouterOutlet } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
@@ -15,6 +23,24 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { RecurringDepositConfirmationDialogComponent } from './custom-dialogs/recurring-deposit-confirmation-dialog/recurring-deposit-confirmation-dialog.component';
 import { Currency } from 'app/shared/models/general.model';
 import { TranslateService } from '@ngx-translate/core';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitleGroup,
+  MatCardMdImage,
+  MatCardTitle,
+  MatCardContent
+} from '@angular/material/card';
+import { MatTooltip } from '@angular/material/tooltip';
+import { NgClass, DecimalPipe, CurrencyPipe } from '@angular/common';
+import { AccountNumberComponent } from '../../../shared/account-number/account-number.component';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatIcon } from '@angular/material/icon';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTabNav, MatTabLink, MatTabNavPanel } from '@angular/material/tabs';
+import { StatusLookupPipe } from '../../../pipes/status-lookup.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * RecurringDeposits Account View Component
@@ -22,9 +48,40 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'mifosx-recurring-deposits-account-view',
   templateUrl: './recurring-deposits-account-view.component.html',
-  styleUrls: ['./recurring-deposits-account-view.component.scss']
+  styleUrls: ['./recurring-deposits-account-view.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCardHeader,
+    MatCardTitleGroup,
+    MatCardMdImage,
+    MatTooltip,
+    MatCardTitle,
+    NgClass,
+    AccountNumberComponent,
+    MatIconButton,
+    MatMenuTrigger,
+    MatIcon,
+    FaIconComponent,
+    MatMenu,
+    MatMenuItem,
+    MatTabNav,
+    MatTabLink,
+    RouterLinkActive,
+    MatTabNavPanel,
+    RouterOutlet,
+    DecimalPipe,
+    CurrencyPipe,
+    StatusLookupPipe
+  ]
 })
 export class RecurringDepositsAccountViewComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private recurringDepositsService = inject(RecurringDepositsService);
+  private savingsService = inject(SavingsService);
+  dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   /** RecurringDeposits Account Data */
   recurringDepositsAccountData: any;
   /** Button Configuration */
@@ -44,14 +101,7 @@ export class RecurringDepositsAccountViewComponent implements OnInit {
    * @param {Router} router Router
    * @param {RecurringDepositsService} recurringDepositsService RecurringDeposits Service
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private recurringDepositsService: RecurringDepositsService,
-    private savingsService: SavingsService,
-    public dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { recurringDepositsAccountData: any; savingsDatatables: any }) => {
       this.recurringDepositsAccountData = data.recurringDepositsAccountData;
       this.charges = this.recurringDepositsAccountData.charges;

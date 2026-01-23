@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 /** Custom Services */
@@ -12,6 +20,11 @@ import { LoansAccountDetailsStepComponent } from '../loans-account-stepper/loans
 import { LoansAccountTermsStepComponent } from '../loans-account-stepper/loans-account-terms-step/loans-account-terms-step.component';
 import { LoansAccountChargesStepComponent } from '../loans-account-stepper/loans-account-charges-step/loans-account-charges-step.component';
 import { LoansAccountDatatableStepComponent } from '../loans-account-stepper/loans-account-datatable-step/loans-account-datatable-step.component';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { LoansAccountScheduleStepComponent } from '../loans-account-stepper/loans-account-schedule-step/loans-account-schedule-step.component';
+import { LoansAccountPreviewStepComponent } from '../loans-account-stepper/loans-account-preview-step/loans-account-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create loans account
@@ -19,9 +32,29 @@ import { LoansAccountDatatableStepComponent } from '../loans-account-stepper/loa
 @Component({
   selector: 'mifosx-create-loans-account',
   templateUrl: './create-loans-account.component.html',
-  styleUrls: ['./create-loans-account.component.scss']
+  styleUrls: ['./create-loans-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    LoansAccountDetailsStepComponent,
+    LoansAccountTermsStepComponent,
+    LoansAccountChargesStepComponent,
+    LoansAccountScheduleStepComponent,
+    LoansAccountDatatableStepComponent,
+    LoansAccountPreviewStepComponent
+  ]
 })
 export class CreateLoansAccountComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private loansService = inject(LoansService);
+  private settingsService = inject(SettingsService);
+  private clientService = inject(ClientsService);
+
   /** Imports all the step component */
   @ViewChild(LoansAccountDetailsStepComponent, { static: true })
   loansAccountDetailsStep: LoansAccountDetailsStepComponent;
@@ -53,13 +86,7 @@ export class CreateLoansAccountComponent {
    * @param {SettingsService} settingsService Settings Service
    * @param {ClientsService} clientService Client Service
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private loansService: LoansService,
-    private settingsService: SettingsService,
-    private clientService: ClientsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { loansAccountTemplate: any }) => {
       this.loansAccountTemplate = data.loansAccountTemplate;
     });
@@ -117,6 +144,10 @@ export class CreateLoansAccountComponent {
   /** Checks wheter all the forms in different steps are valid or not */
   get loansAccountFormValid() {
     return this.loansAccountDetailsForm.valid && this.loansAccountTermsForm.valid;
+  }
+
+  get loansSavingsAccountLinked() {
+    return this.loansAccountDetailsStep.loansAccountDetailsForm.get('linkAccountId').value;
   }
 
   /** Gets principal Amount */

@@ -1,8 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-  name: 'statusLookup'
-})
+@Pipe({ name: 'statusLookup' })
 export class StatusLookupPipe implements PipeTransform {
   transform(status: string): string {
     const cssClassNameLookup = {
@@ -16,6 +22,8 @@ export class StatusLookupPipe implements PipeTransform {
       'loanStatusType.active': 'status-active',
       'loanStatusType.overpaid': 'status-overpaid',
       'loanStatusType.chargeoff': 'status-chargeoff',
+      'loanStatusType.activeOverdue': 'status-active-overdue',
+      'loanSubStatusType.contractTermination': 'subStatus-contract-termination',
       'savingsAccountStatusType.submitted.and.pending.approval': 'status-pending',
       'savingsAccountStatusType.approved': 'status-approved',
       'savingsAccountStatusType.active': 'status-active',
@@ -46,6 +54,6 @@ export class StatusLookupPipe implements PipeTransform {
       'smsCampaignStatus.closed': 'status-closed',
       'purchasedSharesStatusType.applied': 'status-pending'
     };
-    return cssClassNameLookup[status];
+    return cssClassNameLookup[status as keyof typeof cssClassNameLookup] ?? 'status-unknown';
   }
 }

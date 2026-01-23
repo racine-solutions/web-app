@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Injectable } from '@angular/core';
 
 export interface PaymentAllocationTransactionType {
@@ -40,6 +48,26 @@ export interface CreditAllocationOrder {
 export interface CreditAllocation {
   transactionType: string;
   creditAllocationOrder: CreditAllocationOrder[];
+}
+
+export interface CapitalizedIncome {
+  enableIncomeCapitalization: boolean;
+  capitalizedIncomeCalculationType?: string;
+  capitalizedIncomeStrategy?: string;
+  capitalizedIncomeType?: string;
+}
+
+export interface BuyDownFee {
+  enableBuyDownFee: boolean;
+  buyDownFeeCalculationType?: string;
+  buyDownFeeStrategy?: string;
+  buyDownFeeIncomeType?: string;
+  merchantBuyDownFee?: boolean;
+}
+
+export interface DeferredIncomeRecognition {
+  capitalizedIncome?: CapitalizedIncome;
+  buyDownFee?: BuyDownFee;
 }
 
 export class PaymentAllocationTransactionTypes {

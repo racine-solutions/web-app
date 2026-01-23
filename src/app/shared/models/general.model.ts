@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { OptionData } from './option-data.model';
 
 export interface Currency {
@@ -41,12 +49,28 @@ export interface PaymentChannelToFundSourceMapping {
 
 export interface ChargeOffReasonToExpenseAccountMapping {
   chargeOffReasonCodeValueId?: number;
+  writeOffReasonCodeValueId?: number;
   expenseAccountId?: number;
-  chargeOffReasonCodeValue?: ChargeOffReasonCodeValue;
+  reasonCodeValue?: CodeValue;
+  writeOffReasonCodeValue?: CodeValue;
   expenseAccount?: AccountingMapping;
 }
 
-export interface ChargeOffReasonCodeValue {
+export interface AccountMapping {
+  codeValueId?: number;
+  glAccountId?: number;
+  codeValue?: CodeValue;
+  glAccount?: AccountingMapping;
+}
+
+export interface ClassificationToIncomeAccountMapping {
+  classificationCodeValueId?: number;
+  incomeAccountId?: number;
+  classificationCodeValue?: CodeValue;
+  incomeAccount?: AccountingMapping;
+}
+
+export interface CodeValue {
   active: boolean;
   description: string;
   id: number;

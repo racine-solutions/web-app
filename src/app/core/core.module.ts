@@ -1,6 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { NgModule, Optional, Injector, inject } from '@angular/core';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  HttpHandler,
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 
 /** Translation Imports */
@@ -8,7 +22,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 /** Custom Services */
 import { AuthenticationService } from './authentication/authentication.service';
-import { HttpService } from './http/http.service';
+import { HttpService, HTTP_DYNAMIC_INTERCEPTORS } from './http/http.service';
 import { HttpCacheService } from './http/http-cache.service';
 import { ProgressBarService } from './progress-bar/progress-bar.service';
 
@@ -41,22 +55,18 @@ import { ContentComponent } from './shell/content/content.component';
  * Main app shell components and singleton services should be here.
  */
 @NgModule({
+  exports: [
+    SharedModule // TO BE REMOVED: Once all components have replaced the core module import by shared module.
+  ],
   imports: [
     SharedModule,
-    HttpClientModule,
     TranslateModule,
-    RouterModule
-  ],
-  declarations: [
+    RouterModule,
     ShellComponent,
     SidenavComponent,
     ToolbarComponent,
     BreadcrumbComponent,
     ContentComponent
-  ],
-  exports: [
-    SharedModule // TO BE REMOVED: Once all components have replaced the core module import by shared module.
-
   ],
   providers: [
     AuthenticationService,
@@ -68,12 +78,32 @@ import { ContentComponent } from './shell/content/content.component';
       multi: true
     },
     HttpCacheService,
-    ApiPrefixInterceptor,
-    ErrorHandlerInterceptor,
-    CacheInterceptor,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiPrefixInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorHandlerInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CacheInterceptor,
+      multi: true
+    },
     {
       provide: HttpClient,
-      useClass: HttpService
+      useClass: HttpService,
+      deps: [
+        HttpHandler,
+        Injector,
+        [
+          new Optional(),
+          HTTP_DYNAMIC_INTERCEPTORS
+        ]
+      ]
     },
     ProgressBarService,
     {
@@ -84,11 +114,14 @@ import { ContentComponent } from './shell/content/content.component';
     {
       provide: RouteReuseStrategy,
       useClass: RouteReusableStrategy
-    }
+    },
+    provideHttpClient(withInterceptorsFromDi())
   ]
 })
 export class CoreModule {
-  constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
+  constructor() {
+    const parentModule = inject(CoreModule, { optional: true, skipSelf: true });
+
     // Import guard
     if (parentModule) {
       throw new Error(`${parentModule} has already been loaded. Import Core module in the AppModule only.`);

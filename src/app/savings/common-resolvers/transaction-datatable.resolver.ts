@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 // Angular Imports
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 // rxjs Imports
 import { Observable } from 'rxjs';
@@ -9,12 +17,9 @@ import { Observable } from 'rxjs';
 import { SavingsService } from '../savings.service';
 
 @Injectable()
-export class TransactionDatatableResolver implements Resolve<Object> {
-  /**
-   *
-   * @param {SavingsService} savingsService
-   */
-  constructor(private savingsService: SavingsService) {}
+export class TransactionDatatableResolver {
+  private savingsService = inject(SavingsService);
+
   /**
    * Returns the Transactions Account's Datatable data.
    * @returns {Observable<any>}

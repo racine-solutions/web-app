@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 
@@ -53,6 +61,7 @@ import { DatatableTransactionTabComponent } from './savings-account-view/transac
 import { SavingsTransactionGeneralTabComponent } from './savings-account-view/transactions/view-transaction/savings-transaction-general-tab/savings-transaction-general-tab.component';
 import { SavingsTransactionDatatableTabComponent } from './savings-account-view/transactions/view-transaction/savings-transaction-datatable-tab/savings-transaction-datatable-tab.component';
 import { GeneralTabComponent } from './savings-account-view/general-tab/general-tab.component';
+import { SavingsActiveClientMembersComponent } from './savings-account-stepper/savings-active-client-members/savings-active-client-members.component';
 
 /**
  * Savings Module
@@ -64,9 +73,7 @@ import { GeneralTabComponent } from './savings-account-view/general-tab/general-
     SharedModule,
     PipesModule,
     DirectivesModule,
-    SavingsRoutingModule
-  ],
-  declarations: [
+    SavingsRoutingModule,
     SavingAccountActionsComponent,
     SavingsAccountTransactionsComponent,
     TransactionsTabComponent,
@@ -111,7 +118,8 @@ import { GeneralTabComponent } from './savings-account-view/general-tab/general-
     DatatableTransactionTabComponent,
     SavingsTransactionGeneralTabComponent,
     SavingsTransactionDatatableTabComponent,
-    GeneralTabComponent
+    GeneralTabComponent,
+    SavingsActiveClientMembersComponent
   ],
   providers: []
 })

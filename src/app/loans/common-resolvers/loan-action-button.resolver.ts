@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +20,8 @@ import { LoansService } from '../loans.service';
  * Loans notes data resolver.
  */
 @Injectable()
-export class LoanActionButtonResolver implements Resolve<Object> {
-  /**
-   * @param {LoansService} LoansService Loans service.
-   */
-  constructor(private loansService: LoansService) {}
+export class LoanActionButtonResolver {
+  private loansService = inject(LoansService);
 
   /**
    * Returns the Loans Notes Data.
@@ -31,8 +36,7 @@ export class LoanActionButtonResolver implements Resolve<Object> {
       return this.loansService.getLoanActionTemplate(loanId, 'repayment');
     } else if (loanActionButton === 'Goodwill Credit') {
       return this.loansService.getLoanActionTemplate(loanId, 'goodwillCredit');
-    }
-    if (loanActionButton === 'Interest Payment Waiver') {
+    } else if (loanActionButton === 'Interest Payment Waiver') {
       return this.loansService.getLoanActionTemplate(loanId, 'interestPaymentWaiver');
     } else if (loanActionButton === 'Payout Refund') {
       return this.loansService.getLoanActionTemplate(loanId, 'payoutRefund');
@@ -74,6 +78,16 @@ export class LoanActionButtonResolver implements Resolve<Object> {
       return this.loansService.getLoanForeclosureActionTemplate(loanId);
     } else if (loanActionButton === 'Charge-Off') {
       return this.loansService.getLoanActionTemplate(loanId, 'charge-off');
+    } else if (loanActionButton === 'Capitalized Income') {
+      return this.loansService.getLoanActionTemplate(loanId, 'capitalizedIncome');
+    } else if (loanActionButton === 'Contract Termination') {
+      return this.loansService.getLoanActionTemplate(loanId, 'contractTermination');
+    } else if (loanActionButton === 'Buy Down Fee') {
+      return this.loansService.getLoanActionTemplate(loanId, 'buyDownFee');
+    } else if (loanActionButton === 'Re-Age') {
+      return this.loansService.getLoanActionTemplate(loanId, 'reAge');
+    } else if (loanActionButton === 'Re-Amortize') {
+      return this.loansService.getLoanActionTemplate(loanId, 'reAmortization');
     } else {
       return undefined;
     }

@@ -1,4 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,13 +22,59 @@ import {
 import { SettingsService } from 'app/settings/settings.service';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { Currency } from 'app/shared/models/general.model';
+import { NgClass, CurrencyPipe } from '@angular/common';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { DatetimeFormatPipe } from '../../../pipes/datetime-format.pipe';
+import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-delinquency-tags-tab',
   templateUrl: './loan-delinquency-tags-tab.component.html',
-  styleUrls: ['./loan-delinquency-tags-tab.component.scss']
+  styleUrls: ['./loan-delinquency-tags-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FaIconComponent,
+    NgClass,
+    MatTooltip,
+    CurrencyPipe,
+    DateFormatPipe,
+    DatetimeFormatPipe,
+    FormatNumberPipe
+  ]
 })
 export class LoanDelinquencyTagsTabComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private loansServices = inject(LoansService);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
+  dialog = inject(MatDialog);
+
   loanDelinquencyTags: LoanDelinquencyTags[] = [];
   loanDelinquencyActions: LoanDelinquencyAction[] = [];
   currentLoanDelinquencyAction: LoanDelinquencyAction | null;
@@ -50,14 +104,7 @@ export class LoanDelinquencyTagsTabComponent implements OnInit {
   locale: string;
   dateFormat: string;
 
-  constructor(
-    private route: ActivatedRoute,
-    private loansServices: LoansService,
-    private dateUtils: Dates,
-    private settingsService: SettingsService,
-    private translateService: TranslateService,
-    public dialog: MatDialog
-  ) {
+  constructor() {
     this.loanId = this.route.parent.parent.snapshot.params['loanId'];
 
     this.route.parent.data.subscribe(

@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 @use '@angular/material' as mat;
 @use 'sass:map';
 
@@ -7,12 +15,12 @@
   mifosx-shares-account-view {
     .shares-account-card {
       .header {
-        background-color: mat.get-color-from-palette($primary, 500);
+        background-color: mat.m2-get-color-from-palette($primary, 500);
       }
 
       .table-headers {
-        background-color: mat.get-color-from-palette($primary, 500);
-        color: mat.get-contrast-color-from-palette($primary, 500);
+        background-color: mat.m2-get-color-from-palette($primary, 500);
+        color: mat.m2-get-contrast-color-from-palette($primary, 500);
       }
     }
   }

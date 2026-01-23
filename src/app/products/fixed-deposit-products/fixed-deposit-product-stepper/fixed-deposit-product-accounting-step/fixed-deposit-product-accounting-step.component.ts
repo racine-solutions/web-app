@@ -1,5 +1,20 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
@@ -9,13 +24,62 @@ import { TranslateService } from '@ngx-translate/core';
 import { Accounting } from 'app/core/utils/accounting';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { MatDivider } from '@angular/material/divider';
+import { GlAccountSelectorComponent } from '../../../../shared/accounting/gl-account-selector/gl-account-selector.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-fixed-deposit-product-accounting-step',
   templateUrl: './fixed-deposit-product-accounting-step.component.html',
-  styleUrls: ['./fixed-deposit-product-accounting-step.component.scss']
+  styleUrls: ['./fixed-deposit-product-accounting-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatRadioGroup,
+    MatRadioButton,
+    MatDivider,
+    GlAccountSelectorComponent,
+    MatCheckbox,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    FindPipe
+  ]
 })
 export class FixedDepositProductAccountingStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  dialog = inject(MatDialog);
+  private accounting = inject(Accounting);
+  private translateService = inject(TranslateService);
+
   @Input() fixedDepositProductsTemplate: any;
   @Input() accountingRuleData: any;
   @Input() fixedDepositProductFormValid: boolean;
@@ -41,12 +105,7 @@ export class FixedDepositProductAccountingStepComponent implements OnInit {
     'actions'
   ];
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    public dialog: MatDialog,
-    private accounting: Accounting,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.createfixedDepositProductAccountingForm();
     this.setConditionalControls();
   }
@@ -332,7 +391,6 @@ export class FixedDepositProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }
@@ -355,7 +413,6 @@ export class FixedDepositProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }
@@ -378,7 +435,6 @@ export class FixedDepositProductAccountingStepComponent implements OnInit {
         required: true,
         order: 2
       })
-
     ];
     return formfields;
   }

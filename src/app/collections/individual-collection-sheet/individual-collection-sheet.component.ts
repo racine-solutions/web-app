@@ -1,9 +1,29 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -21,6 +41,9 @@ import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { OrganizationService } from 'app/organization/organization.service';
 
 /**
  * Individual Collection Sheet
@@ -28,9 +51,35 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-individual-collection-sheet',
   templateUrl: './individual-collection-sheet.component.html',
-  styleUrls: ['./individual-collection-sheet.component.scss']
+  styleUrls: ['./individual-collection-sheet.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class IndividualCollectionSheetComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private collectionsService = inject(CollectionsService);
+  private organizationService = inject(OrganizationService);
+  private route = inject(ActivatedRoute);
+  private dateUtils = inject(Dates);
+  dialog = inject(MatDialog);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+
   /** Offices Data */
   officesData: any;
   /** Loan Officer Data */
@@ -52,7 +101,10 @@ export class IndividualCollectionSheetComponent implements OnInit {
   /** checks and stores the local storage values */
   Success: boolean;
   /** Bulk Disbursement Transactions Data */
-  bulkDisbursementTransactionsData = {};
+  bulkDisbursementTransactionsData: {
+    bulkRepaymentTransactions?: any[];
+    bulkSavingsDueTransactions?: any[];
+  } = {};
   /** Bulk Repayment Transactions Data */
   bulkRepaymentTransactions: any[] = [];
   /** Bulk Savings Due Data */
@@ -99,15 +151,7 @@ export class IndividualCollectionSheetComponent implements OnInit {
    * @param {Router} router Router for navigation.
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private collectionsService: CollectionsService,
-    private route: ActivatedRoute,
-    private dateUtils: Dates,
-    public dialog: MatDialog,
-    private router: Router,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { officesData: any }) => {
       this.officesData = data.officesData;
     });
@@ -148,7 +192,7 @@ export class IndividualCollectionSheetComponent implements OnInit {
    */
   buildDependencies() {
     this.collectionSheetForm.get('officeId').valueChanges.subscribe((value: any) => {
-      this.collectionsService.getStaffs(value).subscribe((response: any) => {
+      this.organizationService.getStaffs(value).subscribe((response: any) => {
         this.loanOfficerData = response;
       });
     });
@@ -249,7 +293,6 @@ export class IndividualCollectionSheetComponent implements OnInit {
         type: 'number',
         required: false
       })
-
     ];
     const data = {
       title: `Payment for ${type === 'loans' ? 'Loan' : 'Saving'} Id ${type === 'loans' ? selectedData.loanId : selectedData.savingsId}`,
@@ -261,7 +304,16 @@ export class IndividualCollectionSheetComponent implements OnInit {
       if (response.data) {
         if (type === 'loans') {
           const totalDue = this.getLoanTotalDueAmount(selectedData);
-          const loanTransaction = {
+          const loanTransaction: {
+            loanId: any;
+            transactionAmount: number;
+            paymentTypeId?: string;
+            accountNumber?: any;
+            checkNumber?: number;
+            routingCode?: string;
+            receiptNumber?: number;
+            bankNumber?: number;
+          } = {
             loanId: selectedData.loanId,
             transactionAmount: totalDue
           };
@@ -279,7 +331,17 @@ export class IndividualCollectionSheetComponent implements OnInit {
           if (isNaN(dueAmount)) {
             dueAmount = 0;
           }
-          const savingsTransaction = {
+          const savingsTransaction: {
+            savingsId: any;
+            transactionAmount: any;
+            depositAccountType: number;
+            accountNumber?: any;
+            checkNumber?: number;
+            routingCode?: string;
+            receiptNumber?: number;
+            bankNumber?: number;
+            paymentTypeId?: string;
+          } = {
             savingsId: selectedData.savingsId,
             transactionAmount: dueAmount,
             depositAccountType:

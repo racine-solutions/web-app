@@ -1,10 +1,23 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ConfigurationWizardService } from '../configuration-wizard/configuration-wizard.service';
 import { PopoverService } from '../configuration-wizard/popover/popover.service';
+import { MatNavList, MatListItem } from '@angular/material/list';
+import { MatIcon } from '@angular/material/icon';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatLine } from '@angular/material/grid-list';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Accounting component.
@@ -12,9 +25,21 @@ import { PopoverService } from '../configuration-wizard/popover/popover.service'
 @Component({
   selector: 'mifosx-accounting',
   templateUrl: './accounting.component.html',
-  styleUrls: ['./accounting.component.scss']
+  styleUrls: ['./accounting.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatNavList,
+    MatListItem,
+    MatIcon,
+    FaIconComponent,
+    MatLine
+  ]
 })
 export class AccountingComponent implements AfterViewInit {
+  private router = inject(Router);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+
   /* Reference of Chart of Accounts */
   @ViewChild('chartofAccounts') chartofAccounts: ElementRef<any>;
   /* Template for popover on Chart of Accounts */
@@ -37,17 +62,6 @@ export class AccountingComponent implements AfterViewInit {
   @ViewChild('templateCreateJournalEntries') templateCreateJournalEntries: TemplateRef<any>;
   // Initialize an array of 10 boolean values, all set to false
   arrowBooleans: boolean[] = new Array(10).fill(false);
-
-  /**
-   * @param {Router} router Router.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor(
-    private router: Router,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {}
 
   /**
    * Popover function

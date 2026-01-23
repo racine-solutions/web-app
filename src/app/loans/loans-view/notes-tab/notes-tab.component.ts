@@ -1,4 +1,12 @@
-import { Component } from '@angular/core';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Components */
@@ -6,27 +14,39 @@ import { ActivatedRoute } from '@angular/router';
 /** Custom Services */
 import { LoansService } from '../../loans.service';
 import { AuthenticationService } from '../../../core/authentication/authentication.service';
+import { EntityNotesTabComponent } from '../../../shared/tabs/entity-notes-tab/entity-notes-tab.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-notes-tab',
   templateUrl: './notes-tab.component.html',
-  styleUrls: ['./notes-tab.component.scss']
+  styleUrls: ['./notes-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    EntityNotesTabComponent
+  ]
 })
-export class NotesTabComponent {
+export class NotesTabComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private loansService = inject(LoansService);
+  private authenticationService = inject(AuthenticationService);
+
   entityId: string;
   username: string;
   entityNotes: any;
 
-  constructor(
-    private route: ActivatedRoute,
-    private loansService: LoansService,
-    private authenticationService: AuthenticationService
-  ) {
+  constructor() {
     const savedCredentials = this.authenticationService.getCredentials();
     this.username = savedCredentials.username;
     this.entityId = this.route.parent.snapshot.params['loanId'];
     this.route.data.subscribe((data: { loanNotes: any }) => {
       this.entityNotes = data.loanNotes;
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.parent.params.subscribe((params) => {
+      this.entityId = params['loanId'];
     });
   }
 

@@ -1,10 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { SystemService } from 'app/system/system.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit scheduler job component.
@@ -12,9 +22,18 @@ import { SystemService } from 'app/system/system.service';
 @Component({
   selector: 'mifosx-edit-scheduler-job',
   templateUrl: './edit-scheduler-job.component.html',
-  styleUrls: ['./edit-scheduler-job.component.scss']
+  styleUrls: ['./edit-scheduler-job.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox
+  ]
 })
 export class EditSchedulerJobComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private systemService = inject(SystemService);
+  private router = inject(Router);
+  private formBuilder = inject(UntypedFormBuilder);
+
   /** Job Data. */
   jobData: any;
   /** Job Form. */
@@ -27,12 +46,7 @@ export class EditSchedulerJobComponent implements OnInit {
    * @param {Router} router Router for navigation.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(
-    private route: ActivatedRoute,
-    private systemService: SystemService,
-    private router: Router,
-    private formBuilder: UntypedFormBuilder
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { jobSelected: any }) => {
       this.jobData = data.jobSelected;
     });

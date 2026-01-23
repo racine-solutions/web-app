@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
 
@@ -9,6 +17,11 @@ import { SettingsService } from 'app/settings/settings.service';
 
 /** Custom Components */
 import { CampaignMessageStepComponent } from '../sms-campaign-stepper/campaign-message-step/campaign-message-step.component';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { EditSmsCampaignStepComponent } from '../sms-campaign-stepper/edit-sms-campaign-step/edit-sms-campaign-step.component';
+import { CampaignPreviewStepComponent } from '../sms-campaign-stepper/campaign-preview-step/campaign-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit Campaign Component
@@ -16,9 +29,26 @@ import { CampaignMessageStepComponent } from '../sms-campaign-stepper/campaign-m
 @Component({
   selector: 'mifosx-edit-campaign',
   templateUrl: './edit-campaign.component.html',
-  styleUrls: ['./edit-campaign.component.scss']
+  styleUrls: ['./edit-campaign.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    EditSmsCampaignStepComponent,
+    CampaignMessageStepComponent,
+    CampaignPreviewStepComponent
+  ]
 })
 export class EditCampaignComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private organizationService = inject(OrganizationService);
+  private settingsService = inject(SettingsService);
+
   /** smsCampaign */
   smsCampaign: any;
   /** SMS Campaign Template */
@@ -37,13 +67,7 @@ export class EditCampaignComponent {
    * @param {OrganizationService} organizationService Organiztion Service
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private organizationService: OrganizationService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { smsCampaign: any; smsCampaignTemplate: any }) => {
       this.smsCampaignTemplate = data.smsCampaignTemplate;
       this.smsCampaign = data.smsCampaign;

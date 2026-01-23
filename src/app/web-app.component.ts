@@ -1,19 +1,28 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import { Component, OnInit, HostListener, HostBinding } from '@angular/core';
+import { Component, OnInit, HostListener, HostBinding, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 
 /** rxjs Imports */
-import { merge } from 'rxjs';
-import { filter, map, mergeMap } from 'rxjs/operators';
+import { merge, Subscription, Subject } from 'rxjs';
+import { filter, map, mergeMap, takeUntil, take } from 'rxjs/operators';
 
 /** Translation Imports */
 import { TranslateService } from '@ngx-translate/core';
 
 /** Environment Configuration */
-import { environment } from 'environments/environment';
+import { environment } from '../environments/environment';
 
 /** Custom Services */
 import { Logger } from './core/logger/logger.service';
@@ -21,6 +30,7 @@ import { ThemeStorageService } from './shared/theme-picker/theme-storage.service
 import { AlertService } from './core/alert/alert.service';
 import { AuthenticationService } from './core/authentication/authentication.service';
 import { SettingsService } from './settings/settings.service';
+import { DocumentationLinksService } from 'app/shared/services/documentation-links.service';
 import { IdleTimeoutService } from './home/timeout-dialog/idle-timeout.service';
 import { SessionTimeoutDialogComponent } from './home/timeout-dialog/session-timeout-dialog.component';
 
@@ -48,6 +58,7 @@ import localeLV from '@angular/common/locales/lv';
 import localeNE from '@angular/common/locales/ne';
 import localePT from '@angular/common/locales/pt';
 import localeSW from '@angular/common/locales/sw';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 registerLocaleData(localeCS);
 registerLocaleData(localeEN);
 registerLocaleData(localeES);
@@ -72,19 +83,25 @@ registerLocaleData(localeSW);
     trigger('opacityScale', [
       transition(':enter', [
         style({ opacity: 0, transform: 'scale(.95)' }),
-        animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))]),
+        animate('100ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ]),
       transition(':leave', [
         style({ opacity: 1, transform: 'scale(1)' }),
-        animate('75ms ease-in', style({ opacity: 0, transform: 'scale(.95)' }))])
-
+        animate('75ms ease-in', style({ opacity: 0, transform: 'scale(.95)' }))
+      ])
     ])
+  ],
 
-  ]
+  // eslint-disable-next-line @angular-eslint/prefer-standalone
+  standalone: false
 })
-export class WebAppComponent implements OnInit {
+export class WebAppComponent implements OnInit, OnDestroy {
   buttonConfig: KeyboardShortcutsConfiguration;
 
   i18nService: I18nService;
+
+  private authSubscription: Subscription;
+  private destroy$ = new Subject<void>();
 
   /**
    * @param {Router} router Router for navigation.
@@ -113,7 +130,8 @@ export class WebAppComponent implements OnInit {
     private themingService: ThemingService,
     private dateUtils: Dates,
     private idle: IdleTimeoutService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private documentationLinks: DocumentationLinksService
   ) {}
 
   @HostBinding('class') public cssClass: string;
@@ -129,12 +147,13 @@ export class WebAppComponent implements OnInit {
    *
    * 4) Alerts
    */
+
   ngOnInit() {
     this.themingService.theme.subscribe((value: string) => {
       this.cssClass = value;
     });
     this.themingService.setInitialDarkMode();
-    this.themingService.setDarkMode(this.settingsService.themeDarkEnabled === 'true');
+    this.themingService.setDarkMode(!!this.settingsService.themeDarkEnabled);
 
     // Setup logger
     if (environment.production) {
@@ -164,16 +183,17 @@ export class WebAppComponent implements OnInit {
           return route;
         }),
         filter((route) => route.outlet === 'primary'),
-        mergeMap((route) => route.data)
+        mergeMap((route) => route.data),
+        takeUntil(this.destroy$)
       )
       .subscribe((event) => {
-        let title = event['title'];
-        if (!title) {
-          title = 'APP_NAME';
-        }
-        this.i18nService.translate(title).subscribe((titleTranslated: any) => {
-          this.titleService.setTitle(titleTranslated);
-        });
+        const title = event['title'] ? `labels.text.${event['title']}` : 'APP_NAME';
+        this.i18nService
+          .translate(title)
+          .pipe(take(1))
+          .subscribe((titleTranslated: any) => {
+            this.titleService.setTitle(titleTranslated);
+          });
       });
 
     // Stores top 100 user activites as local storage object.
@@ -184,7 +204,7 @@ export class WebAppComponent implements OnInit {
       activities = length > 100 ? activitiesArray.slice(length - 100) : activitiesArray;
     }
     // Store route URLs array in local storage on navigation end.
-    onNavigationEnd.subscribe(() => {
+    onNavigationEnd.pipe(takeUntil(this.destroy$)).subscribe(() => {
       activities.push(this.router.url);
       localStorage.setItem('mifosXLocation', JSON.stringify(activities));
     });
@@ -208,8 +228,10 @@ export class WebAppComponent implements OnInit {
     }
     // Set default max date picker as Today
     this.settingsService.setBusinessDate(this.dateUtils.formatDate(new Date(), SettingsService.businessDateFormat));
-    // Set the server list from the env var FINERACT_API_URLS
-    this.settingsService.setServers(environment.baseApiUrls.split(','));
+    // Set the server list from the env var FINERACT_API_URLS, but avoid overwriting "Add new server" user choice
+    if (!this.settingsService.servers) {
+      this.settingsService.setServers(environment.baseApiUrls.split(','));
+    }
     // Set the Tenant Identifier(s) list from the env var
     if (!localStorage.getItem('mifosXTenantIdentifier')) {
       this.settingsService.setTenantIdentifier(environment.fineractPlatformTenantId || 'default');
@@ -218,16 +240,32 @@ export class WebAppComponent implements OnInit {
 
     // Subscribe to session timeout If IdleTimeout is higher than 0 (zero)
     if (environment.session.timeout.idleTimeout > 0) {
-      this.idle.$onSessionTimeout.subscribe(() => {
-        if (this.authenticationService.getUserLoggedIn()) {
-          this.alertService.alert({
-            type: 'Session timeout',
-            message: this.translateService.instant('labels.text.Session timed out')
-          });
-          this.dialog.open(SessionTimeoutDialogComponent);
-          this.logout();
+      this.authSubscription = this.authenticationService.isAuthenticated$.subscribe((loggedIn) => {
+        if (loggedIn) {
+          this.idle.start();
+        } else {
+          this.idle.stop();
         }
       });
+
+      this.idle.$onSessionTimeout.subscribe(() => {
+        this.alertService.alert({
+          type: 'Session timeout',
+          message: this.translateService.instant('labels.text.Session timed out')
+        });
+        this.dialog.open(SessionTimeoutDialogComponent);
+        setTimeout(() => {
+          this.logout();
+        }, 1000);
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 
@@ -236,7 +274,7 @@ export class WebAppComponent implements OnInit {
   }
 
   help() {
-    window.open('https://mifosforge.jira.com/wiki/spaces/docs/pages/52035622/User+Manual', '_blank');
+    this.documentationLinks.open('userManual');
   }
 
   // Monitor all keyboard events and excute keyboard shortcuts

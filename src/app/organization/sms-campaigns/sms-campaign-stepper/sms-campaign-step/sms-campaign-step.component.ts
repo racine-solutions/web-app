@@ -1,6 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
+import { Component, OnInit, Input, ViewChild, EventEmitter, Output, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 
 /** Custom Services */
 import { ReportsService } from 'app/reports/reports.service';
@@ -10,6 +24,10 @@ import { ReportParameter } from 'app/reports/common-models/report-parameter.mode
 
 /** Custom Components */
 import { BusinessRuleParametersComponent } from './business-rule-parameters/business-rule-parameters.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * SMS Campaign Step Component
@@ -17,9 +35,20 @@ import { BusinessRuleParametersComponent } from './business-rule-parameters/busi
 @Component({
   selector: 'mifosx-sms-campaign-step',
   templateUrl: './sms-campaign-step.component.html',
-  styleUrls: ['./sms-campaign-step.component.scss']
+  styleUrls: ['./sms-campaign-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext,
+    BusinessRuleParametersComponent
+  ]
 })
 export class SmsCampaignStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private reportService = inject(ReportsService);
+
   /** SMS Campaign Template */
   @Input() smsCampaignTemplate: any;
   /** Business Rule Parameters Component */
@@ -50,10 +79,7 @@ export class SmsCampaignStepComponent implements OnInit {
    * @param {FormBuilder} formBuilder Form Builder
    * @param {ReportsService} reportService Reports Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private reportService: ReportsService
-  ) {
+  constructor() {
     this.createSMSCampaignDetailsForm();
     this.buildDependencies();
   }

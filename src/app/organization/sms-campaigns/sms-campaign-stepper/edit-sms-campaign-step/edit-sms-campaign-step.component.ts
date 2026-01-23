@@ -1,6 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
-import { UntypedFormGroup, Validators, UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
+import { Component, OnInit, Output, Input, EventEmitter, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  Validators,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 
 /** Custom Services */
 import { ReportsService } from 'app/reports/reports.service';
@@ -8,6 +22,9 @@ import { ReportsService } from 'app/reports/reports.service';
 /** Custom Models */
 import { ReportParameter } from 'app/reports/common-models/report-parameter.model';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { EditBusinessRuleParametersComponent } from './edit-business-rule-parameters/edit-business-rule-parameters.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Edit SMS Campaign step.
@@ -15,9 +32,18 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-edit-sms-campaign-step',
   templateUrl: './edit-sms-campaign-step.component.html',
-  styleUrls: ['./edit-sms-campaign-step.component.scss']
+  styleUrls: ['./edit-sms-campaign-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    EditBusinessRuleParametersComponent
+  ]
 })
 export class EditSmsCampaignStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private reportService = inject(ReportsService);
+  private settingsService = inject(SettingsService);
+
   /** SMS Campaign Template */
   @Input() smsCampaignTemplate: any;
   /** SMS Campaign */
@@ -48,11 +74,7 @@ export class EditSmsCampaignStepComponent implements OnInit {
    * @param {ReportsService} reportService Reports Service
    * @param {SettingsService} settingsService Settings Service.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private reportService: ReportsService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.createSMSCampaignDetailsForm();
   }
 

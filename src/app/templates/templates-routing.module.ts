@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -8,8 +16,7 @@ import { Route } from '../core/route/route.service';
 /** Custom Components */
 import { TemplatesComponent } from './templates.component';
 import { ViewTemplateComponent } from './view-template/view-template.component';
-import { EditTemplateComponent } from './edit-template/edit-template.component';
-import { CreateTemplateComponent } from './create-template/create-template.component';
+import { CreateEditComponent } from './create-edit-template/create-edit-template.component';
 
 /** Custom Resolvers */
 import { TemplatesResolver } from './common-resolvers/templates.resolver';
@@ -33,11 +40,9 @@ const routes: Routes = [
         },
         {
           path: 'create',
-          data: { title: 'Create Template', breadcrumb: 'Create Template' },
-          component: CreateTemplateComponent,
-          resolve: {
-            createTemplateData: CreateTemplateResolver
-          }
+          component: CreateEditComponent,
+          data: { mode: 'create', breadcrumb: 'Create Template' },
+          resolve: { templateData: CreateTemplateResolver }
         },
         {
           path: ':id',
@@ -52,18 +57,15 @@ const routes: Routes = [
             },
             {
               path: 'edit',
-              component: EditTemplateComponent,
-              data: { title: 'Edit Template', breadcrumb: 'Edit', routeParamBreadcrumb: false },
-              resolve: {
-                editTemplateData: EditTemplateResolver
-              }
+              component: CreateEditComponent,
+              data: { mode: 'edit', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+              resolve: { templateData: EditTemplateResolver }
             }
           ]
         }
       ]
     }
   ])
-
 ];
 
 /**

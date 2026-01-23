@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 #mifosx-toolbar {
   position: relative;
   box-shadow:
@@ -5,9 +13,25 @@
     0 2px 2px 0 rgb(0 0 0 / 14%),
     0 1px 5px 0 rgb(0 0 0 / 12%);
 
+  .tab-nav-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
   .tab-link {
     min-width: auto;
-    padding: 0 1rem;
+    padding: 15px 1rem;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    color: rgb(255 255 255 / 70%);
+
+    &:hover {
+      color: #fff;
+    }
+
+    cursor: pointer;
   }
 
   .search-bar {
@@ -42,14 +66,36 @@
   }
 }
 
-// Show icon on small screens
-.lg-icon {
+// Show language icon button only on small screens (when full selector is hidden)
+.show-lt-md {
   display: none;
 }
 
-@media (width <= 959px) {
-  .lg-icon {
-    display: block;
-    margin-left: 5px;
+@media (width <= 768px) {
+  .show-lt-md {
+    display: inline-flex;
+  }
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.white-text-language ::ng-deep mifosx-language-selector {
+  color: white !important;
+  /* stylelint-disable-next-line selector-max-universal */
+  * {
+    background-color: transparent !important;
+    color: white !important;
+  }
+}
+
+.white-text-search ::ng-deep mifosx-search-tool {
+  color: white !important;
+  /* stylelint-disable-next-line selector-max-universal */
+  * {
+    background-color: transparent !important;
+    color: white !important;
+    margin-bottom: 0;
   }
 }

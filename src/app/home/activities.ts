@@ -1,20 +1,23 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 const activities: any[] = [
   { activity: 'client', path: '/clients' },
   { activity: 'groups', path: '/groups' },
   { activity: 'centers', path: '/centers' },
   { activity: 'accounting', path: '/accounting' },
-  { activity: 'users', path: '/users' },
+  { activity: 'users', path: '/appusers' },
   { activity: 'organization', path: '/organization' },
   { activity: 'system', path: '/system' },
   { activity: 'templates', path: '/templates' },
-  { activity: 'self-service users', path: '/self-service/users' },
-  { activity: 'self-service app-configuration', path: '/self-service/app-configuration' },
-  { activity: 'task management', path: '/self-service/task-management' },
   { activity: 'create group', path: '' },
   { activity: 'create center', path: '/centers/create' },
   { activity: 'configuration', path: '/system/global-configurations' },
-  { activity: 'tasks', path: '/self-service/task-management' },
-  { activity: 'create template', path: '/self-service/task-management' },
   { activity: 'create loan product', path: '/products/loan-products/create' },
   { activity: 'create saving product', path: '/products/saving-products/create' },
   { activity: 'roles', path: '/system/roles-and-permissions' },
@@ -55,7 +58,6 @@ const activities: any[] = [
   { activity: 'audit', path: '/products/audit-trails' },
   { activity: 'create accounting closure', path: '' },
   { activity: 'navigation', path: '/navigation' },
-  { activity: 'system users', path: '/self-service/users' },
   { activity: '', path: 'home' }
 ];
 

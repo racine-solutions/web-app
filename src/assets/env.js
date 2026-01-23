@@ -1,25 +1,39 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 (function(window) {
   window["env"] = window["env"] || {};
 
   // BackEnd Environment variables
-  window['env']['fineractApiUrls'] = '';
-  window['env']['fineractApiUrl'] = '';
+  window["env"]["fineractApiUrls"] = '';
+  window["env"]["fineractApiUrl"]  = '';
 
-  window['env']['apiProvider'] = '';
-  window['env']['apiVersion'] = '';
+  window["env"]["apiProvider"] = '';
+  window["env"]["apiVersion"]  = '';
+  window["env"]["apiActuator"]  = '';
 
   window["env"]["fineractPlatformTenantId"]  = '';
   window["env"]["fineractPlatformTenantIds"]  = '';
 
+  window['env']['tenantLogoUrl'] = '';
+
   // Language Environment variables
-  window['env']['defaultLanguage'] = '';
-  window['env']['supportedLanguages'] = '';
+  window["env"]["defaultLanguage"] = '';
+  window["env"]["supportedLanguages"] = '';
 
   window['env']['preloadClients'] = '';
 
   // Char delimiter to Export CSV options: ',' ';' '|' ' '
   window['env']['defaultCharDelimiter'] = '';
 
+  // Display or not the Server Selector
+  window['env']['allowServerSwitch'] = '';
+  
   // Display or not the BackEnd Info
   window['env']['displayBackEndInfo'] = '';
 
@@ -35,18 +49,24 @@
   // Time in milliseconds for Session idle timeout, default 300000 seconds
   window['env']['sessionIdleTimeout'] = '0';
 
-  // OAuth Server Enabled  
-  window['env']['oauthServerEnabled'] = '';
+  // OAuth Server Enabled
+  window['env']['oauthServerEnabled'] = false;
 
-  // OAuth Server URL  
+  // OAuth Server URL
   window['env']['oauthServerUrl'] = '';
 
-  // OAuth Client Id  
+  // OAuth Client Id
   window['env']['oauthAppId'] = '';
 
-  window["env"]["vNextApiUrl"] = '';
-  window["env"]["vNextApiProvider"] = '';
-  window["env"]["vNextApiVersion"] = '';
-  window["env"]["interbankTransfers"] = "false";
+
+  // Hide client data (mask names)
+  window['env']['complianceHideClientData'] = '';
+
+  // OIDC Plugin Environment variables
+  window['env']['oidcServerEnabled'] = false;
+  window['env']['oidcBaseUrl']       = '';
+  window['env']['oidcClientId']      = '';
+  window['env']['oidcApiUrl']        = '';
+  window['env']['oidcFrontUrl']      = '';
 
 })(this);

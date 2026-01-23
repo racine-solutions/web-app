@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +20,8 @@ import { SharesService } from '../shares.service';
  * Shares Account Actions data resolver.
  */
 @Injectable()
-export class ShareAccountActionsResolver implements Resolve<Object> {
-  /**
-   * @param {sharesService} SharesService Shares service.
-   */
-  constructor(private sharesService: SharesService) {}
+export class ShareAccountActionsResolver {
+  private sharesService = inject(SharesService);
 
   /**
    * Returns the Shares account actions data.

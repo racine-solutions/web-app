@@ -1,10 +1,26 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { OrganizationService } from '../../organization.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Adhoc Query component.
@@ -12,9 +28,18 @@ import { OrganizationService } from '../../organization.service';
 @Component({
   selector: 'mifosx-create-adhoc-query',
   templateUrl: './create-adhoc-query.component.html',
-  styleUrls: ['./create-adhoc-query.component.scss']
+  styleUrls: ['./create-adhoc-query.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox
+  ]
 })
 export class CreateAdhocQueryComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private organizationService = inject(OrganizationService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Adhoc Query form. */
   adhocQueryForm: UntypedFormGroup;
   /** Adhoc Query template data. */
@@ -29,12 +54,7 @@ export class CreateAdhocQueryComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private organizationService: OrganizationService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { adhocQueryTemplate: any }) => {
       this.adhocQueryTemplateData = data.adhocQueryTemplate;
     });
@@ -89,7 +109,8 @@ export class CreateAdhocQueryComponent implements OnInit {
           'reportRunEvery',
           new UntypedFormControl('', [
             Validators.required,
-            Validators.min(1)])
+            Validators.min(1)
+          ])
         );
       } else {
         this.adhocQueryForm.removeControl('reportRunEvery');

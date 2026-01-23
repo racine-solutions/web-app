@@ -1,3 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { OptionData } from 'app/shared/models/option-data.model';
+
 /** Recurring Deposits Account Buttons Configuration */
 export class LoansAccountButtonConfiguration {
   optionArray: {
@@ -16,8 +26,8 @@ export class LoansAccountButtonConfiguration {
     taskPermissionName?: string;
   }[];
 
-  constructor(status: string) {
-    this.setOptions(status);
+  constructor(status: string, substatus: OptionData) {
+    this.setOptions(status, substatus);
     this.setButtons(status);
   }
 
@@ -122,6 +132,11 @@ export class LoansAccountButtonConfiguration {
             name: 'Recovery Payment',
             icon: 'briefcase',
             taskPermissionName: 'RECOVERYPAYMENT_LOAN'
+          },
+          {
+            name: 'Undo Write-off',
+            icon: 'undo',
+            taskPermissionName: 'UNDOWRITEOFF_LOAN'
           }
         ];
         break;
@@ -154,7 +169,7 @@ export class LoansAccountButtonConfiguration {
     }
   }
 
-  setOptions(status: string) {
+  setOptions(status: string, substatus: OptionData) {
     switch (status) {
       case 'Active':
         this.optionArray = [
@@ -199,6 +214,12 @@ export class LoansAccountButtonConfiguration {
             taskPermissionName: 'SALE_LOAN'
           }
         ];
+        if (!this.isContractTermination(substatus)) {
+          this.optionArray.push({
+            name: 'Contract Termination',
+            taskPermissionName: 'CONTRACT_TERMINATION_LOAN'
+          });
+        }
         this.optionPaymentArray = [
           {
             name: 'Goodwill Credit',
@@ -280,5 +301,12 @@ export class LoansAccountButtonConfiguration {
 
   addButton(option: { name: string; icon: string; taskPermissionName?: string }) {
     this.buttonsArray.push(option);
+  }
+
+  private isContractTermination(substatus: OptionData): boolean {
+    if (substatus == null) {
+      return false;
+    }
+    return substatus.code === 'loanSubStatus.loanSubStatusType.contractTermination';
   }
 }

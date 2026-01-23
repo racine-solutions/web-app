@@ -1,8 +1,27 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { UntypedFormControl, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
+import { UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTable } from '@angular/material/table';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import {
@@ -14,13 +33,35 @@ import {
   PaymentAllocationOrder,
   PaymentAllocationTransactionType
 } from '../payment-allocation-model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-advance-payment-allocation-tab',
   templateUrl: './advance-payment-allocation-tab.component.html',
-  styleUrls: ['./advance-payment-allocation-tab.component.scss']
+  styleUrls: ['./advance-payment-allocation-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    CdkDropList,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    CdkDrag
+  ]
 })
 export class AdvancePaymentAllocationTabComponent implements OnInit {
+  private dialog = inject(MatDialog);
+  private advancedPaymentStrategy = inject(AdvancedPaymentStrategy);
+  private translateService = inject(TranslateService);
+
   @Input() advancedPaymentAllocation: AdvancedPaymentAllocation;
   @Input() advancedCreditAllocation: AdvancedCreditAllocation;
 
@@ -40,12 +81,6 @@ export class AdvancePaymentAllocationTabComponent implements OnInit {
   futureInstallmentAllocationRule = new UntypedFormControl('', Validators.required);
 
   @ViewChild('table') table: MatTable<any>;
-
-  constructor(
-    private dialog: MatDialog,
-    private advancedPaymentStrategy: AdvancedPaymentStrategy,
-    private translateService: TranslateService
-  ) {}
 
   ngOnInit(): void {
     if (this.advancedCreditAllocation) {

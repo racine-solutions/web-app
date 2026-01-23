@@ -1,8 +1,25 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
 import { DialogData } from 'app/core/dialogs/dialog-data.model';
 import { Dialogs } from 'app/core/dialogs/dialogs';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Delete dialog component.
@@ -10,19 +27,22 @@ import { Dialogs } from 'app/core/dialogs/dialogs';
 @Component({
   selector: 'mifosx-confirmation-dialog',
   templateUrl: './confirmation-dialog.component.html',
-  styleUrls: ['./confirmation-dialog.component.scss']
+  styleUrls: ['./confirmation-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class ConfirmationDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ConfirmationDialogComponent>>(MatDialogRef);
+  private dialogs = inject(Dialogs);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
   color: string;
-  /**
-   * @param {MatDialogRef} dialogRef Component reference to dialog.
-   * @param {any} data Provides a deleteContext.
-   */
-  constructor(
-    public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    private dialogs: Dialogs,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {}
 
   ngOnInit() {
     this.setColor();

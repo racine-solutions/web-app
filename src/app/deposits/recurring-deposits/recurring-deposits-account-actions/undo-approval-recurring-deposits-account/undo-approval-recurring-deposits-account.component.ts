@@ -1,10 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { RecurringDepositsService } from '../../recurring-deposits.service';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Undo Approval Recurring Deposits Account Component
@@ -12,9 +22,18 @@ import { RecurringDepositsService } from '../../recurring-deposits.service';
 @Component({
   selector: 'mifosx-undo-approval-recurring-deposits-account',
   templateUrl: './undo-approval-recurring-deposits-account.component.html',
-  styleUrls: ['./undo-approval-recurring-deposits-account.component.scss']
+  styleUrls: ['./undo-approval-recurring-deposits-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    CdkTextareaAutosize
+  ]
 })
 export class UndoApprovalRecurringDepositsAccountComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private recurringDepositsService = inject(RecurringDepositsService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   /** Undo Approval Recurring Deposits Account form. */
   undoApprovalRecurringDepositsAccountForm: UntypedFormGroup;
   /** Recurring Deposits Account Id */
@@ -29,12 +48,7 @@ export class UndoApprovalRecurringDepositsAccountComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route
    * @param {Router} router Router
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private recurringDepositsService: RecurringDepositsService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.undoCommand = 'undoapproval'; // Default command
     this.undoAction = this.route.snapshot.params['name'];
     if (this.undoAction === 'Undo Activation') {

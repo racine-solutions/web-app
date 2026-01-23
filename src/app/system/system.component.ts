@@ -1,17 +1,44 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ConfigurationWizardService } from '../configuration-wizard/configuration-wizard.service';
 import { PopoverService } from '../configuration-wizard/popover/popover.service';
+import { MatNavList, MatListItem } from '@angular/material/list';
+import { MatIcon } from '@angular/material/icon';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatLine } from '@angular/material/grid-list';
+import { NgClass } from '@angular/common';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-system',
   templateUrl: './system.component.html',
-  styleUrls: ['./system.component.scss']
+  styleUrls: ['./system.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatNavList,
+    MatListItem,
+    MatIcon,
+    FaIconComponent,
+    MatLine,
+    NgClass
+  ]
 })
 export class SystemComponent implements AfterViewInit {
+  private router = inject(Router);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+
   /* Reference of manage datatables */
   @ViewChild('datatables') datatables: ElementRef<any>;
   /* Template for popover on manage datables */
@@ -41,18 +68,8 @@ export class SystemComponent implements AfterViewInit {
   /* Template for popover on manage reports */
   @ViewChild('templateManageReports') templateManageReports: TemplateRef<any>;
   // Initialize an array of 15 boolean values, all set to false
+  isDisabled: boolean = true;
   arrowBooleans: boolean[] = new Array(15).fill(false);
-
-  /**
-   * @param {Router} router Router.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor(
-    private router: Router,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {}
 
   /**
    * Popover function

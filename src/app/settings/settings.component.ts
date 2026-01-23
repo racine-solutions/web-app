@@ -1,9 +1,26 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 /** Custom Service */
 import { SettingsService } from './settings.service';
-import { UntypedFormControl } from '@angular/forms';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from '@angular/material/expansion';
+import { FileUploadComponent } from '../shared/file-upload/file-upload.component';
+import { ThemePickerComponent } from '../shared/theme-picker/theme-picker.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Settings component.
@@ -11,9 +28,20 @@ import { UntypedFormControl } from '@angular/forms';
 @Component({
   selector: 'mifosx-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    FileUploadComponent,
+    ThemePickerComponent
+  ]
 })
 export class SettingsComponent implements OnInit {
+  private settingsService = inject(SettingsService);
+
   /** Placeholder for languages. update once translations are set up */
   languages: any[] = [
     {
@@ -54,11 +82,6 @@ export class SettingsComponent implements OnInit {
   dateFormat = new UntypedFormControl('');
   /** Decimals to Display Setting */
   decimalsToDisplay = new UntypedFormControl('');
-
-  /**
-   * @param {SettingsService} settingsService Settings Service
-   */
-  constructor(private settingsService: SettingsService) {}
 
   ngOnInit() {
     this.language.patchValue(this.settingsService.language);

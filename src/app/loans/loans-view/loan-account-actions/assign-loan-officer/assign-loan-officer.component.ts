@@ -1,18 +1,37 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LoansService } from 'app/loans/loans.service';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-assign-loan-officer',
   templateUrl: './assign-loan-officer.component.html',
-  styleUrls: ['./assign-loan-officer.component.scss']
+  styleUrls: ['./assign-loan-officer.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class AssignLoanOfficerComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private loanService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+
   @Input() dataObject: any;
   /** Loan Id */
   loanId: string;
@@ -31,14 +50,7 @@ export class AssignLoanOfficerComponent implements OnInit {
    * @param {Router} router Router for navigation.
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private loanService: LoansService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.loanId = this.route.snapshot.params['loanId'];
   }
 

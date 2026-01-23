@@ -1,10 +1,19 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
+
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { UntypedFormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** rxjs Imports */
 import { merge } from 'rxjs';
@@ -15,6 +24,22 @@ import { CentersService } from './centers.service';
 
 /** Custom Data Source */
 import { CentersDataSource } from './centers.datasource';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { NgClass, AsyncPipe } from '@angular/common';
+import { StatusLookupPipe } from '../pipes/status-lookup.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Centers component.
@@ -22,9 +47,32 @@ import { CentersDataSource } from './centers.datasource';
 @Component({
   selector: 'mifosx-app-centers',
   templateUrl: './centers.component.html',
-  styleUrls: ['./centers.component.scss']
+  styleUrls: ['./centers.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgClass,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    AsyncPipe,
+    StatusLookupPipe
+  ]
 })
 export class CentersComponent implements OnInit, AfterViewInit {
+  private centersService = inject(CentersService);
+
   @ViewChild('showClosedCenters', { static: true }) showClosedCenters: MatCheckbox;
 
   /** Name form control. */
@@ -57,8 +105,6 @@ export class CentersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   /** Sorter for centers table. */
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-
-  constructor(private centersService: CentersService) {}
 
   ngOnInit() {
     this.getCenters();

@@ -1,13 +1,24 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports. */
-import { Component, OnInit, Input } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, Input, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services. */
 import { LoansService } from 'app/loans/loans.service';
 import { Dates } from 'app/core/utils/dates';
 import { SettingsService } from 'app/settings/settings.service';
 import { Currency } from 'app/shared/models/general.model';
+import { InputAmountComponent } from '../../../../shared/input-amount/input-amount.component';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Waive Interest component.
@@ -15,9 +26,21 @@ import { Currency } from 'app/shared/models/general.model';
 @Component({
   selector: 'mifosx-waive-interest',
   templateUrl: './waive-interest.component.html',
-  styleUrls: ['./waive-interest.component.scss']
+  styleUrls: ['./waive-interest.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    InputAmountComponent,
+    CdkTextareaAutosize
+  ]
 })
 export class WaiveInterestComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+  private loanService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+
   @Input() dataObject: any;
 
   /** Loan Interest form. */
@@ -27,22 +50,6 @@ export class WaiveInterestComponent implements OnInit {
   /** Maximum Date allowed. */
   maxDate = new Date();
   currency: Currency;
-
-  /**
-   * Get data from `Resolver`.
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {Router} router Router.
-   * @param {LoansService} loanService Loan Service.
-   * @param {ActivatedRoute} route Activated Route.
-   */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private router: Router,
-    private settingsService: SettingsService,
-    private dateUtils: Dates,
-    private loanService: LoansService,
-    private route: ActivatedRoute
-  ) {}
 
   ngOnInit() {
     this.maxDate = this.settingsService.businessDate;

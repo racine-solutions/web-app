@@ -1,12 +1,28 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
 
 /** Custom Services */
 import { GroupsService } from 'app/groups/groups.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Group Meetings Component
@@ -14,9 +30,20 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-attach-group-meeting',
   templateUrl: './attach-group-meeting.component.html',
-  styleUrls: ['./attach-group-meeting.component.scss']
+  styleUrls: ['./attach-group-meeting.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox
+  ]
 })
 export class AttachGroupMeetingComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private groupsService = inject(GroupsService);
+  private dateUtils = inject(Dates);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private settingsService = inject(SettingsService);
+
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum date allowed. */
@@ -43,14 +70,7 @@ export class AttachGroupMeetingComponent implements OnInit {
    * @param {Router} router Router
    * @param {SettingsService} settingsService SettingsService
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private groupsService: GroupsService,
-    private dateUtils: Dates,
-    private route: ActivatedRoute,
-    private router: Router,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { groupActionData: any }) => {
       this.calendarTemplate = data.groupActionData;
       this.frequencyOptions = this.calendarTemplate.frequencyOptions;

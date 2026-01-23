@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { DirectivesModule } from '../directives/directives.module';
@@ -58,10 +66,6 @@ import { ViewTransactionComponent } from './loans-view/transactions/view-transac
 import { EditTransactionComponent } from './loans-view/transactions/edit-transaction/edit-transaction.component';
 import { GlimAccountComponent } from './glim-account/glim-account.component';
 import { CreateGlimAccountComponent } from './glim-account/create-glim-account/create-glim-account.component';
-import { GlimDetailsStepComponent } from './glim-account/create-glim-account/glim-account-stepper/glim-details-step/glim-details-step.component';
-import { GlimChargesStepComponent } from './glim-account/create-glim-account/glim-account-stepper/glim-charges-step/glim-charges-step.component';
-import { GlimTermsStepComponent } from './glim-account/create-glim-account/glim-account-stepper/glim-terms-step/glim-terms-step.component';
-import { GlimPreviewStepComponent } from './glim-account/create-glim-account/glim-account-stepper/glim-preview-step/glim-preview-step.component';
 
 /** Dialog Components */
 import { LoansAccountViewGuarantorDetailsDialogComponent } from './custom-dialog/loans-account-view-guarantor-details-dialog/loans-account-view-guarantor-details-dialog.component';
@@ -84,6 +88,7 @@ import { LoanReagingComponent } from './loans-view/loan-account-actions/loan-rea
 import { LoanReamortizeComponent } from './loans-view/loan-account-actions/loan-reamortize/loan-reamortize.component';
 import { LoanTermVariationsTabComponent } from './loans-view/loan-term-variations-tab/loan-term-variations-tab.component';
 import { AddInterestPauseComponent } from './loans-view/loan-account-actions/add-interest-pause/add-interest-pause.component';
+import { LoansActiveClientMembersComponent } from './loans-account-stepper/loans-active-client-members/loans-active-client-members.component';
 
 /**
  * Loans Module
@@ -96,9 +101,7 @@ import { AddInterestPauseComponent } from './loans-view/loan-account-actions/add
     DirectivesModule,
     LoansRoutingModule,
     PipesModule,
-    TranslateModule
-  ],
-  declarations: [
+    TranslateModule,
     AddLoanChargeComponent,
     LoansViewComponent,
     GeneralTabComponent,
@@ -152,10 +155,6 @@ import { AddInterestPauseComponent } from './loans-view/loan-account-actions/add
     LoanCreditBalanceRefundComponent,
     GlimAccountComponent,
     CreateGlimAccountComponent,
-    GlimDetailsStepComponent,
-    GlimChargesStepComponent,
-    GlimTermsStepComponent,
-    GlimPreviewStepComponent,
     LoanDelinquencyTagsTabComponent,
     LoansAccountScheduleStepComponent,
     EditRepaymentScheduleComponent,
@@ -171,7 +170,8 @@ import { AddInterestPauseComponent } from './loans-view/loan-account-actions/add
     LoanReagingComponent,
     LoanReamortizeComponent,
     LoanTermVariationsTabComponent,
-    AddInterestPauseComponent
+    AddInterestPauseComponent,
+    LoansActiveClientMembersComponent
   ],
   providers: []
 })

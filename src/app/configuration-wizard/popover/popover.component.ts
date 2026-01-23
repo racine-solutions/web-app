@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { BasePortalOutlet, CdkPortalOutlet, ComponentPortal, TemplatePortal } from '@angular/cdk/portal';
 import { Component, ComponentRef, EmbeddedViewRef, ViewChild, ChangeDetectorRef } from '@angular/core';
@@ -10,6 +18,8 @@ import { map } from 'rxjs/operators';
 
 /* Popover Ref */
 import { PopoverRef } from './popover-ref';
+import { PopoverArrowDirective } from './popover-arrow.directive';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Internal component that wraps user-provided popover content.
@@ -17,7 +27,12 @@ import { PopoverRef } from './popover-ref';
 @Component({
   selector: 'mifosx-popover',
   templateUrl: './popover.component.html',
-  styleUrls: ['./popover.component.scss']
+  styleUrls: ['./popover.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    CdkPortalOutlet,
+    PopoverArrowDirective
+  ]
 })
 export class PopoverComponent extends BasePortalOutlet {
   @ViewChild(CdkPortalOutlet, { static: true }) portalOutlet: CdkPortalOutlet;

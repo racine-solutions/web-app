@@ -1,12 +1,36 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 /** rxjs Imports */
 import { of } from 'rxjs';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Tellers component.
@@ -14,9 +38,30 @@ import { of } from 'rxjs';
 @Component({
   selector: 'mifosx-tellers',
   templateUrl: './tellers.component.html',
-  styleUrls: ['./tellers.component.scss']
+  styleUrls: ['./tellers.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DateFormatPipe
+  ]
 })
 export class TellersComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   /** Tellers data. */
   tellersData: any;
   /** Columns to be displayed in tellers table. */
@@ -39,7 +84,7 @@ export class TellersComponent implements OnInit {
    * Retrieves the tellers data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { tellers: any }) => {
       this.tellersData = data.tellers;
     });

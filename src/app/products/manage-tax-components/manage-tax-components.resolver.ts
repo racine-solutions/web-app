@@ -1,6 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +19,8 @@ import { ProductsService } from '../products.service';
  * Manage Tax Component data resolver.
  */
 @Injectable()
-export class ManageTaxComponentsResolver implements Resolve<Object> {
-  /**
-   * @param {ProductsService} productsService Products service.
-   */
-  constructor(private productsService: ProductsService) {}
+export class ManageTaxComponentsResolver {
+  private productsService = inject(ProductsService);
 
   /**
    * Returns the tax components data.

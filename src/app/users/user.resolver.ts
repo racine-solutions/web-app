@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -12,11 +20,8 @@ import { UsersService } from './users.service';
  * User data resolver.
  */
 @Injectable()
-export class UserResolver implements Resolve<Object> {
-  /**
-   * @param {UsersService} usersService Users service.
-   */
-  constructor(private usersService: UsersService) {}
+export class UserResolver {
+  private usersService = inject(UsersService);
 
   /**
    * Returns the user data.

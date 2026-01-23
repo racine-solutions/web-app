@@ -1,9 +1,29 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Dialogs */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
@@ -17,6 +37,11 @@ import { DatepickerBase } from 'app/shared/form-dialog/formfield/model/datepicke
 import { OrganizationService } from '../../organization.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatList, MatListItem } from '@angular/material/list';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View SMS Campaign Component
@@ -24,9 +49,36 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-view-campaign',
   templateUrl: './view-campaign.component.html',
-  styleUrls: ['./view-campaign.component.scss']
+  styleUrls: ['./view-campaign.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTabGroup,
+    MatTab,
+    MatList,
+    MatListItem,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    DateFormatPipe
+  ]
 })
 export class ViewCampaignComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  dialog = inject(MatDialog);
+  private formBuilder = inject(UntypedFormBuilder);
+  private dateUtils = inject(Dates);
+  private organizationService = inject(OrganizationService);
+  private settingsService = inject(SettingsService);
+
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum date allowed. */
@@ -84,15 +136,7 @@ export class ViewCampaignComponent implements OnInit {
    * @param {OrganizationService} organizationService Organization Service
    * @param {SettingsService} settingsService Setting Service
    */
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    public dialog: MatDialog,
-    private formBuilder: UntypedFormBuilder,
-    private dateUtils: Dates,
-    private organizationService: OrganizationService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { smsCampaign: any }) => {
       this.smsCampaignData = data.smsCampaign;
     });
@@ -140,7 +184,6 @@ export class ViewCampaignComponent implements OnInit {
         type: 'date',
         required: true
       })
-
     ];
     const data = {
       title: 'Close SMS Campaign',
@@ -178,7 +221,6 @@ export class ViewCampaignComponent implements OnInit {
         type: 'date',
         required: true
       })
-
     ];
     const data = {
       title: 'Activate SMS Campaign',
@@ -216,7 +258,6 @@ export class ViewCampaignComponent implements OnInit {
         type: 'date',
         required: true
       })
-
     ];
     const data = {
       title: 'Reactivate SMS Campaign',

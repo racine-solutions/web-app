@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
@@ -9,6 +17,9 @@ import { AccountingService } from '../../accounting.service';
 /** Custom Components */
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { Location } from '@angular/common';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { GlAccountDisplayComponent } from '../../../shared/accounting/gl-account-display/gl-account-display.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View financial activity mapping component.
@@ -16,9 +27,20 @@ import { Location } from '@angular/common';
 @Component({
   selector: 'mifosx-view-financial-activity-mapping',
   templateUrl: './view-financial-activity-mapping.component.html',
-  styleUrls: ['./view-financial-activity-mapping.component.scss']
+  styleUrls: ['./view-financial-activity-mapping.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    GlAccountDisplayComponent
+  ]
 })
 export class ViewFinancialActivityMappingComponent {
+  private accountingService = inject(AccountingService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private location = inject(Location);
+
   /** Financial activity account ID. */
   financialActivityAccountId: any;
   /** Financial activity account data. */
@@ -31,13 +53,7 @@ export class ViewFinancialActivityMappingComponent {
    * @param {Router} router Router for navigation.
    * @param {MatDialog} dialog Dialog reference.
    */
-  constructor(
-    private accountingService: AccountingService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog,
-    private location: Location
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { financialActivityAccount: any }) => {
       this.financialActivityAccount = data.financialActivityAccount;
       this.financialActivityAccountId = data.financialActivityAccount.id;

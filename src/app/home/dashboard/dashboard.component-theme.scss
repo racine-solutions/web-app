@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 @use '@angular/material' as mat;
 @use 'sass:map';
 
@@ -8,8 +16,8 @@
     .recent-activities,
     .frequent-activities {
       .header {
-        background-color: mat.get-color-from-palette($primary, 500);
-        color: mat.get-contrast-color-from-palette($primary, 500);
+        background-color: mat.m2-get-color-from-palette($primary, 500);
+        color: mat.m2-get-contrast-color-from-palette($primary, 500);
       }
     }
 
@@ -18,18 +26,18 @@
     mifosx-client-trends-bar {
       .card {
         .header {
-          background-color: mat.get-color-from-palette($primary, 500);
-          color: mat.get-contrast-color-from-palette($primary, 500);
+          background-color: mat.m2-get-color-from-palette($primary, 500);
+          color: mat.m2-get-contrast-color-from-palette($primary, 500);
 
           mat-label,
           .mat-select-value,
           .mat-select-arrow {
-            color: mat.get-contrast-color-from-palette($primary, 500);
+            color: mat.m2-get-contrast-color-from-palette($primary, 500);
           }
 
           .mat-form-field-underline,
           .mat-form-field-ripple {
-            background-color: mat.get-contrast-color-from-palette($primary, 500);
+            background-color: mat.m2-get-contrast-color-from-palette($primary, 500);
           }
         }
       }

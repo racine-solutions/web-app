@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Dialogs */
@@ -9,6 +17,25 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 
 /** Custom Services */
 import { GroupsService } from '../groups.service';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitleGroup,
+  MatCardMdImage,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent
+} from '@angular/material/card';
+import { NgClass, LowerCasePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatIcon } from '@angular/material/icon';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTabNav, MatTabLink, MatTabNavPanel } from '@angular/material/tabs';
+import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Groups View Component.
@@ -16,9 +43,38 @@ import { GroupsService } from '../groups.service';
 @Component({
   selector: 'mifosx-groups-view',
   templateUrl: './groups-view.component.html',
-  styleUrls: ['./groups-view.component.scss']
+  styleUrls: ['./groups-view.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCardHeader,
+    MatCardTitleGroup,
+    MatCardMdImage,
+    MatCardTitle,
+    NgClass,
+    MatTooltip,
+    MatIconButton,
+    MatMenuTrigger,
+    MatIcon,
+    FaIconComponent,
+    MatCardSubtitle,
+    MatMenu,
+    MatMenuItem,
+    MatTabNav,
+    MatTabLink,
+    RouterLinkActive,
+    MatTabNavPanel,
+    RouterOutlet,
+    LowerCasePipe,
+    StatusLookupPipe,
+    DateFormatPipe
+  ]
 })
 export class GroupsViewComponent {
+  private route = inject(ActivatedRoute);
+  private groupsService = inject(GroupsService);
+  private router = inject(Router);
+  dialog = inject(MatDialog);
+
   /** Group view data */
   groupViewData: any;
   /** Group datatables data */
@@ -31,12 +87,7 @@ export class GroupsViewComponent {
    * @param {Router} router Router
    * @param {MatDialog} dialog Dialog
    */
-  constructor(
-    private route: ActivatedRoute,
-    private groupsService: GroupsService,
-    private router: Router,
-    public dialog: MatDialog
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { groupViewData: any; groupDatatables: any }) => {
       this.groupViewData = data.groupViewData;
       this.groupDatatables = data.groupDatatables;
@@ -57,6 +108,12 @@ export class GroupsViewComponent {
       case 'Manage Members':
       case 'Transfer Clients':
         this.router.navigate([`actions/${name}`], { relativeTo: this.route });
+        if (name === 'Activate') {
+          const generalTab = this.getGeneralTabComponent();
+          if (generalTab) {
+            generalTab.refreshAccounts(this.groupViewData.id);
+          }
+        }
         break;
       case 'Edit Meeting':
         const queryParams: any = { calendarId: this.groupViewData.collectionMeetingCalendar.id };
@@ -73,7 +130,9 @@ export class GroupsViewComponent {
         break;
     }
   }
-
+  getGeneralTabComponent(): any {
+    return null;
+  }
   /**
    * Checks if meeting is editable.
    */
@@ -86,7 +145,6 @@ export class GroupsViewComponent {
     }
     return false;
   }
-
   /**
    * Refetches data for the component
    * TODO: Replace by a custom reload component instead of hard-coded back-routing.

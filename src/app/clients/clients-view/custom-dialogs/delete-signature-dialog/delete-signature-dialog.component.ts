@@ -1,6 +1,23 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Delete signature dialog component.
@@ -8,9 +25,20 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
   selector: 'mifosx-delete-signature-dialog',
   templateUrl: './delete-signature-dialog.component.html',
-  styleUrls: ['./delete-signature-dialog.component.scss']
+  styleUrls: ['./delete-signature-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class DeleteSignatureDialogComponent {
+  dialogRef = inject<MatDialogRef<DeleteSignatureDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
   /** Id of client signature in documents */
   signatureId: any;
 
@@ -18,10 +46,7 @@ export class DeleteSignatureDialogComponent {
    * @param {MatDialogRef} dialogRef Component reference to dialog.
    * @param {any} data Documents data
    */
-  constructor(
-    public dialogRef: MatDialogRef<DeleteSignatureDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any[]
-  ) {
+  constructor() {
     const signature = this.data.find((document: any) => document.name === 'clientSignature') || {};
     this.signatureId = signature.id;
   }

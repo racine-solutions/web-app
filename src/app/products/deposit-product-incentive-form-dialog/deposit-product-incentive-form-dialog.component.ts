@@ -1,14 +1,44 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from '@angular/material/dialog';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-deposit-product-incentive-form-dialog',
   templateUrl: './deposit-product-incentive-form-dialog.component.html',
-  styleUrls: ['./deposit-product-incentive-form-dialog.component.scss']
+  styleUrls: ['./deposit-product-incentive-form-dialog.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class DepositProductIncentiveFormDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DepositProductIncentiveFormDialogComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+  private formBuilder = inject(UntypedFormBuilder);
+  private translateService = inject(TranslateService);
+
   layout: {
     addButtonText?: string;
   } = {
@@ -25,12 +55,9 @@ export class DepositProductIncentiveFormDialogComponent implements OnInit {
   attributeValueData: any;
   incentiveTypeData: any;
 
-  constructor(
-    public dialogRef: MatDialogRef<DepositProductIncentiveFormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private formBuilder: UntypedFormBuilder,
-    private translateService: TranslateService
-  ) {
+  constructor() {
+    const data = this.data;
+
     this.createDepositProductIncentiveForm();
     this.setConditionalControls();
     this.layout = { ...this.layout, ...data.layout };

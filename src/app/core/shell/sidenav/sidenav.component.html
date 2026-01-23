@@ -1,10 +1,18 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
 <div
   [ngClass]="{
     'sidebar-full': !sidenavCollapsed,
     'sidebar-compact': sidenavCollapsed
   }"
 >
-  <div class="navigation-panel" fxLayout="column">
+  <div class="navigation-panel layout-column">
     <!-- TODO: Allow customization by organization -->
     <div class="app-brand" [routerLink]="['/home']">
       <img src="assets/images/racine_solutions.svg" alt="app-logo" class="app-logo" />
@@ -40,16 +48,18 @@
         </div>
       </div>
       <div class="icon-menu">
-        <div class="icon-menu-item" *ngFor="let activity of mappedActivities">
-          <button
-            mat-raised-button
-            [matTooltipPosition]="tooltipPosition"
-            [matTooltip]="activity.toolTip"
-            [routerLink]="[activity.path]"
-          >
-            <fa-icon [icon]="activity.icon" size="lg"></fa-icon>
-          </button>
-        </div>
+        @for (activity of mappedActivities; track activity) {
+          <div class="icon-menu-item">
+            <button
+              mat-raised-button
+              [matTooltipPosition]="tooltipPosition"
+              [matTooltip]="activity.toolTip"
+              [routerLink]="[activity.path]"
+            >
+              <fa-icon [icon]="activity.icon" size="lg"></fa-icon>
+            </button>
+          </div>
+        }
       </div>
 
       <div class="nav-item-sep">
@@ -62,6 +72,8 @@
           [routerLink]="['/dashboard']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Dashboard' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="tachometer-alt" size="sm"></fa-icon>
@@ -72,6 +84,8 @@
           [routerLink]="['/navigation']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Navigation' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="location-arrow" size="sm"></fa-icon>
@@ -82,6 +96,8 @@
           [routerLink]="['/checker-inbox-and-tasks/checker-inbox']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Checker Inbox and Tasks' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <i class="fa fa-check"></i>
@@ -89,9 +105,23 @@
           <a matLine>{{ 'labels.menus.Checker Inbox and Tasks' | translate }}</a>
         </mat-list-item>
         <mat-list-item
+          [routerLink]="['/collections/collection-sheet']"
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'labels.menus.Collection Sheet' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
+        >
+          <mat-icon matListIcon>
+            <i class="fa fa-tasks"></i>
+          </mat-icon>
+          <a matLine>{{ 'labels.menus.Collection Sheet' | translate }}</a>
+        </mat-list-item>
+        <mat-list-item
           [routerLink]="['/collections/individual-collection-sheet']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Individual Collection Sheet' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <i class="fa fa-tasks"></i>
@@ -102,6 +132,8 @@
           [routerLink]="['/notifications']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Notifications' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="bell" size="sm"></fa-icon>
@@ -112,6 +144,8 @@
           [routerLink]="['/accounting/journal-entries/frequent-postings']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Frequent Postings' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="sync" size="sm"></fa-icon>
@@ -122,6 +156,8 @@
           [routerLink]="['/accounting/journal-entries/create']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Create Journal Entry' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="plus" size="sm"></fa-icon>
@@ -132,6 +168,8 @@
           [routerLink]="['/accounting/chart-of-accounts']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Chart Of Accounts' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
         >
           <mat-icon matListIcon>
             <fa-icon icon="sitemap" size="sm"></fa-icon>
@@ -183,8 +221,9 @@
 </div>
 
 <ng-template #templateLogo let-popover="popover">
+  <h2>{{ 'labels.text.Home' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Welcome page logo from anywhere' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -204,7 +243,7 @@
 <ng-template #templateUserPanel let-popover="popover">
   <h2>{{ 'labels.menus.User Panel' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Section Buttons' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -228,7 +267,7 @@
 <ng-template #templateFrequentlyAccessed let-popover="popover">
   <h2>{{ 'labels.menus.Frequently Accessed' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Shortcut to the frequently accessed components' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -252,7 +291,7 @@
 <ng-template #templateDashboard let-popover="popover">
   <h2>{{ 'labels.menus.Dashboard' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.User Dashboard Component' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -276,7 +315,7 @@
 <ng-template #templateNavigation let-popover="popover">
   <h2>{{ 'labels.menus.Navigation' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.User Entity navigation screen' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -300,7 +339,7 @@
 <ng-template #templateFrequentPostings let-popover="popover">
   <h2>{{ 'labels.menus.Frequent Postings' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Shortcut accounting rules' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -324,7 +363,7 @@
 <ng-template #templateCreateJournalEntry let-popover="popover">
   <h2>{{ 'labels.menus.Create Journal Entry' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Shortcut entry screen' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>
@@ -348,7 +387,7 @@
 <ng-template #templateChartOfAccounts let-popover="popover">
   <h2>{{ 'labels.menus.Chart of Accounts' | translate }}</h2>
   <p class="mw300">{{ 'labels.text.Shortcut accounts screen' | translate }}</p>
-  <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
+  <div class="layout-row align-end gap-2px responsive-column">
     <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
       {{ 'labels.buttons.Close' | translate }}
     </button>

@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 
 /** rxjs Imports */
 import { Observable, Subscription } from 'rxjs';
@@ -8,6 +16,14 @@ import { map } from 'rxjs/operators';
 
 /** Custom Services */
 import { ProgressBarService } from '../progress-bar/progress-bar.service';
+import { MatSidenavContainer, MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { NgClass, AsyncPipe } from '@angular/common';
+import { SidenavComponent } from './sidenav/sidenav.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { ContentComponent } from './content/content.component';
+import { FooterComponent } from '../../shared/footer/footer.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Shell component.
@@ -15,9 +31,26 @@ import { ProgressBarService } from '../progress-bar/progress-bar.service';
 @Component({
   selector: 'mifosx-shell',
   templateUrl: './shell.component.html',
-  styleUrls: ['./shell.component.scss']
+  styleUrls: ['./shell.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatSidenavContainer,
+    MatSidenav,
+    NgClass,
+    SidenavComponent,
+    MatSidenavContent,
+    ToolbarComponent,
+    BreadcrumbComponent,
+    ContentComponent,
+    FooterComponent,
+    AsyncPipe
+  ]
 })
 export class ShellComponent implements OnInit, OnDestroy {
+  private breakpointObserver = inject(BreakpointObserver);
+  private progressBarService = inject(ProgressBarService);
+  private cdr = inject(ChangeDetectorRef);
+
   /** Subscription to breakpoint observer for handset. */
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
@@ -28,17 +61,6 @@ export class ShellComponent implements OnInit, OnDestroy {
   progressBarMode: string;
   /** Subscription to progress bar. */
   progressBar$: Subscription;
-
-  /**
-   * @param {BreakpointObserver} breakpointObserver Breakpoint Observer to detect screen size.
-   * @param {ProgressBarService} progressBarService Progress Bar Service.
-   * @param {ChangeDetectorRef} cdr Change Detector Ref.
-   */
-  constructor(
-    private breakpointObserver: BreakpointObserver,
-    private progressBarService: ProgressBarService,
-    private cdr: ChangeDetectorRef
-  ) {}
 
   /**
    * Subscribes to progress bar to update its mode.

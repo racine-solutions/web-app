@@ -1,10 +1,20 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { CentersService } from '../../../centers.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Staff Assignment History Component
@@ -12,9 +22,16 @@ import { CentersService } from '../../../centers.service';
 @Component({
   selector: 'mifosx-staff-assignment-history',
   templateUrl: './staff-assignment-history.component.html',
-  styleUrls: ['./staff-assignment-history.component.scss']
+  styleUrls: ['./staff-assignment-history.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent
+  ]
 })
 export class StaffAssignmentHistoryComponent implements OnInit {
+  private sanitizer = inject(DomSanitizer);
+  private route = inject(ActivatedRoute);
+
   /** Staff Assignment History Data */
   staffAssignmentHistoryData: any;
   /** trusted resource url for pentaho output */
@@ -23,10 +40,7 @@ export class StaffAssignmentHistoryComponent implements OnInit {
   /**
    * @param {DomSanitizer} sanitizer DOM Sanitizer
    */
-  constructor(
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { centersActionData: any }) => {
       this.staffAssignmentHistoryData = data.centersActionData;
     });

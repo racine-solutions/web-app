@@ -1,9 +1,36 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatDivider } from '@angular/material/divider';
+import { DecimalPipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { YesnoPipe } from '../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * View Floating Rate Component.
@@ -11,9 +38,33 @@ import { MatTableDataSource } from '@angular/material/table';
 @Component({
   selector: 'mifosx-view-floating-rate',
   templateUrl: './view-floating-rate.component.html',
-  styleUrls: ['./view-floating-rate.component.scss']
+  styleUrls: ['./view-floating-rate.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatDivider,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DecimalPipe,
+    DateFormatPipe,
+    YesnoPipe
+  ]
 })
 export class ViewFloatingRateComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   /** Floating Rate Data. */
   floatingRateData: any;
   /** Columns to be displayed in floating rate periods table. */
@@ -34,7 +85,7 @@ export class ViewFloatingRateComponent implements OnInit {
    * Retrieves the floating rate data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { floatingRate: any }) => {
       this.floatingRateData = data.floatingRate;
     });

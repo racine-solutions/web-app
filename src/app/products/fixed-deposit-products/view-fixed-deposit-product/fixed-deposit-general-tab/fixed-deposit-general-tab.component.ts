@@ -1,6 +1,35 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { trigger, state, transition, animate, style } from '@angular/animations';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatDivider } from '@angular/material/divider';
+
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ViewSavingsAccountingDetailsComponent } from '../../../../shared/accounting/view-savings-accounting-details/view-savings-accounting-details.component';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { FormatNumberPipe } from '../../../../pipes/format-number.pipe';
+import { YesnoPipe } from '../../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-fixed-deposit-general-tab',
@@ -10,11 +39,33 @@ import { trigger, state, transition, animate, style } from '@angular/animations'
     trigger('expandChartSlab', [
       state('collapsed', style({ height: '0px', minHeight: '0' })),
       state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))])
-
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ])
+  ],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatDivider,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    ViewSavingsAccountingDetailsComponent,
+    FindPipe,
+    DateFormatPipe,
+    FormatNumberPipe,
+    YesnoPipe
   ]
 })
 export class FixedDepositGeneralTabComponent {
+  private route = inject(ActivatedRoute);
+
   /** Fixed Deposit Product data. */
   fixedDepositProductData: any;
   fixedDepositProductsTemplate: any;
@@ -54,7 +105,7 @@ export class FixedDepositGeneralTabComponent {
    * Retrieves the fixed deposit product data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.route.data.subscribe((data: { fixedDepositProduct: any; fixedDepositProductsTemplate: any }) => {
       this.fixedDepositProductData = data.fixedDepositProduct;
       this.fixedDepositProductsTemplate = data.fixedDepositProductsTemplate;

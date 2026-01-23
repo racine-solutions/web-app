@@ -1,10 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 /** Custom Services */
 import { SavingsService } from 'app/savings/savings.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Savings Account Details Step
@@ -12,9 +23,19 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-savings-account-details-step',
   templateUrl: './savings-account-details-step.component.html',
-  styleUrls: ['./savings-account-details-step.component.scss']
+  styleUrls: ['./savings-account-details-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext
+  ]
 })
 export class SavingsAccountDetailsStepComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private savingsService = inject(SavingsService);
+  private settingsService = inject(SettingsService);
+
   /** Savings Account Template */
   @Input() savingsAccountTemplate: any;
 
@@ -42,11 +63,7 @@ export class SavingsAccountDetailsStepComponent implements OnInit {
    * @param {SavingsService} savingsService Savings Service.
    * @param {SettingsService} settingsService Setting service
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private savingsService: SavingsService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.createSavingsAccountDetailsForm();
   }
 
@@ -93,7 +110,7 @@ export class SavingsAccountDetailsStepComponent implements OnInit {
    * Fetches savings account product template on productId value changes
    */
   buildDependencies() {
-    const entityId = this.savingsAccountTemplate.clientId || this.savingsAccountTemplate.groupId;
+    const entityId = this.savingsAccountTemplate.groupId || this.savingsAccountTemplate.clientId;
     this.savingsAccountDetailsForm.get('productId').valueChanges.subscribe((productId: string) => {
       this.savingsService
         .getSavingsAccountTemplate(entityId, productId, this.savingsAccountTemplate.groupId ? true : false)

@@ -1,7 +1,21 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormArray } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormArray,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { AccountingService } from '../accounting.service';
@@ -13,6 +27,9 @@ import { ConfigurationWizardService } from '../../configuration-wizard/configura
 import { onlyOneOfTheFieldsIsRequiredValidator } from './only-one-of-the-fields-is-required.validator';
 import { Dates } from 'app/core/utils/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { GlAccountDisplayComponent } from '../../shared/accounting/gl-account-display/gl-account-display.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Migrate opening balances component.
@@ -20,9 +37,24 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'mifosx-migrate-opening-balances',
   templateUrl: './migrate-opening-balances.component.html',
-  styleUrls: ['./migrate-opening-balances.component.scss']
+  styleUrls: ['./migrate-opening-balances.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    GlAccountDisplayComponent,
+    CurrencyPipe
+  ]
 })
 export class MigrateOpeningBalancesComponent implements OnInit, AfterViewInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private accountingService = inject(AccountingService);
+  private settingsService = inject(SettingsService);
+  private dateUtils = inject(Dates);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+  private translateService = inject(TranslateService);
+
   /** Minimum opening balances date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum opening balances date allowed. */
@@ -56,17 +88,7 @@ export class MigrateOpeningBalancesComponent implements OnInit, AfterViewInit {
    * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
    * @param {PopoverService} popoverService PopoverService.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private accountingService: AccountingService,
-    private settingsService: SettingsService,
-    private dateUtils: Dates,
-    private route: ActivatedRoute,
-    private router: Router,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { offices: any; currencies: any }) => {
       this.officeData = data.offices;
       this.currencyData = data.currencies.selectedCurrencyOptions;

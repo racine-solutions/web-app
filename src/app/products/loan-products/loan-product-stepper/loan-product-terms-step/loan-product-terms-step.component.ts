@@ -1,5 +1,20 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormArray, UntypedFormControl } from '@angular/forms';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormArray,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
@@ -10,13 +25,59 @@ import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { ProcessingStrategyService } from '../../services/processing-strategy.service';
 import { TranslateService } from '@ngx-translate/core';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDivider } from '@angular/material/divider';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FindPipe } from '../../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-loan-product-terms-step',
   templateUrl: './loan-product-terms-step.component.html',
-  styleUrls: ['./loan-product-terms-step.component.scss']
+  styleUrls: ['./loan-product-terms-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    MatCheckbox,
+    MatDivider,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    FindPipe
+  ]
 })
 export class LoanProductTermsStepComponent implements OnInit, OnChanges {
+  private formBuilder = inject(UntypedFormBuilder);
+  private processingStrategyService = inject(ProcessingStrategyService);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+
   @Input() loanProductsTemplate: any;
 
   loanProductTermsForm: UntypedFormGroup;
@@ -41,12 +102,7 @@ export class LoanProductTermsStepComponent implements OnInit, OnChanges {
   ];
   isAdvancedTransactionProcessingStrategy = false;
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private processingStrategyService: ProcessingStrategyService,
-    private dialog: MatDialog,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.createLoanProductTermsForm();
     this.setConditionalControls();
   }
@@ -140,39 +196,89 @@ export class LoanProductTermsStepComponent implements OnInit, OnChanges {
   createLoanProductTermsForm() {
     this.loanProductTermsForm = this.formBuilder.group({
       useBorrowerCycle: [false],
-      minPrincipal: [''],
+      minPrincipal: [
+        '',
+        [
+          Validators.min(1)
+        ]
+      ],
       principal: [
         '',
-        Validators.required
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
       ],
-      maxPrincipal: [''],
-      minNumberOfRepayments: [''],
+      maxPrincipal: [
+        '',
+        [
+          Validators.min(1)
+        ]
+      ],
+      minNumberOfRepayments: [
+        '',
+        [
+          Validators.pattern('^[1-9]\\d*$')
+        ]
+      ],
       numberOfRepayments: [
         '',
-        Validators.required
+        [
+          Validators.required,
+          Validators.pattern('^[1-9]\\d*$')
+        ]
       ],
-      maxNumberOfRepayments: [''],
+      maxNumberOfRepayments: [
+        '',
+        [
+          Validators.pattern('^[1-9]\\d*$')
+        ]
+      ],
       isLinkedToFloatingInterestRates: [false],
       allowApprovedDisbursedAmountsOverApplied: [false],
-      minInterestRatePerPeriod: [''],
+      overAppliedCalculationType: [{ value: null, disabled: true }],
+      overAppliedNumber: [{ value: null, disabled: true }],
+      minInterestRatePerPeriod: [
+        '',
+        [
+          Validators.min(0),
+          Validators.pattern(/^\d+([.,]\d{1,6})?$/)
+        ]
+      ],
       interestRatePerPeriod: [
         '',
-        Validators.required
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.pattern(/^\d+([.,]\d{1,6})?$/)
+        ]
       ],
-      maxInterestRatePerPeriod: [''],
+      maxInterestRatePerPeriod: [
+        '',
+        [
+          Validators.min(0),
+          Validators.pattern(/^\d+([.,]\d{1,6})?$/)
+        ]
+      ],
       interestRateFrequencyType: [
         '',
         Validators.required
       ],
       repaymentEvery: [
         '',
-        Validators.required
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
       ],
       repaymentFrequencyType: [
         '',
         Validators.required
       ],
-      minimumDaysBetweenDisbursalAndFirstRepayment: [''],
+      minimumDaysBetweenDisbursalAndFirstRepayment: [
+        '',
+        []
+      ],
       repaymentStartDateType: [1],
       fixedLength: [null],
       interestRecognitionOnDisbursementDate: [false]
@@ -188,12 +294,14 @@ export class LoanProductTermsStepComponent implements OnInit, OnChanges {
       .get('allowApprovedDisbursedAmountsOverApplied')
       .valueChanges.subscribe((allowApprovedDisbursedAmountsOverApplied) => {
         if (allowApprovedDisbursedAmountsOverApplied) {
-          this.loanProductTermsForm.addControl('overAppliedCalculationType', new UntypedFormControl(''));
-          this.loanProductTermsForm.addControl('overAppliedNumber', new UntypedFormControl(''));
+          this.loanProductTermsForm.get('overAppliedCalculationType').enable();
+          this.loanProductTermsForm.get('overAppliedNumber').enable();
           this.loanProductTermsForm.addControl('disallowExpectedDisbursements', new UntypedFormControl('true'));
         } else {
-          this.loanProductTermsForm.removeControl('overAppliedCalculationType');
-          this.loanProductTermsForm.removeControl('overAppliedNumber');
+          this.loanProductTermsForm.get('overAppliedCalculationType').disable();
+          this.loanProductTermsForm.get('overAppliedCalculationType').patchValue(null);
+          this.loanProductTermsForm.get('overAppliedNumber').disable();
+          this.loanProductTermsForm.get('overAppliedNumber').patchValue(null);
           this.loanProductTermsForm.removeControl('disallowExpectedDisbursements');
         }
       });
@@ -404,13 +512,26 @@ export class LoanProductTermsStepComponent implements OnInit, OnChanges {
         type: 'number',
         order: 5
       })
-
     ];
     return formfields;
   }
 
   get loanProductTerms() {
-    return this.loanProductTermsForm.getRawValue();
+    const formValue = this.loanProductTermsForm.getRawValue();
+    // Normalize decimal separators: convert comma to dot for backend compatibility
+    const normalizeDecimal = (value: any) => {
+      if (typeof value === 'string' && value.includes(',')) {
+        return value.replace(',', '.');
+      }
+      return value;
+    };
+
+    return {
+      ...formValue,
+      minInterestRatePerPeriod: normalizeDecimal(formValue.minInterestRatePerPeriod),
+      interestRatePerPeriod: normalizeDecimal(formValue.interestRatePerPeriod),
+      maxInterestRatePerPeriod: normalizeDecimal(formValue.maxInterestRatePerPeriod)
+    };
   }
 
   isZeroInterest(): boolean {

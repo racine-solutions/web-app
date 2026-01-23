@@ -1,9 +1,29 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Models */
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
@@ -16,6 +36,11 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { OrganizationService } from '../../organization.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { FindPipe } from '../../../pipes/find.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Create Loan Provisioning Criteria Component.
@@ -23,9 +48,33 @@ import { SettingsService } from 'app/settings/settings.service';
 @Component({
   selector: 'mifosx-create-loan-provisioning-criteria',
   templateUrl: './create-loan-provisioning-criteria.component.html',
-  styleUrls: ['./create-loan-provisioning-criteria.component.scss']
+  styleUrls: ['./create-loan-provisioning-criteria.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatHint,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    FaIconComponent,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    FindPipe
+  ]
 })
 export class CreateLoanProvisioningCriteriaComponent implements OnInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private organizationService = inject(OrganizationService);
+  private settingsService = inject(SettingsService);
+  private router = inject(Router);
+  dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private translateService = inject(TranslateService);
+
   /** Loan Provisioning Criteria form. */
   provisioningCriteriaForm: UntypedFormGroup;
   /** Loan Provisioning Criteria Template */
@@ -66,14 +115,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private organizationService: OrganizationService,
-    private settingsService: SettingsService,
-    private router: Router,
-    public dialog: MatDialog,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { loanProvisioningCriteriaTemplate: any }) => {
       this.loanProvisioningCriteriaTemplate = data.loanProvisioningCriteriaTemplate;
       this.definitions = this.loanProvisioningCriteriaTemplate.definitions;
@@ -99,7 +141,10 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
         '',
         Validators.required
       ],
-      loanProducts: ['']
+      loanProducts: [
+        [],
+        Validators.required
+      ]
     });
   }
 
@@ -110,7 +155,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
    */
   editDefinition(definition: any) {
     const data = {
-      title: 'Edit Criteria Definition',
+      title: this.translateService.instant('labels.heading.Edit Criteria Definition'),
       formfields: this.getDefinitionFormFields(definition),
       layout: { addButtonText: 'Confirm' }
     };
@@ -138,7 +183,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
     formfields.push(
       new InputBase({
         controlName: 'minAge',
-        label: 'Min Age',
+        label: this.translateService.instant('labels.inputs.Min Age'),
         value: definition ? definition.minAge : '',
         type: 'number',
         required: true,
@@ -148,7 +193,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
     formfields.push(
       new InputBase({
         controlName: 'maxAge',
-        label: 'Max Age',
+        label: this.translateService.instant('labels.inputs.Max Age'),
         value: definition ? definition.maxAge : '',
         type: 'number',
         required: true,
@@ -158,7 +203,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
     formfields.push(
       new InputBase({
         controlName: 'provisioningPercentage',
-        label: 'Percentage (%)',
+        label: this.translateService.instant('labels.inputs.Percentage') + ' (%)',
         value: definition ? definition.provisioningPercentage : '',
         type: 'number',
         required: true,
@@ -168,7 +213,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
     formfields.push(
       new SelectBase({
         controlName: 'liabilityAccount',
-        label: 'Liability Account',
+        label: this.translateService.instant('labels.inputs.Liability Account'),
         value: definition ? definition.liabilityAccount : '',
         options: { label: 'name', value: 'id', data: this.liabilityAccounts },
         required: true,
@@ -178,7 +223,7 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
     formfields.push(
       new SelectBase({
         controlName: 'expenseAccount',
-        label: 'Expense Account',
+        label: this.translateService.instant('labels.inputs.Expense Account'),
         value: definition ? definition.expenseAccount : '',
         options: { label: 'name', value: 'id', data: this.expenseAccounts },
         required: true,
@@ -202,9 +247,10 @@ export class CreateLoanProvisioningCriteriaComponent implements OnInit {
    */
   submit() {
     const locale = this.settingsService.language.code;
+    const products = this.provisioningCriteriaForm.get('loanProducts').value;
     const loanProvisioningCriteria = {
       ...this.provisioningCriteriaForm.value,
-      loanProducts: this.provisioningCriteriaForm.get('loanProducts').value.map((product: any) => ({
+      loanProducts: products.map((product: any) => ({
         id: product.id,
         name: product.name,
         includeInBorrowerCycle: product.includeInBorrowerCycle

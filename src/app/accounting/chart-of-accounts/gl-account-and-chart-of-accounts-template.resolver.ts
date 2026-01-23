@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -13,11 +21,8 @@ import { AccountingService } from '../accounting.service';
  * GL Account and chart of accounts template data resolver.
  */
 @Injectable()
-export class GlAccountAndChartOfAccountsTemplateResolver implements Resolve<Object> {
-  /**
-   * @param {AccountingService} accountingService Accounting service.
-   */
-  constructor(private accountingService: AccountingService) {}
+export class GlAccountAndChartOfAccountsTemplateResolver {
+  private accountingService = inject(AccountingService);
 
   /**
    * Returns the gl account and chart of accounts template data.

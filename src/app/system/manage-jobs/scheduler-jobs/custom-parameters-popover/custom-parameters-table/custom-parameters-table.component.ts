@@ -1,10 +1,52 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { JobIdAndParameterType, JobParameterType } from '../custom-parameters-popover.component';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-custom-parameters-table',
   templateUrl: './custom-parameters-table.component.html',
-  styleUrls: ['./custom-parameters-table.component.scss']
+  styleUrls: ['./custom-parameters-table.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    FormsModule,
+    MatIconButton,
+    MatTooltip,
+    FaIconComponent,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow
+  ]
 })
 export class CustomParametersTableComponent implements OnInit {
   /* Job name for table title */

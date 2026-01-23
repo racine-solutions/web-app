@@ -1,5 +1,13 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -13,6 +21,23 @@ import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-
 import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { Dates } from 'app/core/utils/dates';
 import { Charge, Currency } from 'app/shared/models/general.model';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Fixed Deposit Account Charges Step
@@ -20,9 +45,31 @@ import { Charge, Currency } from 'app/shared/models/general.model';
 @Component({
   selector: 'mifosx-fixed-deposit-account-charges-step',
   templateUrl: './fixed-deposit-account-charges-step.component.html',
-  styleUrls: ['./fixed-deposit-account-charges-step.component.scss']
+  styleUrls: ['./fixed-deposit-account-charges-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    FaIconComponent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatStepperPrevious,
+    MatStepperNext,
+    DateFormatPipe
+  ]
 })
 export class FixedDepositAccountChargesStepComponent implements OnInit, OnChanges {
+  dialog = inject(MatDialog);
+  private dateUtils = inject(Dates);
+  private settingsService = inject(SettingsService);
+
   /** Fixed deposits account template */
   @Input() fixedDepositsAccountTemplate: any;
   /** Fixed deposits account and product template */
@@ -50,17 +97,6 @@ export class FixedDepositAccountChargesStepComponent implements OnInit, OnChange
   isChargesPatched = false;
   /** Component is pristine if there has been no changes by user interaction */
   pristine = true;
-
-  /**
-   * @param {MatDialog} dialog Mat Dialog
-   * @param {Dates} dateUtils Date Utils
-   * @param {SettingsService} settingsService Settings Service
-   */
-  constructor(
-    public dialog: MatDialog,
-    private dateUtils: Dates,
-    private settingsService: SettingsService
-  ) {}
 
   ngOnInit() {
     this.chargesDataSource = [];
@@ -107,7 +143,6 @@ export class FixedDepositAccountChargesStepComponent implements OnInit, OnChange
         type: 'number',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Amount',
@@ -138,7 +173,6 @@ export class FixedDepositAccountChargesStepComponent implements OnInit, OnChange
         type: 'datetime-local',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Date',
@@ -180,7 +214,6 @@ export class FixedDepositAccountChargesStepComponent implements OnInit, OnChange
         type: 'text',
         required: false
       })
-
     ];
     const data = {
       title: 'Edit Charge Fee Interval',

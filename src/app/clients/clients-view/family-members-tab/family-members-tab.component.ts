@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Components */
@@ -8,6 +16,18 @@ import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dial
 
 /** Custom Services */
 import { ClientsService } from '../../clients.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+  MatExpansionPanelDescription
+} from '@angular/material/expansion';
+import { MatDivider } from '@angular/material/divider';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { YesnoPipe } from '../../../pipes/yesno.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Client Family Members Tab
@@ -15,9 +35,26 @@ import { ClientsService } from '../../clients.service';
 @Component({
   selector: 'mifosx-family-members-tab',
   templateUrl: './family-members-tab.component.html',
-  styleUrls: ['./family-members-tab.component.scss']
+  styleUrls: ['./family-members-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    RouterOutlet,
+    FaIconComponent,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    MatDivider,
+    DateFormatPipe,
+    YesnoPipe
+  ]
 })
 export class FamilyMembersTabComponent {
+  private route = inject(ActivatedRoute);
+  private clientsService = inject(ClientsService);
+  dialog = inject(MatDialog);
+
   /** Client Family Members */
   clientFamilyMembers: any;
 
@@ -26,11 +63,7 @@ export class FamilyMembersTabComponent {
    * @param {ClientsService} clientsService Clients Service
    * @param {MatDialog }dialog Mat Dialog
    */
-  constructor(
-    private route: ActivatedRoute,
-    private clientsService: ClientsService,
-    public dialog: MatDialog
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { clientFamilyMembers: any }) => {
       this.clientFamilyMembers = data.clientFamilyMembers;
     });

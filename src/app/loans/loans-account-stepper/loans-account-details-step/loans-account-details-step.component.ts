@@ -1,14 +1,37 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, inject } from '@angular/core';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SettingsService } from 'app/settings/settings.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Services */
 import { LoansService } from '../../loans.service';
 import { Commons } from 'app/core/utils/commons';
 import { takeUntil } from 'rxjs/operators';
 import { ReplaySubject, Subject } from 'rxjs';
+import { MatTooltip } from '@angular/material/tooltip';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { AsyncPipe } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Loans Account Details Step
@@ -16,9 +39,31 @@ import { ReplaySubject, Subject } from 'rxjs';
 @Component({
   selector: 'mifosx-loans-account-details-step',
   templateUrl: './loans-account-details-step.component.html',
-  styleUrls: ['./loans-account-details-step.component.scss']
+  styleUrls: ['./loans-account-details-step.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatTooltip,
+    NgxMatSelectSearchModule,
+    MatDivider,
+    MatCheckbox,
+    MatStepperPrevious,
+    FaIconComponent,
+    MatStepperNext,
+    AsyncPipe
+  ]
 })
 export class LoansAccountDetailsStepComponent implements OnInit, OnDestroy {
+  private formBuilder = inject(UntypedFormBuilder);
+  private loansService = inject(LoansService);
+  private route = inject(ActivatedRoute);
+  private translateService = inject(TranslateService);
+  private settingsService = inject(SettingsService);
+  private commons = inject(Commons);
+
+  //** Defining PlaceHolders for the search bar */
+  placeHolderLabel = '';
+  noEntriesFoundLabel = '';
+
   /** Loans Account Template */
   @Input() loansAccountTemplate: any;
 
@@ -59,18 +104,14 @@ export class LoansAccountDetailsStepComponent implements OnInit, OnDestroy {
    * @param {LoansService} loansService Loans Service.
    * @param {SettingsService} settingsService SettingsService
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private loansService: LoansService,
-    private route: ActivatedRoute,
-    private settingsService: SettingsService,
-    private commons: Commons
-  ) {
+  constructor() {
     this.loanId = this.route.snapshot.params['loanId'];
+    this.createLoansAccountDetailsForm();
   }
 
   ngOnInit() {
-    this.createLoansAccountDetailsForm();
+    this.placeHolderLabel = this.translateService.instant('labels.text.Search');
+    this.noEntriesFoundLabel = this.translateService.instant('labels.text.No data found');
     this.maxDate = this.settingsService.maxFutureDate;
     this.buildDependencies();
     if (this.loansAccountTemplate) {

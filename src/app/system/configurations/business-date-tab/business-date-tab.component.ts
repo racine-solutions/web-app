@@ -1,6 +1,14 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { Alert } from 'app/core/alert/alert.model';
 import { AlertService } from 'app/core/alert/alert.service';
@@ -10,13 +18,31 @@ import { Subscription } from 'rxjs';
 
 /** Custom Services */
 import { SystemService } from '../../system.service';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { DateFormatPipe } from '../../../pipes/date-format.pipe';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-business-date-tab',
   templateUrl: './business-date-tab.component.html',
-  styleUrls: ['./business-date-tab.component.scss']
+  styleUrls: ['./business-date-tab.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatIconButton,
+    MatTooltip,
+    FaIconComponent,
+    DateFormatPipe
+  ]
 })
 export class BusinessDateTabComponent implements OnInit {
+  private systemService = inject(SystemService);
+  private settingsService = inject(SettingsService);
+  private formBuilder = inject(UntypedFormBuilder);
+  private dateUtils = inject(Dates);
+  private alertService = inject(AlertService);
+
   /** Subscription to alerts. */
   alert$: Subscription;
 
@@ -37,21 +63,6 @@ export class BusinessDateTabComponent implements OnInit {
   userDateFormat: '';
   isBusinessDateEnabled = false;
   isEditInProgress = false;
-
-  /**
-   * Retrieves the configurations data from `resolve`.
-   * @param {SystemService} systemService System Service.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {FormBuilder} formBuilder Form Builder.
-   * @param {Dates} dateUtils Date Utils.
-   */
-  constructor(
-    private systemService: SystemService,
-    private settingsService: SettingsService,
-    private formBuilder: UntypedFormBuilder,
-    private dateUtils: Dates,
-    private alertService: AlertService
-  ) {}
 
   ngOnInit(): void {
     this.alert$ = this.alertService.alertEvent.subscribe((alertEvent: Alert) => {

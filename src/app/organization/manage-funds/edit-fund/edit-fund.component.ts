@@ -1,14 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { Component, OnInit, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { OrganizationService } from 'app/organization/organization.service';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 @Component({
   selector: 'mifosx-edit-fund',
   templateUrl: './edit-fund.component.html',
-  styleUrls: ['./edit-fund.component.scss']
+  styleUrls: ['./edit-fund.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS
+  ]
 })
 export class EditFundComponent implements OnInit {
+  private organizationService = inject(OrganizationService);
+  private formBuilder = inject(UntypedFormBuilder);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   /** Selected Data. */
   fundData: any;
   /** Charge form. */
@@ -21,12 +38,7 @@ export class EditFundComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    */
-  constructor(
-    private organizationService: OrganizationService,
-    private formBuilder: UntypedFormBuilder,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { fundData: any }) => {
       this.fundData = data.fundData;
     });

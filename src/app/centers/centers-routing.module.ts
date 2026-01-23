@@ -1,3 +1,11 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
@@ -12,6 +20,7 @@ import { GeneralTabComponent } from './centers-view/general-tab/general-tab.comp
 import { NotesTabComponent } from './centers-view/notes-tab/notes-tab.component';
 import { DatatableTabComponent } from './centers-view/datatable-tab/datatable-tab.component';
 import { EditCenterComponent } from './edit-center/edit-center.component';
+import { CenterActionsComponent } from './centers-view/center-actions/center-actions.component';
 
 /** Custom Resolvers */
 import { OfficesResolver } from 'app/accounting/common-resolvers/offices.resolver';
@@ -91,11 +100,19 @@ const routes: Routes = [
               ]
             },
             {
+              path: 'actions/:action',
+              data: { title: 'Center Actions', breadcrumb: 'action', routeParamBreadcrumb: 'action' },
+              component: CenterActionsComponent,
+              resolve: {
+                centersActionData: CenterActionsResolver
+              }
+            },
+            {
               path: 'edit',
               component: EditCenterComponent,
-              data: { title: 'Edit Center', breadcrumb: 'Edit' },
+              data: { title: 'Edit Center', breadcrumb: 'Edit', routeParamBreadcrumb: false },
               resolve: {
-                centerDataAndTemplate: CenterDataAndTemplateResolver
+                centerData: CenterDataAndTemplateResolver
               }
             }
           ]
@@ -103,11 +120,22 @@ const routes: Routes = [
       ]
     }
   ])
-
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [
+    OfficesResolver,
+    CenterViewResolver,
+    SavingsAccountResolver,
+    CenterResourceResolver,
+    CenterSummaryResolver,
+    CenterNotesResolver,
+    CenterDatatableResolver,
+    CenterDatatablesResolver,
+    CenterActionsResolver,
+    CenterDataAndTemplateResolver
+  ]
 })
 export class CentersRoutingModule {}

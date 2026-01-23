@@ -1,11 +1,31 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow
+} from '@angular/material/table';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { ConfigurationWizardService } from '../../../configuration-wizard/configuration-wizard.service';
@@ -23,6 +43,11 @@ import { ColumnDialogComponent } from '../column-dialog/column-dialog.component'
 import { TranslateService } from '@ngx-translate/core';
 import { ContinueSetupDialogComponent } from '../../../configuration-wizard/continue-setup-dialog/continue-setup-dialog.component';
 import { DatatableColumn } from '../datatable-column.model';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MatTooltip } from '@angular/material/tooltip';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create Data Table Component.
@@ -30,9 +55,38 @@ import { DatatableColumn } from '../datatable-column.model';
 @Component({
   selector: 'mifosx-create-data-table',
   templateUrl: './create-data-table.component.html',
-  styleUrls: ['./create-data-table.component.scss']
+  styleUrls: ['./create-data-table.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatCheckbox,
+    FaIconComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatIconButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class CreateDataTableComponent implements OnInit, AfterViewInit {
+  private formBuilder = inject(UntypedFormBuilder);
+  private systemService = inject(SystemService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private configurationWizardService = inject(ConfigurationWizardService);
+  private popoverService = inject(PopoverService);
+  private translateService = inject(TranslateService);
+
   /** Data Table Form */
   dataTableForm: UntypedFormGroup;
   /** Application Table Data */
@@ -89,16 +143,7 @@ export class CreateDataTableComponent implements OnInit, AfterViewInit {
    * @param {PopoverService} popoverService PopoverService.
    * @param {TranslateService} translateService Translate Service.
    */
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private systemService: SystemService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog,
-    private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService,
-    private translateService: TranslateService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { columnCodes: any }) => {
       this.dataForDialog.columnCodes = data.columnCodes;
     });

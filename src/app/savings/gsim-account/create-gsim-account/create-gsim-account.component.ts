@@ -1,16 +1,29 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 /** Angular Imports */
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 /** Custom Components */
 import { SavingsAccountDetailsStepComponent } from '../../savings-account-stepper/savings-account-details-step/savings-account-details-step.component';
 import { SavingsAccountTermsStepComponent } from '../../savings-account-stepper/savings-account-terms-step/savings-account-terms-step.component';
 import { SavingsAccountChargesStepComponent } from '../../savings-account-stepper/savings-account-charges-step/savings-account-charges-step.component';
+import { SavingsActiveClientMembersComponent } from '../../savings-account-stepper/savings-active-client-members/savings-active-client-members.component';
 
 /** Custom Services */
 import { SavingsService } from '../../savings.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
+import { MatStepper, MatStepperIcon, MatStep, MatStepLabel } from '@angular/material/stepper';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { SavingsAccountPreviewStepComponent } from '../../savings-account-stepper/savings-account-preview-step/savings-account-preview-step.component';
+import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
  * Create GSIM Account Component
@@ -18,9 +31,28 @@ import { Dates } from 'app/core/utils/dates';
 @Component({
   selector: 'mifosx-create-gsim-account',
   templateUrl: './create-gsim-account.component.html',
-  styleUrls: ['./create-gsim-account.component.scss']
+  styleUrls: ['./create-gsim-account.component.scss'],
+  imports: [
+    ...STANDALONE_SHARED_IMPORTS,
+    MatStepper,
+    MatStepperIcon,
+    FaIconComponent,
+    MatStep,
+    MatStepLabel,
+    SavingsAccountDetailsStepComponent,
+    SavingsAccountTermsStepComponent,
+    SavingsAccountChargesStepComponent,
+    SavingsActiveClientMembersComponent,
+    SavingsAccountPreviewStepComponent
+  ]
 })
 export class CreateGsimAccountComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private dateUtils = inject(Dates);
+  private savingsService = inject(SavingsService);
+  private settingsService = inject(SettingsService);
+
   /** Savings Account Template */
   savingsAccountTemplate: any;
   /** Savings Account Product Template */
@@ -39,6 +71,9 @@ export class CreateGsimAccountComponent {
   /** Savings Account Charges Step */
   @ViewChild(SavingsAccountChargesStepComponent, { static: true })
   savingsAccountChargesStep: SavingsAccountChargesStepComponent;
+  /** Savings Active Client Members */
+  @ViewChild(SavingsActiveClientMembersComponent, { static: true })
+  savingsActiveClientMembers: SavingsActiveClientMembersComponent;
 
   /**
    * Fetches savings account template from `resolve`
@@ -48,13 +83,7 @@ export class CreateGsimAccountComponent {
    * @param {SavingsService} savingsService Savings Service
    * @param {SettingsService} settingsService Settings Service
    */
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private dateUtils: Dates,
-    private savingsService: SavingsService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     this.route.data.subscribe((data: { savingsAccountTemplate: any; groupsData: any }) => {
       this.savingsAccountTemplate = data.savingsAccountTemplate;
       this.dataSource = data.groupsData.activeClientMembers;
@@ -94,14 +123,18 @@ export class CreateGsimAccountComponent {
    * Checks validity of overall savings account form.
    */
   get savingsAccountFormValid() {
-    return this.savingsAccountDetailsForm.valid && this.savingsAccountTermsForm.valid;
+    return (
+      this.savingsAccountDetailsForm.valid &&
+      this.savingsAccountTermsForm.valid &&
+      this.activeClientMembers.filter((m: any) => m.selected).length > 0
+    );
   }
 
   /**
    * Retrieves savings account object.
    */
   get savingsAccount() {
-    this.selectedMembers = this.savingsAccountChargesStep.selectedClientMembers;
+    this.selectedMembers = this.savingsActiveClientMembers.selectedClientMembers;
     return {
       ...this.savingsAccountDetailsStep.savingsAccountDetails,
       ...this.savingsAccountTermsStep.savingsAccountTerms,
@@ -110,7 +143,7 @@ export class CreateGsimAccountComponent {
   }
 
   /** Set Body for each client selected */
-  setData(client: any): any {
+  setData(client: any, isParentAccount: any): any {
     const locale = this.settingsService.language.code;
     const dateFormat = this.settingsService.dateFormat;
     const monthDayFormat = 'dd MMMM';
@@ -122,7 +155,7 @@ export class CreateGsimAccountComponent {
       })),
       clientId: client.id,
       isGSIM: true,
-      isParentAccount: true,
+      isParentAccount: isParentAccount,
       submittedOnDate: this.dateUtils.formatDate(this.savingsAccount.submittedOnDate, dateFormat),
       dateFormat,
       monthDayFormat,
@@ -138,7 +171,10 @@ export class CreateGsimAccountComponent {
     const requestData = [];
     const memberSelected = this.selectedMembers.selectedMembers;
     for (let index = 0; index < 1; index++) {
-      requestData.push(this.setData(memberSelected[index]));
+      requestData.push(this.setData(memberSelected[index], true));
+    }
+    for (let index = 1; index < memberSelected.length; index++) {
+      requestData.push(this.setData(memberSelected[index], false));
     }
     return requestData;
   }

@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatLabel } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
-import { TranslatePipe } from 'app/pipes/translate.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'mifosx-sms-event-configuration',
@@ -22,7 +22,7 @@ import { TranslatePipe } from 'app/pipes/translate.pipe';
     MatLabel,
     MatTableModule,
     MatInputModule,
-    TranslatePipe
+    TranslateModule
   ]
 })
 export class SmsEventConfigurationComponent implements OnInit {

@@ -88,6 +88,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   /* Template for popover on chart of accounts */
   @ViewChild('templateChartOfAccounts') templateChartOfAccounts: TemplateRef<any>;
 
+  tooltipPosition: TooltipPosition = 'right';
+
   /**
    * Sets the username of the authenticated user.
    */

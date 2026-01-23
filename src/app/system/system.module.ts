@@ -8,6 +8,7 @@
 
 /** Angular Imports */
 import { NgModule } from '@angular/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 /** Module Imports */
 import { SharedModule } from '../shared/shared.module';
@@ -96,6 +97,32 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     BrowserAnimationsModule,
     DragDropModule,
     DirectivesModule,
+    RunSelectedJobsPopoverComponent,
+    RunSelectedJobsTableComponent,
+    SmsEventConfigurationComponent,
+    ManageExternalEventsComponent,
+    CobWorkflowComponent,
+    LoanLockedComponent,
+    CustomParametersPopoverComponent,
+    CustomParametersTableComponent,
+    ErrorLogPopoverComponent,
+    EditSchedulerJobComponent,
+    ViewRoleComponent,
+    EditRoleComponent,
+    EntityToEntityMappingComponent,
+    ConfigureMakerCheckerTasksComponent,
+    CreateSurveyComponent,
+    ViewHistorySchedulerJobComponent,
+    ViewSurveyComponent,
+    EditSurveyComponent,
+    BusinessDateTabComponent,
+    ConfigurationsComponent,
+    GlobalConfigurationsTabComponent,
+    ManageJobsComponent,
+    ManageSchedulerJobsComponent,
+    WorkflowJobsComponent,
+    WorkflowDiagramComponent,
+    MatPaginatorModule,
     SystemComponent,
     CodesComponent,
     ViewCodeComponent,
@@ -135,33 +162,9 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     ColumnDialogComponent,
     AuditTrailsComponent,
     ViewAuditComponent,
-    ViewSchedulerJobComponent,
-    EditSchedulerJobComponent,
-    ViewRoleComponent,
-    EditRoleComponent,
-    EntityToEntityMappingComponent,
-    ConfigureMakerCheckerTasksComponent,
-    CreateSurveyComponent,
-    EditSchedulerJobComponent,
-    ViewHistorySchedulerJobComponent,
-    ViewSurveyComponent,
-    EditSurveyComponent,
-    BusinessDateTabComponent,
-    ConfigurationsComponent,
-    GlobalConfigurationsTabComponent,
-    ManageJobsComponent,
-    ManageSchedulerJobsComponent,
-    WorkflowJobsComponent,
-    WorkflowDiagramComponent,
-    ManageExternalEventsComponent,
-    CobWorkflowComponent,
-    LoanLockedComponent,
-    CustomParametersPopoverComponent,
-    CustomParametersTableComponent,
-    ErrorLogPopoverComponent,
-    RunSelectedJobsPopoverComponent,
-    RunSelectedJobsTableComponent,
-    SmsEventConfigurationComponent
+    ViewSchedulerJobComponent
+  ],
+  declarations: [
   ]
 })
 export class SystemModule {}

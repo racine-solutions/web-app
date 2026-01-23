@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialogRef, MatDialogActions, MatDialogTitle, MatDialogContent } from '@angular/material/dialog';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'mifosx-release-notes',
   templateUrl: './release-notes.component.html',
-  styleUrls: ['./release-notes.component.scss']
+  styleUrls: ['./release-notes.component.scss'],
+  standalone: true,
+  imports: [FaIconComponent, MatDialogActions, MatDialogTitle, MatDialogContent]
 })
 export class ReleaseNotesComponent {
-  constructor(public dialogRef: MatDialogRef<ReleaseNotesComponent>) {}
+  dialogRef = inject(MatDialogRef<ReleaseNotesComponent>);
 }

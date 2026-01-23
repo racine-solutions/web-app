@@ -10,7 +10,7 @@ import { SystemService } from '../system.service';
   templateUrl: './sms-event-configuration.component.html',
   styleUrls: ['./sms-event-configuration.component.scss'],
   standalone: true,
-  imports: [MatPaginator, MatSort, MatTableDataSource]
+  imports: [MatPaginator, MatSort]
 })
 export class SmsEventConfigurationComponent implements OnInit {
   /** Events Data. */

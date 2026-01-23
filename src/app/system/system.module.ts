@@ -91,27 +91,6 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     ViewDataTableComponent,
     EditDataTableComponent,
     ManageHooksComponent,
-    RolesAndPermissionsComponent,
-    ManageSurveysComponent,
-    EditConfigurationComponent,
-    AmazonS3Component,
-    EmailComponent,
-    SMSComponent,
-    NotificationComponent,
-    AccountNumberPreferencesComponent,
-    CreateAccountNumberPreferenceComponent,
-    ViewAccountNumberPreferenceComponent,
-    EditAccountNumberPreferenceComponent,
-    ManageReportsComponent,
-    ViewReportComponent,
-    CreateReportComponent,
-    EditReportComponent,
-    AuditTrailsComponent,
-    ViewAuditComponent
-  ],
-  declarations: [
-    RolesAndPermissionsComponent,
-    AddRoleComponent,
     ManageSurveysComponent,
     ViewSurveyComponent,
     CreateSurveyComponent,
@@ -129,7 +108,10 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     CreateReportComponent,
     EditReportComponent,
     AuditTrailsComponent,
-    ViewAuditComponent
-  ]
+    ViewAuditComponent,
+    RolesAndPermissionsComponent,
+    AddRoleComponent
+  ],
+  declarations: []
 })
 export class SystemModule {}

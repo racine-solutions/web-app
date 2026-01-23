@@ -10,6 +10,12 @@
 import { NgModule } from '@angular/core';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 /** Module Imports */
 import { SharedModule } from '../shared/shared.module';
@@ -81,6 +87,12 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     CustomParametersTableComponent,
     ErrorLogPopoverComponent,
     MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatTableModule,
+    MatSortModule,
+    MatSlideToggleModule,
     SystemComponent,
     CodesComponent,
     ViewCodeComponent,

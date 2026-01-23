@@ -36,10 +36,6 @@ import { AmazonS3Component } from './external-services/amazon-s3/amazon-s3.compo
 import { EmailComponent } from './external-services/email/email.component';
 import { SMSComponent } from './external-services/sms/sms.component';
 import { NotificationComponent } from './external-services/notification/notification.component';
-import { EditAmazonS3Component } from './external-services/amazon-s3/edit-amazon-s3/edit-amazon-s3.component';
-import { EditEmailComponent } from './external-services/email/edit-email/edit-email.component';
-import { EditNotificationComponent } from './external-services/notification/edit-notification/edit-notification.component';
-import { EditSMSComponent } from './external-services/sms/edit-sms/edit-sms.component';
 import { ViewCodeComponent } from './codes/view-code/view-code.component';
 import { EditCodeComponent } from './codes/edit-code/edit-code.component';
 import { AccountNumberPreferencesComponent } from './account-number-preferences/account-number-preferences.component';
@@ -52,31 +48,8 @@ import { CreateReportComponent } from './manage-reports/create-report/create-rep
 import { EditReportComponent } from './manage-reports/edit-report/edit-report.component';
 import { AuditTrailsComponent } from './audit-trails/audit-trails.component';
 import { ViewAuditComponent } from './audit-trails/view-audit/view-audit.component';
-import { ColumnDialogComponent } from './manage-data-tables/column-dialog/column-dialog.component';
-import { ViewHistorySchedulerJobComponent } from './manage-jobs/scheduler-jobs/view-history-scheduler-job/view-history-scheduler-job.component';
-import { EditHookComponent } from './manage-hooks/edit-hook/edit-hook.component';
-import { ViewHookComponent } from './manage-hooks/view-hook/view-hook.component';
-import { CreateHookComponent } from './manage-hooks/create-hook/create-hook.component';
-import { ViewRoleComponent } from './roles-and-permissions/view-role/view-role.component';
-import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
-import { EntityToEntityMappingComponent } from './entity-to-entity-mapping/entity-to-entity-mapping.component';
-
-/** Dialog Component Imports */
-import { ReportParameterDialogComponent } from './manage-reports/report-parameter-dialog/report-parameter-dialog.component';
-import { AddEventDialogComponent } from './manage-hooks/add-event-dialog/add-event-dialog.component';
-import { ViewSchedulerJobComponent } from './manage-jobs/scheduler-jobs/view-scheduler-job/view-scheduler-job.component';
-import { EditSchedulerJobComponent } from './manage-jobs/scheduler-jobs/edit-scheduler-job/edit-scheduler-job.component';
-import { ConfigureMakerCheckerTasksComponent } from './configure-maker-checker-tasks/configure-maker-checker-tasks.component';
-import { EditSurveyComponent } from './manage-surveys/edit-survey/edit-survey.component';
-import { BusinessDateTabComponent } from './configurations/business-date-tab/business-date-tab.component';
-import { ConfigurationsComponent } from './configurations/configurations.component';
-import { GlobalConfigurationsTabComponent } from './configurations/global-configurations-tab/global-configurations-tab.component';
-import { ManageJobsComponent } from './manage-jobs/manage-jobs.component';
-import { ManageSchedulerJobsComponent } from './manage-jobs/scheduler-jobs/manage-scheduler-jobs.component';
-import { WorkflowDiagramComponent } from './manage-jobs/workflow-jobs/workflow-diagram/workflow-diagram.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { WorkflowJobsComponent } from './manage-jobs/workflow-jobs/workflow-jobs.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ManageExternalEventsComponent } from './manage-external-events/manage-external-events.component';
 import { CobWorkflowComponent } from './manage-jobs/cob-workflow/cob-workflow.component';
@@ -106,22 +79,6 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     CustomParametersPopoverComponent,
     CustomParametersTableComponent,
     ErrorLogPopoverComponent,
-    EditSchedulerJobComponent,
-    ViewRoleComponent,
-    EditRoleComponent,
-    EntityToEntityMappingComponent,
-    ConfigureMakerCheckerTasksComponent,
-    CreateSurveyComponent,
-    ViewHistorySchedulerJobComponent,
-    ViewSurveyComponent,
-    EditSurveyComponent,
-    BusinessDateTabComponent,
-    ConfigurationsComponent,
-    GlobalConfigurationsTabComponent,
-    ManageJobsComponent,
-    ManageSchedulerJobsComponent,
-    WorkflowJobsComponent,
-    WorkflowDiagramComponent,
     MatPaginatorModule,
     SystemComponent,
     CodesComponent,
@@ -141,10 +98,6 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     EmailComponent,
     SMSComponent,
     NotificationComponent,
-    EditAmazonS3Component,
-    EditEmailComponent,
-    EditNotificationComponent,
-    EditSMSComponent,
     AccountNumberPreferencesComponent,
     CreateAccountNumberPreferenceComponent,
     ViewAccountNumberPreferenceComponent,
@@ -153,16 +106,8 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     ViewReportComponent,
     CreateReportComponent,
     EditReportComponent,
-    ReportParameterDialogComponent,
-    AddRoleComponent,
-    EditHookComponent,
-    ViewHookComponent,
-    CreateHookComponent,
-    AddEventDialogComponent,
-    ColumnDialogComponent,
     AuditTrailsComponent,
-    ViewAuditComponent,
-    ViewSchedulerJobComponent
+    ViewAuditComponent
   ],
   declarations: [
     CodesComponent,
@@ -170,47 +115,7 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     CreateCodeComponent,
     ExternalServicesComponent,
     ManageDataTablesComponent,
-    CreateDataTableComponent,
-    ViewDataTableComponent,
-    EditDataTableComponent,
-    ManageHooksComponent,
-    RolesAndPermissionsComponent,
-    AddRoleComponent,
-    ManageSurveysComponent,
-    ViewSurveyComponent,
-    CreateSurveyComponent,
-    EditConfigurationComponent,
-    AmazonS3Component,
-    EmailComponent,
-    SMSComponent,
-    NotificationComponent,
-    EditAmazonS3Component,
-    EditEmailComponent,
-    EditNotificationComponent,
-    EditSMSComponent,
-    ViewCodeComponent,
-    EditCodeComponent,
-    AccountNumberPreferencesComponent,
-    CreateAccountNumberPreferenceComponent,
-    ViewAccountNumberPreferenceComponent,
-    EditAccountNumberPreferenceComponent,
-    ManageReportsComponent,
-    ViewReportComponent,
-    CreateReportComponent,
-    EditReportComponent,
-    AuditTrailsComponent,
-    ViewAuditComponent,
-    ColumnDialogComponent,
-    ViewHistorySchedulerJobComponent,
-    EditHookComponent,
-    ViewHookComponent,
-    CreateHookComponent,
-    ViewRoleComponent,
-    EditRoleComponent,
-    EntityToEntityMappingComponent,
-    ReportParameterDialogComponent,
-    AddEventDialogComponent,
-    ViewSchedulerJobComponent
+    CreateDataTableComponent
   ]
 })
 export class SystemModule {}

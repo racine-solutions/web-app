@@ -77,7 +77,7 @@ jobs:
           echo 'FROM nginx:1.29-alpine' > dist/web-app/browser/Dockerfile
           echo 'COPY . /usr/share/nginx/html' >> dist/web-app/browser/Dockerfile
           echo 'EXPOSE 80' >> dist/web-app/browser/Dockerfile
-          echo 'CMD ["nginx", "-g", "daemon off;"]' >> dist/web-app/browser/Dockerfile
+          echo 'CMD ["/bin/sh", "-c", "if [ -f /usr/share/nginx/html/assets/env.template.js ]; then envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js; fi && exec nginx -g '\''daemon off;'\''"]' >> dist/web-app/browser/Dockerfile
 
       - name: Build and push Docker image
         id: build

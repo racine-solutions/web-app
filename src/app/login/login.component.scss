@@ -234,199 +234,116 @@
   flex-direction: column;
   background: var(--md-sys-color-surface, #fff);
   position: relative;
-  min-height: 100vh;
+  min-height: 100px;
   min-height: -webkit-fill-available; // Safari fix: use available height
   overflow-y: auto;
-}
 
-.login-header {
-  display: flex;
+  // Enhanced centering and card styles for login
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: transparent;
-  flex-shrink: 0; // Safari fix: prevent header from growing
-  max-height: 76px; // Safari fix: constrain header height
-
-  .header-control {
-    opacity: 0.8;
-    transition: opacity 0.2s ease;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .theme-toggle {
-    flex-shrink: 0; // Prevent toggle from growing
-  }
-
-  // Theme Toggle Button Styles
-  ::ng-deep mifosx-theme-toggle {
-    button {
-      color: var(--md-sys-color-on-surface, #1a1c1e);
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: #1074b914;
-        color: var(--md-sys-color-primary, #1074b9);
-      }
-
-      mat-icon {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
-      }
-    }
-  }
-
-  // Language Selector Outlined Styles
-  ::ng-deep mifosx-language-selector {
-    width: 20%;
-    flex-shrink: 0; // Safari fix
-
-    #language-selector.outlined-variant {
-      width: 100%;
-      margin: 0;
-      max-height: 56px; // Safari fix: constrain height
-
-      // Compact outlined field for header
-      .mat-mdc-form-field-flex {
-        height: 44px;
-        max-height: 44px; // Safari fix
-      }
-
-      .mat-mdc-form-field-infix {
-        padding: 10px 0;
-        min-height: 44px;
-        max-height: 44px; // Safari fix
-      }
-
-      // Rounded corners for Material Design 3
-      .mdc-notched-outline {
-        .mdc-notched-outline__leading {
-          border-radius: 12px 0 0 12px;
-          width: 12px;
-        }
-
-        .mdc-notched-outline__trailing {
-          border-radius: 0 12px 12px 0;
-        }
-      }
-    }
-  }
-
-  // Server Selector Outlined Styles
-  ::ng-deep mifosx-server-selector {
-    width: 70%;
-    flex-shrink: 0; // Safari fix
-
-    #server-selector.outlined-variant {
-      width: 100%;
-      margin: 0;
-      max-height: 56px; // Safari fix: constrain height
-
-      // Compact outlined field for header
-      .mat-mdc-form-field-flex {
-        height: 44px;
-        max-height: 44px; // Safari fix
-      }
-
-      .mat-mdc-form-field-infix {
-        padding: 10px 0;
-        min-height: 44px;
-        max-height: 44px; // Safari fix
-      }
-
-      // Rounded corners for Material Design 3
-      .mdc-notched-outline {
-        .mdc-notched-outline__leading {
-          border-radius: 12px 0 0 12px;
-          width: 12px;
-        }
-
-        .mdc-notched-outline__trailing {
-          border-radius: 0 12px 12px 0;
-        }
-      }
-    }
-  }
+  justify-content: flex-start;
+  padding-top: 3rem;
 }
 
-// ===== Login Card Container =====
 .login-card-container {
-  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; // Safari fix: avoid center calculation issues
-  padding: 1rem;
-  min-height: 0; // Safari fix: allows flex item to shrink below content size
-  animation: fade-in 0.6s ease-out;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 480px;
-  background: var(--md-sys-color-surface-container-low, #fff);
-  border-radius: 28px;
-  padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  margin-top: auto; // Safari fix: push card to center using margin
-  margin-bottom: auto;
-
-  &:hover {
-    box-shadow:
-      0 2px 4px #00000014,
-      0 4px 12px #0000000f,
-      0 12px 32px #0000001f;
-  }
+  justify-content: center;
+  flex: 1 1 auto;
+  width: 100px;
+  min-height: 0;
+  padding: 2rem 1rem 2rem 1rem;
 }
 
 // ===== Logo Section =====
 .logo-section {
-  text-align: center;
-  margin-bottom: 1rem;
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
   animation: fade-in-down 0.6s ease-out 0.2s both;
 }
 
 .logo-image {
-  max-width: 180px;
+  max-width: 160px;
   height: auto;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   filter: drop-shadow(0 2px 8px #0000001a);
 }
 
 .welcome-text {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
   margin: 0 0 0.5rem;
   color: var(--md-sys-color-on-surface, #1a1c1e);
   letter-spacing: -0.01em;
+  text-align: center;
 }
 
 .welcome-subtitle {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--md-sys-color-on-surface-variant, #44474e);
-  margin: 0;
+  margin: 0 0 1.5rem 0;
   font-weight: 400;
+  text-align: center;
+}
+
+// ===== Login Card =====
+.login-card {
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  background: var(--md-sys-color-surface-container-low, #fff);
+  border-radius: 24px;
+  padding: 2rem 2rem 1.5rem 2rem;
+  box-shadow: 0 4px 24px #0000001a, 0 1.5px 6px #0000000f;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 5vh auto 0 auto; /* Push down from top, center horizontally */
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+
+  &:hover {
+    box-shadow: 0 8px 32px #00000026, 0 2px 8px #00000014;
+  }
+}
+
+@media (max-width: 868px) {
+  .login-card {
+    width: 95vw;
+    /* height: 90vw; */
+    min-width: 260px;
+    /* min-height: 340px; */
+    max-width: 98vw;
+    max-height: 95vh;
+    padding: 1.25rem 0.75rem 1rem 0.75rem;
+    border-radius: 18px;
+    margin-top: 4vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    width: 99vw;
+    /* height: 99vw; */
+    min-width: 200px;
+    /* min-height: 260px; */
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0.75rem 0.25rem 0.5rem 0.25rem;
+    border-radius: 12px;
+    margin-top: 2vh;
+  }
 }
 
 // ===== Form Section =====
 .form-section {
-  margin-bottom: 1rem;
-  flex: 0 1 auto;
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
-  animation: fade-in-up 0.6s ease-out 0.3s both;
-}
-
-.tenant-section {
-  margin-bottom: 1rem;
-  flex-shrink: 0;
+  gap: 1.25rem;
 }
 
 // ===== Version Info Section =====
@@ -649,67 +566,36 @@
 
   .login-panel {
     min-height: 100vh;
+    padding-top: 1.5rem;
   }
 
   .login-card-container {
-    padding: 1rem;
-    justify-content: center;
-    height: auto;
-    min-height: calc(100vh - 56px); // 56px for header
-  }
-
-  .login-header {
-    padding: 0.75rem 1rem;
-    gap: 0.25rem;
-
-    ::ng-deep mifosx-language-selector {
-      width: 30%;
-
-      #language-selector.outlined-variant {
-        width: 100%;
-        font-size: 0.8rem;
-      }
-    }
-
-    ::ng-deep mifosx-server-selector {
-      width: 60%;
-
-      #server-selector.outlined-variant {
-        width: 100%;
-        font-size: 0.8rem;
-      }
-    }
-
-    ::ng-deep mifosx-theme-toggle {
-      button {
-        padding: 8px;
-
-        mat-icon {
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
-        }
-      }
-    }
+    padding: 1rem 0.5rem 1rem 0.5rem;
   }
 
   .login-card {
-    padding: 0.75rem 1rem;
-    border-radius: 24px;
-    margin: 0;
-  }
-
-  .logo-section {
-    margin-bottom: 1rem;
+    width: 95vw;
+    /* height: 90vw; */
+    min-width: 260px;
+    /* min-height: 340px; */
+    max-width: 98vw;
+    max-height: 95vh;
+    padding: 1.25rem 0.75rem 1rem 0.75rem;
+    border-radius: 18px;
+    margin-top: 4vh;
   }
 
   .logo-image {
-    max-width: 140px;
+    max-width: 110px;
     margin-bottom: 0.75rem;
   }
 
   .welcome-text {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.95rem;
   }
 
   // Hide resources section on medium and small screens
@@ -760,15 +646,19 @@
   }
 
   .login-card {
-    padding: 0.75rem 0.875rem;
-  }
-
-  .logo-section {
-    margin-bottom: 0.75rem;
+    width: 99vw;
+    height: 99vw;
+    min-width: 200px;
+    min-height: 260px;
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0.75rem 0.25rem 0.5rem 0.25rem;
+    border-radius: 12px;
+    margin-top: 2vh;
   }
 
   .logo-image {
-    max-width: 110px;
+    max-width: 80px;
     margin-bottom: 0.5rem;
   }
 

@@ -47,7 +47,7 @@ LABEL org.opencontainers.image.title="Fineract Webapp" \
       org.opencontainers.image.description="Fineract Webapp Release 1.14.0"
 
 # Correct build output path for Angular CLI >= v8 (defaultProject):
-COPY --from=builder /dist/web-app/browser /usr/share/nginx/html
+COPY --from=builder /dist/browser /usr/share/nginx/html
 
 EXPOSE 80
 

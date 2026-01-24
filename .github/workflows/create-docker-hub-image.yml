@@ -60,25 +60,30 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run production build
+        run: npm run build:prod
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64 # Build for a single platform initially
+          context: dist/web-app/browser
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            NPM_REGISTRY_URL=https://registry.npmjs.org/
-            BUILD_ENVIRONMENT_OPTIONS=--configuration production
-            PUPPETEER_DOWNLOAD_HOST_ARG=https://storage.googleapis.com
-            PUPPETEER_CHROMIUM_REVISION_ARG=1011831
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # Add output caching to speed up builds
-          outputs: type=docker,dest=/tmp/image.tar
+          build-contexts: |
+            nginx=docker-image://nginx:1.29-alpine
+          dockerfile-inline: |
+            FROM nginx:1.29-alpine
+            COPY . /usr/share/nginx/html
+            EXPOSE 80
+            CMD ["nginx", "-g", "daemon off;"]
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}

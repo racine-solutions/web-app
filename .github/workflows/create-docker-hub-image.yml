@@ -74,7 +74,10 @@ jobs:
 
       - name: Create minimal Dockerfile for static nginx image
         run: |
-          echo "FROM nginx:1.29-alpine\nCOPY . /usr/share/nginx/html\nEXPOSE 80\nCMD [\"nginx\", \"-g\", \"daemon off;\"]" > dist/web-app/browser/Dockerfile
+          echo 'FROM nginx:1.29-alpine' > dist/web-app/browser/Dockerfile
+          echo 'COPY . /usr/share/nginx/html' >> dist/web-app/browser/Dockerfile
+          echo 'EXPOSE 80' >> dist/web-app/browser/Dockerfile
+          echo 'CMD ["nginx", "-g", "daemon off;"]' >> dist/web-app/browser/Dockerfile
 
       - name: Build and push Docker image
         id: build

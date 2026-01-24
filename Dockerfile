@@ -32,7 +32,7 @@ RUN npm cache clear --force
 RUN npm config set fetch-retry-maxtimeout 120000
 RUN npm config set registry $NPM_REGISTRY_URL --location=global
 
-RUN npm ci
+RUN npm install
 
 # Build for Release 1.14.0
 RUN npx ng build --configuration production --output-path=/dist/browser

@@ -291,8 +291,9 @@
 
 // ===== Login Card =====
 .login-card {
-  width: 480px;
-  max-width: 95vw;
+  /* Remove rigid width and height */
+  width: 100%;
+  max-width: 400px;
   max-height: 90vh;
   background: var(--md-sys-color-surface-container-low, #fff);
   border-radius: 24px;
@@ -301,40 +302,65 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin: 5vh auto 0 auto; /* Push down from top, center horizontally */
+  margin: 5vh auto 0 auto;
   transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
+  box-sizing: border-box;
 
   &:hover {
     box-shadow: 0 8px 32px #00000026, 0 2px 8px #00000014;
   }
 }
 
-@media (max-width: 868px) {
+@media (max-width: 1200px) {
   .login-card {
-    width: 95vw;
-    /* height: 90vw; */
-    min-width: 260px;
-    /* min-height: 340px; */
+    max-width: 340px;
+    padding: 1.5rem 1.25rem 1rem 1.25rem;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .login-card {
+    max-width: 300px;
+    padding: 1.25rem 1rem 0.75rem 1rem;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-card {
     max-width: 98vw;
-    max-height: 95vh;
-    padding: 1.25rem 0.75rem 1rem 0.75rem;
-    border-radius: 18px;
+    padding: 1rem 0.5rem 0.75rem 0.5rem;
+    border-radius: 14px;
     margin-top: 4vh;
+  }
+  .logo-image {
+    max-width: 90px;
+  }
+  .welcome-text {
+    font-size: 1.1rem;
+  }
+  .welcome-subtitle {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
   .login-card {
-    width: 99vw;
-    /* height: 99vw; */
-    min-width: 200px;
-    /* min-height: 260px; */
     max-width: 100vw;
-    max-height: 100vh;
-    padding: 0.75rem 0.25rem 0.5rem 0.25rem;
-    border-radius: 12px;
+    padding: 0.5rem 0.15rem 0.5rem 0.15rem;
+    border-radius: 8px;
     margin-top: 2vh;
+  }
+  .logo-image {
+    max-width: 60px;
+  }
+  .welcome-text {
+    font-size: 0.95rem;
+  }
+  .welcome-subtitle {
+    font-size: 0.8rem;
   }
 }
 
@@ -574,12 +600,7 @@
   }
 
   .login-card {
-    width: 95vw;
-    /* height: 90vw; */
-    min-width: 260px;
-    /* min-height: 340px; */
     max-width: 98vw;
-    max-height: 95vh;
     padding: 1.25rem 0.75rem 1rem 0.75rem;
     border-radius: 18px;
     margin-top: 4vh;
@@ -646,11 +667,10 @@
   }
 
   .login-card {
-    width: 99vw;
+    max-width: 100vw;
     height: 99vw;
     min-width: 200px;
     min-height: 260px;
-    max-width: 100vw;
     max-height: 100vh;
     padding: 0.75rem 0.25rem 0.5rem 0.25rem;
     border-radius: 12px;

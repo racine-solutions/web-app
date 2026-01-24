@@ -6,17 +6,16 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="layout-row align-end gap-2px responsive-column container m-b-20">
-<div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column" class="container m-b-20">
-  <div #buttonDashboard class="in-block">
-    <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
+<div class="container">
+  <!-- Dashboard button aligned to the right -->
+  <div class="button-container">
+    <button mat-raised-button color="primary" [routerLink]="['/dashboard']" #buttonDashboard>
       <fa-icon icon="tachometer-alt" class="m-r-10"></fa-icon>
       {{ 'labels.buttons.Dashboard' | translate }}
     </button>
   </div>
-</div>
 
-<div class="container">
+  <!-- Welcome card -->
   <mat-card>
     <mat-card-header>
       <mat-card-title class="title">
@@ -35,14 +34,14 @@
 
       <mat-autocomplete #activitySearch="matAutocomplete">
         @for (activity of filteredActivities | async; track activity) {
-          <mat-option [routerLink]="activity.path">
-            <span>{{ activity.activity }}</span>
-          </mat-option>
+        <mat-option [routerLink]="activity.path">
+          <span>{{ activity.activity }}</span>
+        </mat-option>
         }
       </mat-autocomplete>
     </mat-card-content>
 
-    <img mat-card-image src="assets/images/racine_solutions.svg" alt="Racine Solutions" style="display:block; margin:0 auto; width:80%;" />
+    <img mat-card-image src="assets/images/racine_solutions.svg" alt="Racine Solutions" style="display:block; margin:0 auto 15px; width:80%;" />
   </mat-card>
 </div>
 
@@ -52,22 +51,22 @@
       {{ 'labels.buttons.Close' | translate }}
     </button>
     @if (prev) {
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="popover.close(); showPopover(prev.template, prev.target, 'bottom', true)"
-      >
-        {{ 'labels.buttons.Back' | translate }}
-      </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="popover.close(); showPopover(prev.template, prev.target, 'bottom', true)"
+    >
+      {{ 'labels.buttons.Back' | translate }}
+    </button>
     }
     @if (next) {
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="popover.close(); showPopover(next.template, next.target, 'bottom', true)"
-      >
-        {{ 'labels.buttons.Next' | translate }}
-      </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="popover.close(); showPopover(next.template, next.target, 'bottom', true)"
+    >
+      {{ 'labels.buttons.Next' | translate }}
+    </button>
     }
   </div>
 </ng-template>

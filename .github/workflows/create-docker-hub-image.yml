@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [racine-dev-1.14.0-preview]
   pull_request:
-    branches: [Release-1.11.0-preview-non-official]
+    branches: [racine-dev-1.14.0-preview]
 
 # Cancel in-progress runs on new pushes
 concurrency:

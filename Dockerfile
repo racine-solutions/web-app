@@ -34,12 +34,17 @@ RUN npm config set registry $NPM_REGISTRY_URL --location=global
 
 RUN npm ci
 
-RUN sh -c "ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS"
+# Build for Release 1.14.0
+RUN npx ng build --configuration production --output-path=/dist/browser
 
 ###############
 ### STAGE 2: Serve app with nginx ###
 ###############
 FROM $NGINX_IMAGE
+
+LABEL org.opencontainers.image.title="Fineract Webapp" \
+      org.opencontainers.image.version="1.14.0" \
+      org.opencontainers.image.description="Fineract Webapp Release 1.14.0"
 
 COPY --from=builder /dist/browser /usr/share/nginx/html
 

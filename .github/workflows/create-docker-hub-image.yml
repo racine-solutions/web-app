@@ -72,24 +72,22 @@ jobs:
       - name: Run production build
         run: npm run build:prod
 
+      - name: Create minimal Dockerfile for static nginx image
+        run: |
+          echo "FROM nginx:1.29-alpine\nCOPY . /usr/share/nginx/html\nEXPOSE 80\nCMD [\"nginx\", \"-g\", \"daemon off;\"]" > dist/web-app/browser/Dockerfile
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
         with:
           context: dist/web-app/browser
+          file: dist/web-app/browser/Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-contexts: |
-            nginx=docker-image://nginx:1.29-alpine
-          dockerfile-inline: |
-            FROM nginx:1.29-alpine
-            COPY . /usr/share/nginx/html
-            EXPOSE 80
-            CMD ["nginx", "-g", "daemon off;"]
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}

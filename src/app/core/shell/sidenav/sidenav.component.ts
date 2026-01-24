@@ -8,7 +8,6 @@
 
 /** Angular Imports */
 import { Component, OnInit, Input, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
-import { AfterViewInit, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -71,12 +70,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   /** True if sidenav is in collapsed state. */
   @Input() sidenavCollapsed: boolean;
-  /** Tooltip position */
-  tooltipPosition: TooltipPosition = 'after';
   /** Username of authenticated user. */
   username: string;
   /** Array of all user activities */
-  userActivity: string[];
+  userActivity: string[] = JSON.parse(localStorage.getItem('mifosXLocation'));
   /** Mapped Activites */
   mappedActivities: any[] = [];
   /** Collection of possible frequent activities */
@@ -91,25 +88,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   /* Template for popover on chart of accounts */
   @ViewChild('templateChartOfAccounts') templateChartOfAccounts: TemplateRef<any>;
 
-  /**
-   * @param {Router} router Router for navigation.
-   * @param {MatDialog} dialog Mat Dialog
-   * @param {AuthenticationService} authenticationService Authentication Service.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor(
-    private router: Router,
-    public dialog: MatDialog,
-    private authenticationService: AuthenticationService,
-    private settingsService: SettingsService,
-    protected configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {
-  constructor() {
-    this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
-  }
+  tooltipPosition: TooltipPosition = 'right';
 
   /**
    * Sets the username of the authenticated user.

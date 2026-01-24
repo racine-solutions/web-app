@@ -1,14 +1,29 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { SystemService } from '../system.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatLabel } from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'mifosx-sms-event-configuration',
   templateUrl: './sms-event-configuration.component.html',
-  styleUrls: ['./sms-event-configuration.component.scss']
+  styleUrls: ['./sms-event-configuration.component.scss'],
+  standalone: true,
+  imports: [
+    MatPaginator,
+    MatSort,
+    MatFormFieldModule,
+    MatLabel,
+    MatTableModule,
+    MatInputModule,
+    TranslateModule
+  ]
 })
 export class SmsEventConfigurationComponent implements OnInit {
   /** Events Data. */
@@ -30,10 +45,10 @@ export class SmsEventConfigurationComponent implements OnInit {
   /** Sorter for reports table. */
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  constructor(
-    private route: ActivatedRoute,
-    private systemService: SystemService
-  ) {
+  private route = inject(ActivatedRoute);
+  private systemService = inject(SystemService);
+
+  constructor() {
     this.route.data.subscribe((data: { events: any }) => {
       this.eventsData = data.events.smsEventConfiguration;
     });

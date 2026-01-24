@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ReportsService } from 'app/reports/reports.service';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'mifosx-analytics-report',
   templateUrl: './analytics-report.component.html',
-  styleUrls: ['./analytics-report.component.scss']
+  styleUrls: ['./analytics-report.component.scss'],
+  standalone: true,
+  imports: [CommonModule, MatCardModule]
 })
 export class AnalyticsReportComponent implements OnInit {
   analyticsData: any;
-  objectKeys = Object.keys;
-
-  constructor(private reportsService: ReportsService) {}
+  private reportsService = inject(ReportsService);
 
   ngOnInit() {
     this.reportsService.getAnalyticsReport().subscribe((response: any) => {

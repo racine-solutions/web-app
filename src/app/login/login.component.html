@@ -20,29 +20,29 @@
 
   <div fxLayout="column" fxFlex.gt-sm="1 0 30%" class="login-container">
     <!-- Language Selector to the extreme right -->
-    <!-- Logo with Organization Name -->
-    <div fxLayout="row" fxLayoutAlign="center center" fxFlex="1 0 auto">
-      <img src="assets/images/racine_solutions.svg" alt="{{ 'APP_NAME' | translate }} Logo" class="img-container" />
-    </div>
+    <!-- Logo with Organization Name and Login Card Wrapper -->
+    <div class="login-card">
+      <div fxLayout="row" fxLayoutAlign="center center" fxFlex="1 0 auto">
+        <img src="assets/images/racine_solutions.svg" alt="{{ 'APP_NAME' | translate }} Logo" class="img-container" style="display:block; margin:0 auto 15px; width:100%;" />
+      </div>
 
+      <!-- Tenant Identifier Name -->
+      <div fxLayout="row" fxLayoutAlign="center center" fxFlex="1 0 auto" *ngIf="displayTenantSelector()">
+        <mifosx-tenant-selector></mifosx-tenant-selector>
+      </div>
 
-
-    <!-- Tenant Identifier Name -->
-    <div fxLayout="row" fxLayoutAlign="center center" fxFlex="1 0 auto" *ngIf="displayTenantSelector()">
-      <mifosx-tenant-selector></mifosx-tenant-selector>
-    </div>
-
-    <!--
-      Type of Form:
-        Login
-        Reset Password
-        Two Factor Authentication
-        Forgot Password (TODO: Decision to be taken on providing this feature.)
-    -->
-    <div fxLayout="row" fxFlex="3 0 auto" fxLayoutAlign="center start">
-      <mifosx-login-form *ngIf="!resetPassword && !twoFactorAuthenticationRequired"></mifosx-login-form>
-      <mifosx-reset-password *ngIf="resetPassword"></mifosx-reset-password>
-      <mifosx-two-factor-authentication *ngIf="twoFactorAuthenticationRequired"></mifosx-two-factor-authentication>
+      <!--
+        Type of Form:
+          Login
+          Reset Password
+          Two Factor Authentication
+          Forgot Password (TODO: Decision to be taken on providing this feature.)
+      -->
+      <div fxLayout="row" fxFlex="3 0 auto" fxLayoutAlign="center start">
+        <mifosx-login-form *ngIf="!resetPassword && !twoFactorAuthenticationRequired"></mifosx-login-form>
+        <mifosx-reset-password *ngIf="resetPassword"></mifosx-reset-password>
+        <mifosx-two-factor-authentication *ngIf="twoFactorAuthenticationRequired"></mifosx-two-factor-authentication>
+      </div>
     </div>
   </div>
 </div>

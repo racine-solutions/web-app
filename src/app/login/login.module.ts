@@ -23,13 +23,12 @@ import { NgOptimizedImage } from '@angular/common';
     SharedModule,
     LoginRoutingModule,
     TranslateModule,
-    NgOptimizedImage
-  ],
-  declarations: [
-    LoginComponent,
+    NgOptimizedImage,
     LoginFormComponent,
     ResetPasswordComponent,
-    TwoFactorAuthenticationComponent
-  ]
+    TwoFactorAuthenticationComponent,
+    LoginComponent
+  ],
+  declarations: []
 })
 export class LoginModule {}

@@ -7,13 +7,10 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
-import { Component, OnInit, inject } from '@angular/core';
-import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { activities } from '../activities';
@@ -42,6 +39,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 })
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   /** Array of all user activities */
   userActivity: string[];
@@ -61,11 +59,9 @@ export class DashboardComponent implements OnInit {
   /**
    * Gets user activities from local storage.
    */
-  constructor(
-    private router: Router,
-    private changeDetectorRef: ChangeDetectorRef
+  constructor() {
     this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
-  ) {
+  }
 
   ngOnInit() {
     this.recentActivities = this.getRecentActivities();

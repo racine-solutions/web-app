@@ -13,7 +13,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
 
-import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormField, MatLabel, MatError, MatSuffix, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
@@ -21,11 +21,13 @@ import { MatOption } from '@angular/material/core';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { MatTabsModule } from '@angular/material/tabs';
 import { DateFormatPipe } from '@pipes/date-format.pipe';
 import { DocumentationLinkPipe } from '@pipes/documentation-link.pipe';
 import { TranslatePipe as NgxTranslatePipe } from '@ngx-translate/core';
 import { TranslatePipe } from '@pipes/translate.pipe';
 import { HasPermissionDirective } from './directives/has-permission/has-permission.directive';
+import { AnalyticsReportComponent } from './home/components/analytics-report/analytics-report.component';
 
 export const STANDALONE_SHARED_IMPORTS = [
   CommonModule,
@@ -35,9 +37,7 @@ export const STANDALONE_SHARED_IMPORTS = [
   NgFor,
 
   // Angular Material
-  MatCard,
-  MatCardContent,
-  MatCardActions,
+  MatCardModule,
   MatFormField,
   MatLabel,
   MatError,
@@ -51,13 +51,16 @@ export const STANDALONE_SHARED_IMPORTS = [
   MatDatepicker,
   MatButton,
   MatCheckbox,
+  MatTabsModule,
   DateFormatPipe,
   DocumentationLinkPipe,
   HasPermissionDirective,
 
   // Pipes and Directives
   NgxTranslatePipe,
-  TranslatePipe
+  TranslatePipe,
+  AnalyticsReportComponent
 ];
 export { M3ButtonComponent } from './shared/m3-ui/m3-button/m3-button.component';
 export { HasPermissionDirective } from './directives/has-permission/has-permission.directive';
+export { AnalyticsReportComponent } from './home/components/analytics-report/analytics-report.component';

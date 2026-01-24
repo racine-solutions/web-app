@@ -7,9 +7,6 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormControl } from '@angular/forms';
 import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd, RouterLink } from '@angular/router';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
@@ -85,23 +82,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('searchActivity', { static: false }) searchActivity: ElementRef<any>;
   /* Template for popover on search activity */
   @ViewChild('templateSearchActivity', { static: false }) templateSearchActivity: TemplateRef<any>;
-
-  /**
-   * @param {AuthenticationService} authenticationService Authentication Service.
-   * @param {ActivatedRoute} activatedRoute ActivatedRoute.
-   * @param {Router} router Router.
-   * @param {MatDialog} dialog MatDialog.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor(
-    private authenticationService: AuthenticationService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog,
-    protected configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
-  ) {}
 
   /**
    * Sets the username of the authenticated user.

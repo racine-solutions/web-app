@@ -23,29 +23,27 @@
                 <mifosx-client-trends-bar></mifosx-client-trends-bar>
               </div>
             </div>
-  <mat-card class="card layout-column gap-40px">
-    <div class="layout-row search">
-      <mat-card-content>
-        <mat-form-field>
-          <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
-          <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
-        </mat-form-field>
 
-        <mat-autocomplete #activitySearch="matAutocomplete">
-          @for (activity of filteredActivities | async; track activity) {
-            <mat-option [routerLink]="activity.path">
-              <span>{{ activity.activity }}</span>
-            </mat-option>
-          }
-        </mat-autocomplete>
-      </mat-card-content>
-    </div>
+            <div class="layout-row search">
+              <mat-form-field>
+                <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
+                <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
+              </mat-form-field>
 
-    <div class="layout-row top-card">
-      <div class="trends-bar">
-        <mifosx-client-trends-bar></mifosx-client-trends-bar>
-      </div>
-    </div>
+              <mat-autocomplete #activitySearch="matAutocomplete">
+                @for (activity of filteredActivities | async; track activity) {
+                  <mat-option [routerLink]="activity.path">
+                    <span>{{ activity.activity }}</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </div>
+
+            <div class="layout-row top-card">
+              <div class="trends-bar">
+                <mifosx-client-trends-bar></mifosx-client-trends-bar>
+              </div>
+            </div>
 
             <div class="layout-row bottom-card">
               <div class="amount-disbursed">

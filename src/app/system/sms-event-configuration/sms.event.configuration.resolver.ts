@@ -1,16 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 import { SystemService } from '../system.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SmsEventConfigurationResolver implements Resolve<boolean> {
-  /**
-   * @param {SystemService} systemService System service.
-   */
-  constructor(private systemService: SystemService) {}
+  private systemService = inject(SystemService);
 
   /**
    * Returns the Configuration data.

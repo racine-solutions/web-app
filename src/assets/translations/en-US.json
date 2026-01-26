@@ -3576,8 +3576,17 @@
       "“Maker-Checker” principle requires every tasks": "The “Maker-Checker” principle requires every tasks to be completed by two people to reduce the chance of errors and misuse. One person initiates the process and the second completes it.",
       "Buy Down Fees": "Buy Down Fees",
       "Undo Write-off Description": "This action will reverse the write-off transaction and restore the loan to its previous active status. Please provide a note explaining the reason for this action.",
-      "UploadDocumentHint": "Upload a PDF or image to generate a preview."
-    },
+      "UploadDocumentHint": "Upload a PDF or image to generate a preview.",
+      "LoanAccountApprovalEvent": "Loan Account Approval Event",
+      "LoanAccountCreationEvent": "Loan Account Creation Event",
+      "LoanAccountDisbursementEvent": "Loan Account Disbursement Event",
+      "LoanAccountRepaymentEvent": "Loan Account Repayment Event",
+      "SavingsAccountDepositEvent": "Savings Account Deposit Event",
+      "SavingsAccountWithdrawEvent": "Savings Account Withdraw Event",
+      "LoanAccountRejectedEvent": "Loan Account Rejected Event",
+      "SMS Event Configuration": "SMS Event Configuration"
+    }
+  },
     "auditTrail": {
       "actions": {
         "CREATE": "Create",
@@ -3595,7 +3604,8 @@
         "WITHDRAW": "Withdraw",
         "DEPOSIT": "Deposit",
         "TRANSFER": "Transfer"
-      },
+      }
+    },
       "entities": {
         "ROLE": "Role",
         "CODEVALUE": "Code Value",
@@ -3624,13 +3634,6 @@
         "SHAREPRODUCT": "Share Product",
         "FIXEDDEPOSITPRODUCT": "Fixed Deposit Product",
         "RECURRINGDEPOSITPRODUCT": "Recurring Deposit Product",
-        "LoanAccountApprovalEvent": "Loan Account Approval Event",
-        "LoanAccountCreationEvent": "Loan Account Creation Event",
-        "LoanAccountDisbursementEvent": "Loan Account Disbursement Event",
-        "LoanAccountRepaymentEvent": "Loan Account Repayment Event",
-        "SavingsAccountDepositEvent": "Savings Account Deposit Event",
-        "SavingsAccountWithdrawEvent": "Savings Account Withdraw Event",
-        "LoanAccountRejectedEvent": "Loan Account Rejected Event",
        "“Maker-Checker” principle requires every tasks": "The “Maker-Checker” principle requires every tasks to be completed by two people to reduce the chance of errors and misuse. One person initiates the process and the second completes it."
     },
     "titles": {
@@ -3640,8 +3643,7 @@
     },
     "messages": {
       "No Data Found": "No Data Found"
-    }
-  },
+    },
   "languages": {
     "cs-CS": "Čeština (Czech)",
     "de-DE": "Deutsch (German)",
@@ -3976,4 +3978,4 @@
     "ZW": "Zimbabwe"
   }
 }
-  }
+

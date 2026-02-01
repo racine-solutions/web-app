@@ -3584,7 +3584,8 @@
       "SavingsAccountDepositEvent": "Savings Account Deposit Event",
       "SavingsAccountWithdrawEvent": "Savings Account Withdraw Event",
       "LoanAccountRejectedEvent": "Loan Account Rejected Event",
-      "SMS Event Configuration": "SMS Event Configuration"
+      "SMS Event Configuration": "SMS Event Configuration",
+      "Enter Organisation Id": "Enter Organisation Id"
     }
   },
     "auditTrail": {

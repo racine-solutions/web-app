@@ -51,6 +51,11 @@
           </mifosx-input-amount>
 
           <mat-form-field>
+            <mat-label>{{ 'labels.inputs.External Id' | translate }}</mat-label>
+            <input matInput formControlName="externalId" />
+          </mat-form-field>
+
+          <mat-form-field>
             <mat-label>{{ 'labels.inputs.Payment Type' | translate }}</mat-label>
             <mat-select required formControlName="paymentTypeId">
               @for (paymentType of paymentTypeOptions; track paymentType) {

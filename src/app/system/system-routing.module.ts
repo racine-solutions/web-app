@@ -53,6 +53,7 @@ import { PremiumFeatureComponent } from './premium-feature/premium-feature.compo
 import { SmsAccountResolver } from './premium-feature/sms/sms-account.resolver';
 import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
+import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -645,6 +646,11 @@ const routes: Routes = [
                   path: 'messages',
                   data: { title: 'Messages', breadcrumb: 'Messages' },
                   component: SmsMessagesComponent
+                },
+                {
+                  path: 'wallet-transactions',
+                  data: { title: 'Wallet Transactions', breadcrumb: 'Wallet Transactions' },
+                  component: SmsWalletTransactionsComponent
                 }
               ]
             }

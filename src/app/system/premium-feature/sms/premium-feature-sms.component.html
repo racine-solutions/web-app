@@ -84,6 +84,16 @@
           <p matLine class="menu-subtitle">View sent SMS messages</p>
         </div>
       </a>
+
+      <a mat-list-item [routerLink]="['wallet-transactions']" class="menu-item">
+        <mat-icon matListIcon>
+          <fa-icon icon="receipt" size="sm"></fa-icon>
+        </mat-icon>
+        <div class="menu-text">
+          <h4 matLine>Wallet Transactions</h4>
+          <p matLine class="menu-subtitle">View wallet credit transactions</p>
+        </div>
+      </a>
     </mat-nav-list>
   </mat-card>
 </div>

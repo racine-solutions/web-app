@@ -69,6 +69,7 @@ import { RunSelectedJobsTableComponent } from './manage-jobs/scheduler-jobs/run-
 import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
 import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
+import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
 
 @NgModule({
@@ -85,6 +86,7 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     PremiumFeatureComponent,
     SmsMessagesComponent,
     PremiumFeatureSmsComponent,
+    SmsWalletTransactionsComponent,
     SmsEventConfigurationComponent,
     ManageExternalEventsComponent,
     CobWorkflowComponent,

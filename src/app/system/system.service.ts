@@ -725,7 +725,7 @@ export class SystemService {
   }
 
   putSmsEventConfiguration(payload: any): Observable<any> {
-    return this.http.put('/smsevents/configuration', payload);
+    return this.http.put('/sms/smsevents/configuration', payload);
   }
 
   /** Datatable Entries for Entities */
@@ -772,6 +772,6 @@ export class SystemService {
    * @returns {Observable<any>}
    */
   getSmsEventConfiguration(): Observable<any> {
-    return this.http.get('/smsevents/configuration');
+    return this.http.get('/sms/smsevents/configuration');
   }
 }

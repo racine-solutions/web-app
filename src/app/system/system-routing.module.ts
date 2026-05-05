@@ -49,6 +49,8 @@ import { CreateSurveyComponent } from './manage-surveys/create-survey/create-sur
 import { EditSurveyComponent } from './manage-surveys/edit-survey/edit-survey.component';
 import { ManageSurveysComponent } from './manage-surveys/manage-surveys.component';
 import { ViewSurveyComponent } from './manage-surveys/view-survey/view-survey.component';
+import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
+import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -606,17 +608,42 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'sms-event-configuration',
-          data: { title: 'SMS Event Configuration', breadcrumb: 'SMS Event Configuration' },
+          path: 'premium-feature',
+          data: { title: 'RacinePay Premium', breadcrumb: 'RacinePay Premium' },
           children: [
             {
               path: '',
-              component: SmsEventConfigurationComponent,
-              resolve: {
-                events: SmsEventConfigurationResolver
-              }
+              component: PremiumFeatureComponent
+            },
+            {
+              path: 'sms',
+              data: { title: 'SMS', breadcrumb: 'SMS' },
+              children: [
+                {
+                  path: '',
+                  component: PremiumFeatureSmsComponent
+                },
+                {
+                  path: 'sms-event-configuration',
+                  data: { title: 'SMS Event Configuration', breadcrumb: 'SMS Event Configuration' },
+                  children: [
+                    {
+                      path: '',
+                      component: SmsEventConfigurationComponent,
+                      resolve: {
+                        events: SmsEventConfigurationResolver
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
+        },
+        {
+          path: 'sms-event-configuration',
+          pathMatch: 'full',
+          redirectTo: 'premium-feature/sms/sms-event-configuration'
         }
       ]
     }

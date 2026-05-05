@@ -7,20 +7,73 @@
 -->
 
 <div class="container">
-  <mat-card>
+  <mat-card class="sms-account-card">
+    <mat-card-content>
+      <div class="account-header">
+        <div class="account-title-block">
+          <div class="account-icon-wrapper">
+            <fa-icon icon="comment-alt" size="2x"></fa-icon>
+          </div>
+
+          <div>
+            <span class="account-kicker">RacinePay Premium</span>
+            <h2 class="account-title">SMS Account</h2>
+            <p class="account-description">Account overview and available SMS credit details</p>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <span class="status-label">Status</span>
+          <span
+            class="status-pill"
+            [class.status-pill-active]="smsAccount.isActive"
+            [class.status-pill-inactive]="!smsAccount.isActive"
+          >
+            {{ accountStatusLabel }}
+          </span>
+        </div>
+      </div>
+
+      <div class="account-id-row">
+        <span class="muted-label">Account ID</span>
+        <span class="account-id-value">#{{ smsAccount.id }}</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card payment-metric">
+          <span class="metric-label">Total Payment Amount</span>
+          <span class="metric-value">{{ smsAccount.totalPaymentAmount | number: '1.0-2' }}</span>
+        </div>
+
+        <div class="metric-card credit-metric">
+          <span class="metric-label">SMS Total Credit</span>
+          <span class="metric-value">{{ smsAccount.smsTotalCredit | number: '1.0-2' }}</span>
+        </div>
+
+        <div class="metric-card balance-metric">
+          <span class="metric-label">SMS Total Balance</span>
+          <span class="metric-value">{{ smsAccount.smsTotalBalance | number: '1.0-2' }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="sms-menu-card">
     <mat-card-header>
-      <mat-card-title>SMS</mat-card-title>
-      <mat-card-subtitle>RacinePay premium menu</mat-card-subtitle>
+      <mat-card-title>SMS Menu</mat-card-title>
+      <mat-card-subtitle>Manage SMS premium settings</mat-card-subtitle>
     </mat-card-header>
 
     <mat-nav-list>
-      <mat-list-item [routerLink]="['sms-event-configuration']">
+      <a mat-list-item [routerLink]="['sms-event-configuration']" class="menu-item">
         <mat-icon matListIcon>
           <fa-icon icon="key" size="sm"></fa-icon>
         </mat-icon>
-        <h4 matLine>SMS Event Configuration</h4>
-        <p matLine>Manage SMS event configuration</p>
-      </mat-list-item>
+        <div class="menu-text">
+          <h4 matLine>SMS Event Configuration</h4>
+          <p matLine class="menu-subtitle">Manage SMS event configuration</p>
+        </div>
+      </a>
     </mat-nav-list>
   </mat-card>
 </div>

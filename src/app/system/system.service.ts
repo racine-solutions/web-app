@@ -13,6 +13,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 /** rxjs Imports */
 import { Observable } from 'rxjs';
 import { RunJobWithParamPayloadType } from './manage-jobs/scheduler-jobs/custom-parameters-popover/custom-parameters-popover.component';
+import { SmsAccount } from './premium-feature/sms/sms-account.model';
 
 /**
  * System service.
@@ -726,6 +727,13 @@ export class SystemService {
 
   putSmsEventConfiguration(payload: any): Observable<any> {
     return this.http.put('/sms/smsevents/configuration', payload);
+  }
+
+  /**
+   * @returns {Observable<SmsAccount>}
+   */
+  getSmsAccount(): Observable<SmsAccount> {
+    return this.http.get<SmsAccount>('/sms/account');
   }
 
   /** Datatable Entries for Entities */

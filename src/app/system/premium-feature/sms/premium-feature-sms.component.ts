@@ -7,12 +7,14 @@
  */
 
 /** Angular Imports */
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatNavList, MatListItem } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatLine } from '@angular/material/grid-list';
+import { ActivatedRoute } from '@angular/router';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { SmsAccount } from './sms-account.model';
 
 /**
  * Premium Feature SMS menu component.
@@ -20,6 +22,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 @Component({
   selector: 'mifosx-premium-feature-sms',
   templateUrl: './premium-feature-sms.component.html',
+  styleUrls: ['./premium-feature-sms.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatNavList,
@@ -29,4 +32,18 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatLine
   ]
 })
-export class PremiumFeatureSmsComponent {}
+export class PremiumFeatureSmsComponent {
+  private route = inject(ActivatedRoute);
+
+  smsAccount!: SmsAccount;
+
+  constructor() {
+    this.route.data.subscribe((data: { smsAccount: SmsAccount }) => {
+      this.smsAccount = data.smsAccount;
+    });
+  }
+
+  get accountStatusLabel(): string {
+    return this.smsAccount?.isActive ? 'Active' : 'Inactive';
+  }
+}

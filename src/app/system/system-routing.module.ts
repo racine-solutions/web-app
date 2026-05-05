@@ -50,6 +50,7 @@ import { EditSurveyComponent } from './manage-surveys/edit-survey/edit-survey.co
 import { ManageSurveysComponent } from './manage-surveys/manage-surveys.component';
 import { ViewSurveyComponent } from './manage-surveys/view-survey/view-survey.component';
 import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
+import { SmsAccountResolver } from './premium-feature/sms/sms-account.resolver';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
@@ -621,7 +622,10 @@ const routes: Routes = [
               children: [
                 {
                   path: '',
-                  component: PremiumFeatureSmsComponent
+                  component: PremiumFeatureSmsComponent,
+                  resolve: {
+                    smsAccount: SmsAccountResolver
+                  }
                 },
                 {
                   path: 'sms-event-configuration',
@@ -684,7 +688,8 @@ const routes: Routes = [
     ViewRoleResolver,
     EntityToEntityMappingResolver,
     MakerCheckerTasksResolver,
-    ViewHistorySchedulerJobsResolver
+    ViewHistorySchedulerJobsResolver,
+    SmsAccountResolver
   ]
 })
 export class SystemRoutingModule {}

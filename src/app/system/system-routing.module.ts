@@ -51,6 +51,7 @@ import { ManageSurveysComponent } from './manage-surveys/manage-surveys.componen
 import { ViewSurveyComponent } from './manage-surveys/view-survey/view-survey.component';
 import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
 import { SmsAccountResolver } from './premium-feature/sms/sms-account.resolver';
+import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
@@ -639,6 +640,11 @@ const routes: Routes = [
                       }
                     }
                   ]
+                },
+                {
+                  path: 'messages',
+                  data: { title: 'Messages', breadcrumb: 'Messages' },
+                  component: SmsMessagesComponent
                 }
               ]
             }

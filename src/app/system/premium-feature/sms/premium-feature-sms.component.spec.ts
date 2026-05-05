@@ -51,5 +51,6 @@ describe('PremiumFeatureSmsComponent', () => {
     expect(textContent).toContain('SMS Account');
     expect(textContent).toContain('Active');
     expect(textContent).toContain('SMS Event Configuration');
+    expect(textContent).toContain('Messages');
   });
 });

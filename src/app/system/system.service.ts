@@ -14,6 +14,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RunJobWithParamPayloadType } from './manage-jobs/scheduler-jobs/custom-parameters-popover/custom-parameters-popover.component';
 import { SmsAccount } from './premium-feature/sms/sms-account.model';
+import { SmsMessagesPage } from './premium-feature/sms/sms-message.model';
 
 /**
  * System service.
@@ -734,6 +735,16 @@ export class SystemService {
    */
   getSmsAccount(): Observable<SmsAccount> {
     return this.http.get<SmsAccount>('/sms/account');
+  }
+
+  /**
+   * @param {number} offset Page offset.
+   * @param {number} limit Number of entries within the page.
+   * @returns {Observable<SmsMessagesPage>}
+   */
+  getSmsMessages(offset: number = 0, limit: number = 10): Observable<SmsMessagesPage> {
+    const httpParams = new HttpParams().set('offset', offset.toString()).set('limit', limit.toString()).set('paged', 'true');
+    return this.http.get<SmsMessagesPage>('/sms/messages', { params: httpParams });
   }
 
   /** Datatable Entries for Entities */

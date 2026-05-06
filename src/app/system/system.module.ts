@@ -66,6 +66,10 @@ import { CustomParametersTableComponent } from './manage-jobs/scheduler-jobs/cus
 import { ErrorLogPopoverComponent } from './manage-jobs/scheduler-jobs/error-log-popover/error-log-popover.component';
 import { RunSelectedJobsPopoverComponent } from './manage-jobs/scheduler-jobs/run-selected-jobs-popover/run-selected-jobs-popover.component';
 import { RunSelectedJobsTableComponent } from './manage-jobs/scheduler-jobs/run-selected-jobs-popover/run-selected-jobs-table/run-selected-jobs-table.component';
+import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
+import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
+import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
+import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
 
 @NgModule({
@@ -79,6 +83,10 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     DirectivesModule,
     RunSelectedJobsPopoverComponent,
     RunSelectedJobsTableComponent,
+    PremiumFeatureComponent,
+    SmsMessagesComponent,
+    PremiumFeatureSmsComponent,
+    SmsWalletTransactionsComponent,
     SmsEventConfigurationComponent,
     ManageExternalEventsComponent,
     CobWorkflowComponent,

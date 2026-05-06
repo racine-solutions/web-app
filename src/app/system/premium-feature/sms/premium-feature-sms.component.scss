@@ -1,0 +1,184 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sms-account-card {
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #15327d 0%, #2052d8 55%, #00b4d8 100%);
+  color: #fff;
+  box-shadow: 0 1rem 2.5rem rgb(32 82 216 / 22%);
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.account-title-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.account-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 18%);
+}
+
+.account-kicker,
+.status-label,
+.muted-label,
+.metric-label {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.account-kicker,
+.status-label,
+.muted-label,
+.metric-label,
+.account-description {
+  opacity: 0.88;
+}
+
+.account-title {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.account-description {
+  margin: 0.35rem 0 0;
+}
+
+.status-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.status-pill {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.status-pill-active {
+  background: rgb(92 184 92 / 24%);
+  color: #eaffea;
+  border-color: rgb(234 255 234 / 50%);
+}
+
+.status-pill-inactive {
+  background: rgb(102 111 115 / 32%);
+  color: #f4f7f8;
+  border-color: rgb(255 255 255 / 24%);
+}
+
+.account-id-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.account-id-value,
+.metric-value {
+  font-weight: 700;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  backdrop-filter: blur(0.35rem);
+}
+
+.metric-value {
+  font-size: 1.45rem;
+}
+
+.payment-metric {
+  border-color: rgb(255 255 255 / 24%);
+}
+
+.credit-metric {
+  border-color: rgb(135 242 255 / 45%);
+}
+
+.balance-metric {
+  border-color: rgb(255 229 143 / 45%);
+}
+
+.sms-menu-card {
+  border-radius: 1.25rem;
+  box-shadow: 0 0.9rem 2rem rgb(15 23 42 / 8%);
+}
+
+.menu-item {
+  border-radius: 1rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, rgb(32 82 216 / 10%), rgb(0 180 216 / 10%));
+}
+
+.menu-item:hover {
+  background: linear-gradient(135deg, rgb(32 82 216 / 16%), rgb(0 180 216 / 16%));
+}
+
+.menu-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-subtitle {
+  opacity: 0.72;
+}
+
+:host-context(.dark-theme) {
+  .sms-menu-card {
+    box-shadow: none;
+    background: rgb(48 49 53 / 100%);
+  }
+}
+
+@media (width <= 768px) {
+  .account-header {
+    flex-direction: column;
+  }
+
+  .status-panel {
+    align-items: flex-start;
+  }
+}

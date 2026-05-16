@@ -75,6 +75,8 @@ describe('SmsWalletTransactionsComponent', () => {
     expect(textContent).toContain('Wallet Transactions');
     expect(textContent).toContain('Top-up received from Allan via Mobile Money');
     expect(textContent).toContain('SMS Credit');
+    expect(textContent).not.toContain('SMS Cost');
+    expect(component.displayedColumns).not.toContain('smsCost');
   });
 
   it('should handle request failure gracefully', () => {

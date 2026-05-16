@@ -60,7 +60,6 @@ export class SmsWalletTransactionsComponent implements OnInit {
   displayedColumns: string[] = [
     'id',
     'amount',
-    'smsCost',
     'smsCredit',
     'previousBalance',
     'note',

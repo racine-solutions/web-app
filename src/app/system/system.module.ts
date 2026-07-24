@@ -8,14 +8,6 @@
 
 /** Angular Imports */
 import { NgModule } from '@angular/core';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { TranslateModule } from '@ngx-translate/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 /** Module Imports */
 import { SharedModule } from '../shared/shared.module';
@@ -43,6 +35,10 @@ import { AmazonS3Component } from './external-services/amazon-s3/amazon-s3.compo
 import { EmailComponent } from './external-services/email/email.component';
 import { SMSComponent } from './external-services/sms/sms.component';
 import { NotificationComponent } from './external-services/notification/notification.component';
+import { EditAmazonS3Component } from './external-services/amazon-s3/edit-amazon-s3/edit-amazon-s3.component';
+import { EditEmailComponent } from './external-services/email/edit-email/edit-email.component';
+import { EditNotificationComponent } from './external-services/notification/edit-notification/edit-notification.component';
+import { EditSMSComponent } from './external-services/sms/edit-sms/edit-sms.component';
 import { ViewCodeComponent } from './codes/view-code/view-code.component';
 import { EditCodeComponent } from './codes/edit-code/edit-code.component';
 import { AccountNumberPreferencesComponent } from './account-number-preferences/account-number-preferences.component';
@@ -55,8 +51,29 @@ import { CreateReportComponent } from './manage-reports/create-report/create-rep
 import { EditReportComponent } from './manage-reports/edit-report/edit-report.component';
 import { AuditTrailsComponent } from './audit-trails/audit-trails.component';
 import { ViewAuditComponent } from './audit-trails/view-audit/view-audit.component';
+import { ColumnDialogComponent } from './manage-data-tables/column-dialog/column-dialog.component';
+import { ViewHistorySchedulerJobComponent } from './manage-jobs/scheduler-jobs/view-history-scheduler-job/view-history-scheduler-job.component';
+import { EditHookComponent } from './manage-hooks/edit-hook/edit-hook.component';
+import { ViewHookComponent } from './manage-hooks/view-hook/view-hook.component';
+import { CreateHookComponent } from './manage-hooks/create-hook/create-hook.component';
+import { ViewRoleComponent } from './roles-and-permissions/view-role/view-role.component';
+import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
+import { EntityToEntityMappingComponent } from './entity-to-entity-mapping/entity-to-entity-mapping.component';
+
+/** Dialog Component Imports */
+import { ReportParameterDialogComponent } from './manage-reports/report-parameter-dialog/report-parameter-dialog.component';
+import { AddEventDialogComponent } from './manage-hooks/add-event-dialog/add-event-dialog.component';
+import { ViewSchedulerJobComponent } from './manage-jobs/scheduler-jobs/view-scheduler-job/view-scheduler-job.component';
+import { EditSchedulerJobComponent } from './manage-jobs/scheduler-jobs/edit-scheduler-job/edit-scheduler-job.component';
+import { ConfigureMakerCheckerTasksComponent } from './configure-maker-checker-tasks/configure-maker-checker-tasks.component';
+import { EditSurveyComponent } from './manage-surveys/edit-survey/edit-survey.component';
+import { BusinessDateTabComponent } from './configurations/business-date-tab/business-date-tab.component';
+import { ConfigurationsComponent } from './configurations/configurations.component';
+import { GlobalConfigurationsTabComponent } from './configurations/global-configurations-tab/global-configurations-tab.component';
+import { ManageJobsComponent } from './manage-jobs/manage-jobs.component';
+import { ManageSchedulerJobsComponent } from './manage-jobs/scheduler-jobs/manage-scheduler-jobs.component';
+import { WorkflowDiagramComponent } from './manage-jobs/workflow-jobs/workflow-diagram/workflow-diagram.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WorkflowJobsComponent } from './manage-jobs/workflow-jobs/workflow-jobs.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ManageExternalEventsComponent } from './manage-external-events/manage-external-events.component';
@@ -67,13 +84,15 @@ import { CustomParametersTableComponent } from './manage-jobs/scheduler-jobs/cus
 import { ErrorLogPopoverComponent } from './manage-jobs/scheduler-jobs/error-log-popover/error-log-popover.component';
 import { RunSelectedJobsPopoverComponent } from './manage-jobs/scheduler-jobs/run-selected-jobs-popover/run-selected-jobs-popover.component';
 import { RunSelectedJobsTableComponent } from './manage-jobs/scheduler-jobs/run-selected-jobs-popover/run-selected-jobs-table/run-selected-jobs-table.component';
+import { SystemInformationComponent } from './system-information/system-information.component';
+import { AboutUsComponent } from './about-us/about-us.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
 import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
-import { SystemInformationComponent } from './system-information/system-information.component';
-import { AboutUsComponent } from './about-us/about-us.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -83,26 +102,13 @@ import { AboutUsComponent } from './about-us/about-us.component';
     NgxGraphModule,
     DragDropModule,
     DirectivesModule,
-    RunSelectedJobsPopoverComponent,
-    RunSelectedJobsTableComponent,
+    BrowserAnimationsModule,
     PremiumFeatureComponent,
     SmsMessagesComponent,
     PremiumFeatureSmsComponent,
     SmsWalletTransactionsComponent,
     SmsEventConfigurationComponent,
-    ManageExternalEventsComponent,
-    CobWorkflowComponent,
-    LoanLockedComponent,
-    CustomParametersPopoverComponent,
-    CustomParametersTableComponent,
-    ErrorLogPopoverComponent,
-    MatPaginatorModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatTableModule,
-    MatSortModule,
-    MatSlideToggleModule,
+    TranslateModule,
     SystemComponent,
     CodesComponent,
     ViewCodeComponent,
@@ -114,14 +120,17 @@ import { AboutUsComponent } from './about-us/about-us.component';
     ViewDataTableComponent,
     EditDataTableComponent,
     ManageHooksComponent,
+    RolesAndPermissionsComponent,
     ManageSurveysComponent,
-    ViewSurveyComponent,
-    CreateSurveyComponent,
     EditConfigurationComponent,
     AmazonS3Component,
     EmailComponent,
     SMSComponent,
     NotificationComponent,
+    EditAmazonS3Component,
+    EditEmailComponent,
+    EditNotificationComponent,
+    EditSMSComponent,
     AccountNumberPreferencesComponent,
     CreateAccountNumberPreferenceComponent,
     ViewAccountNumberPreferenceComponent,
@@ -130,11 +139,15 @@ import { AboutUsComponent } from './about-us/about-us.component';
     ViewReportComponent,
     CreateReportComponent,
     EditReportComponent,
+    ReportParameterDialogComponent,
+    AddRoleComponent,
+    EditHookComponent,
+    ViewHookComponent,
+    CreateHookComponent,
+    AddEventDialogComponent,
+    ColumnDialogComponent,
     AuditTrailsComponent,
     ViewAuditComponent,
-    RolesAndPermissionsComponent,
-    AddRoleComponent,
-    TranslateModule,
     ViewSchedulerJobComponent,
     EditSchedulerJobComponent,
     ViewRoleComponent,

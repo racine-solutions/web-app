@@ -38,6 +38,10 @@ import { LoginFormComponent } from './login-form/login-form.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
 import { MatMenu, MatMenuItem } from '@angular/material/menu';
+import { M3IconComponent } from '../shared/m3-ui/m3-icon/m3-icon.component';
+import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
+import { ThemeToggleComponent } from '../shared/theme-toggle/theme-toggle.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 import { VersionService } from '../system/version.service';
@@ -57,7 +61,10 @@ import { VersionService } from '../system/version.service';
     TwoFactorAuthenticationComponent,
     MatMenu,
     MatMenuItem,
-    M3IconComponent
+    M3IconComponent,
+    LanguageSelectorComponent,
+    ThemeToggleComponent,
+    FaIconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

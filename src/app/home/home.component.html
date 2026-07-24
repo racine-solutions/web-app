@@ -34,14 +34,14 @@
 
       <mat-autocomplete #activitySearch="matAutocomplete">
         @for (activity of filteredActivities | async; track activity) {
-        <mat-option [routerLink]="activity.path">
-          <span>{{ activity.activity }}</span>
-        </mat-option>
+          <mat-option [routerLink]="activity.path">
+            <span>{{ activity.activity }}</span>
+          </mat-option>
         }
       </mat-autocomplete>
     </mat-card-content>
 
-    <img mat-card-image src="assets/images/racine_solutions.svg" alt="Racine Solutions" style="display:block; margin:0 auto 15px; width:80%;" />
+    <img mat-card-image src="assets/images/racine_solutions.svg" alt="Racine Solutions" class="racine-logo" />
   </mat-card>
 </div>
 
@@ -51,22 +51,22 @@
       {{ 'labels.buttons.Close' | translate }}
     </button>
     @if (prev) {
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="popover.close(); showPopover(prev.template, prev.target, 'bottom', true)"
-    >
-      {{ 'labels.buttons.Back' | translate }}
-    </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="popover.close(); showPopover(prev.template, prev.target, 'bottom', true)"
+      >
+        {{ 'labels.buttons.Back' | translate }}
+      </button>
     }
     @if (next) {
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="popover.close(); showPopover(next.template, next.target, 'bottom', true)"
-    >
-      {{ 'labels.buttons.Next' | translate }}
-    </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="popover.close(); showPopover(next.template, next.target, 'bottom', true)"
+      >
+        {{ 'labels.buttons.Next' | translate }}
+      </button>
     }
   </div>
 </ng-template>

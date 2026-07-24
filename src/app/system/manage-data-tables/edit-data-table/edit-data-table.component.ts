@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -68,7 +68,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditDataTableComponent implements OnInit {
   private systemService = inject(SystemService);
@@ -449,7 +450,7 @@ export class EditDataTableComponent implements OnInit {
         return 'Dropdown';
       }
       default: {
-        return columnDisplayType[0] + columnDisplayType.substr(1).toLowerCase();
+        return columnDisplayType[0] + columnDisplayType.substring(1).toLowerCase();
       }
     }
   }

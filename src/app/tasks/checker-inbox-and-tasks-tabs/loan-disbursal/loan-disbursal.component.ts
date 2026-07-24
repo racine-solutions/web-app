@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import {
@@ -23,6 +24,7 @@ import {
   MatRowDef,
   MatRow
 } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Dialog Imports */
@@ -56,16 +58,19 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
+    MatPaginator,
     FormatNumberPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoanDisbursalComponent {
+export class LoanDisbursalComponent implements AfterViewInit {
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
   private dateUtils = inject(Dates);
   private settingsService = inject(SettingsService);
   private translateService = inject(TranslateService);
   private tasksService = inject(TasksService);
+  private destroyRef = inject(DestroyRef);
 
   /** Loans Data */
   loans: any;
@@ -94,7 +99,7 @@ export class LoanDisbursalComponent {
    * @param {TasksService} tasksService Tasks Service.
    */
   constructor() {
-    this.route.data.subscribe((data: { loansData: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { loansData: any }) => {
       this.loans = data.loansData.pageItems;
       this.loans = this.loans.filter((account: any) => {
         return account.status.waitingForDisbursal === true;
@@ -103,6 +108,7 @@ export class LoanDisbursalComponent {
       this.selection = new SelectionModel(true, []);
     });
   }
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
@@ -142,11 +148,11 @@ export class LoanDisbursalComponent {
 
   bulkLoanDisbursal() {
     const dateFormat = this.settingsService.dateFormat;
-    const approvedOnDate = this.dateUtils.formatDate(new Date(), dateFormat);
+    const actualDisbursementDate = this.dateUtils.formatDate(new Date(), dateFormat);
     const locale = this.settingsService.language.code;
     const formData = {
       dateFormat,
-      approvedOnDate,
+      actualDisbursementDate,
       locale
     };
     const selectedAccounts = this.selection.selected.length;
@@ -177,14 +183,26 @@ export class LoanDisbursalComponent {
     this.tasksService.getAllLoansToBeDisbursed().subscribe((response: any) => {
       this.loans = response.pageItems;
       this.loans = this.loans.filter((account: any) => {
-        return account.status.waitingForDisbursal === true;
+        return account.status.waitingForDisbursal;
       });
       this.dataSource = new MatTableDataSource(this.loans);
+      this.bindPaginator();
       this.selection = new SelectionModel(true, []);
     });
   }
 
+  ngAfterViewInit() {
+    this.bindPaginator();
+  }
+
   applyFilter(filterValue: string = '') {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.paginator?.firstPage();
+  }
+
+  private bindPaginator() {
+    if (this.dataSource) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 }

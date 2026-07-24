@@ -59,6 +59,8 @@ import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.c
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
 import { ViewRoleComponent } from './roles-and-permissions/view-role/view-role.component';
 import { SystemComponent } from './system.component';
+import { SystemInformationComponent } from './system-information/system-information.component';
+import { AboutUsComponent } from './about-us/about-us.component';
 
 /** Custom Resolvers */
 import { AccountNumberPreferencesResolver } from './account-number-preferences/account-number-preferences.resolver';
@@ -107,7 +109,7 @@ import { SmsEventConfigurationResolver } from './sms-event-configuration/sms.eve
 const routes: Routes = [
   Route.withShell([
     {
-      path: 'system',
+      path: '',
       data: { title: 'System', breadcrumb: 'System' },
       children: [
         {
@@ -590,6 +592,16 @@ const routes: Routes = [
           ]
         },
         {
+          path: 'system-information',
+          component: SystemInformationComponent,
+          data: { title: 'System Information', breadcrumb: 'System Information' }
+        },
+        {
+          path: 'about-us',
+          component: AboutUsComponent,
+          data: { title: 'About Us', breadcrumb: 'About Us' }
+        },
+        {
           path: 'audit-trails',
           data: { title: 'Audit Trails', breadcrumb: 'Audit Trails' },
           children: [
@@ -681,7 +693,6 @@ const routes: Routes = [
     RolesAndPermissionsResolver,
     ManageSurveysResolver,
     SurveyResolver,
-    GlobalConfigurationsResolver,
     GlobalConfigurationResolver,
     AmazonS3ConfigurationResolver,
     EmailConfigurationResolver,

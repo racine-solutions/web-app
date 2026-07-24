@@ -7,14 +7,13 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 
 /** Custom Services */
 import { LoansService } from 'app/loans/loans.service';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
-import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { OrganizationService } from 'app/organization/organization.service';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
@@ -45,6 +44,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { TransactionPaymentDetailComponent } from '../../../../shared/transaction-payment-detail/transaction-payment-detail.component';
 import { DateFormatPipe } from '../../../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoanAccountActionsBaseComponent } from '../../loan-account-actions/loan-account-actions-base.component';
 
 /** Custom Dialogs */
 
@@ -76,22 +76,21 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     TransactionPaymentDetailComponent,
     CurrencyPipe,
     DateFormatPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ViewTransactionComponent implements OnInit {
+export class ViewTransactionComponent extends LoanAccountActionsBaseComponent implements OnInit {
   private loansService = inject(LoansService);
-  private route = inject(ActivatedRoute);
   private dateUtils = inject(Dates);
-  private router = inject(Router);
   dialog = inject(MatDialog);
   private translateService = inject(TranslateService);
-  private settingsService = inject(SettingsService);
   private organizationService = inject(OrganizationService);
   private alertService = inject(AlertService);
+  private destroyRef = inject(DestroyRef);
 
   /** Transaction data. */
   transactionData: any;
-  transactionType: LoanTransactionType;
+  transactionType: LoanTransactionType | null = null;
   /** Is Editable */
   allowEdition = true;
   /** Is Undoable */
@@ -112,7 +111,6 @@ export class ViewTransactionComponent implements OnInit {
   amountRelationsAllowed = 0;
 
   clientId: number;
-  loanId: number;
 
   /**
    * Retrieves the Transaction data from `resolve`.
@@ -125,12 +123,26 @@ export class ViewTransactionComponent implements OnInit {
    * @param {AlertService} alertService Alert Service
    */
   constructor() {
-    this.route.data.subscribe((data: { loansAccountTransaction: any }) => {
+    super();
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { loansAccountTransaction: any }) => {
       this.transactionData = data.loansAccountTransaction;
-      this.transactionType = this.transactionData.type;
+      if (this.loanProductService.isWorkingCapital) {
+        this.transactionData.date = this.transactionData.transactionDate;
+      }
+      this.transactionType = this.transactionData?.type ?? null;
+      if (!this.transactionType) {
+        this.allowEdition = false;
+        this.allowUndo = false;
+        this.allowChargeback = false;
+        return;
+      }
       this.allowEdition =
         !this.transactionData.manuallyReversed && !this.allowTransactionEdition(this.transactionData.type.id);
-      this.allowUndo = this.allowUndoTransaction(this.transactionData.manuallyReversed, this.transactionType);
+      this.allowUndo = this.allowUndoTransaction(
+        this.transactionData.manuallyReversed || this.transactionData.reversed,
+        this.transactionType,
+        !!this.transactionData.wcLoanId
+      );
       this.allowChargeback =
         this.allowChargebackTransaction(this.transactionType) && !this.transactionData.manuallyReversed;
       let transactionsChargebackRelated = false;
@@ -198,14 +210,19 @@ export class ViewTransactionComponent implements OnInit {
     );
   }
 
-  allowUndoTransaction(manuallyReversed: boolean, transactionType: LoanTransactionType): boolean {
+  allowUndoTransaction(
+    manuallyReversed: boolean,
+    transactionType: LoanTransactionType,
+    isWorkingCapital: boolean
+  ): boolean {
     if (manuallyReversed) {
       return false;
     }
-    if (transactionType.interestRefund) {
-      return false;
-    }
-    return true;
+    return !(
+      transactionType.interestRefund ||
+      transactionType.id === 44 ||
+      (isWorkingCapital && transactionType.disbursement)
+    );
   }
 
   isWriteOff(transactionType: LoanTransactionType): boolean {
@@ -252,7 +269,12 @@ export class ViewTransactionComponent implements OnInit {
           };
 
           this.loansService.loanActionButtons(accountId, 'undoContractTermination', payload).subscribe(() => {
-            this.router.navigate(['../'], { relativeTo: this.route });
+            this.router.navigate(['../'], {
+              queryParams: {
+                productType: this.loanProductService.productType.value
+              },
+              relativeTo: this.route
+            });
           });
         }
       });
@@ -283,7 +305,12 @@ export class ViewTransactionComponent implements OnInit {
           this.loansService
             .executeLoansAccountTransactionsCommand(accountId, command, data, transactionId)
             .subscribe(() => {
-              this.router.navigate(['../'], { relativeTo: this.route });
+              this.router.navigate(['../'], {
+                queryParams: {
+                  productType: this.loanProductService.productType.value
+                },
+                relativeTo: this.route
+              });
             });
         }
       });
@@ -329,7 +356,12 @@ export class ViewTransactionComponent implements OnInit {
           this.loansService
             .executeLoansAccountTransactionsCommand(accountId, 'chargeback', payload, this.transactionData.id)
             .subscribe(() => {
-              this.router.navigate(['../'], { relativeTo: this.route });
+              this.router.navigate(['../'], {
+                queryParams: {
+                  productType: this.loanProductService.productType.value
+                },
+                relativeTo: this.route
+              });
             });
         } else {
           this.alertService.alert({
@@ -346,12 +378,40 @@ export class ViewTransactionComponent implements OnInit {
   }
 
   loanTransactionColor(): string {
-    if (this.transactionData.manuallyReversed) {
+    if (this.transactionData.manuallyReversed || this.transactionData.reversed) {
       return 'undo';
     }
     if (this.existTransactionRelations) {
       return 'linked';
     }
     return 'active';
+  }
+
+  get transactionBadgeClass(): string {
+    if (!this.transactionType) return 'badge-repayment';
+    const t = this.transactionType;
+    if (this.transactionData.manuallyReversed || this.transactionData.reversed) return 'badge-reversed';
+    if (t.accrual || t.code === 'loanTransactionType.overdueCharge') return 'badge-accrual';
+    if (t.disbursement) return 'badge-disbursement';
+    if (t.downPayment || t.code === 'loanTransactionType.downPayment') return 'badge-downpayment';
+    if (t.chargeoff || t.code === 'loanTransactionType.chargeOff') return 'badge-chargeoff';
+    if (t.reAge) return 'badge-reage';
+    if (t.reAmortize) return 'badge-reamortize';
+    if (this.existTransactionRelations) return 'badge-linked';
+    return 'badge-repayment';
+  }
+
+  get transactionBorderClass(): string {
+    if (!this.transactionType) return 'card-tx--repayment';
+    const t = this.transactionType;
+    if (this.transactionData.manuallyReversed || this.transactionData.reversed) return 'card-tx--reversed';
+    if (t.accrual || t.code === 'loanTransactionType.overdueCharge') return 'card-tx--accrual';
+    if (t.disbursement) return 'card-tx--disbursement';
+    if (t.downPayment || t.code === 'loanTransactionType.downPayment') return 'card-tx--downpayment';
+    if (t.chargeoff || t.code === 'loanTransactionType.chargeOff') return 'card-tx--chargeoff';
+    if (t.reAge) return 'card-tx--reage';
+    if (t.reAmortize) return 'card-tx--reamortize';
+    if (this.existTransactionRelations) return 'card-tx--linked';
+    return 'card-tx--repayment';
   }
 }

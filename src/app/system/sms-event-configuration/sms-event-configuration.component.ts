@@ -81,7 +81,6 @@ export class SmsEventConfigurationComponent implements OnInit {
   /** Sorter for reports table. */
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-
   constructor() {
     this.route.data.subscribe((data: { events: any }) => {
       this.eventsData = data.events.smsEventConfiguration;

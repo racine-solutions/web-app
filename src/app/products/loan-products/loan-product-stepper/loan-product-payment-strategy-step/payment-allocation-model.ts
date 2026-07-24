@@ -115,31 +115,37 @@ export class AdvancedPaymentStrategy {
     return advancedCreditAllocation;
   }
 
-  public buildAdvancedPaymentAllocationList(loanProduct: any): AdvancedPaymentAllocation[] {
+  public buildAdvancedPaymentAllocationList(loanProduct: any, isLoanProduct: boolean): AdvancedPaymentAllocation[] {
     const advancedPaymentAllocation: AdvancedPaymentAllocation[] = [];
     const advancedPaymentAllocationTransactionTypes: PaymentAllocationTransactionType[] =
       loanProduct.advancedPaymentAllocationTransactionTypes;
     const advancedPaymentAllocationTypes: PaymentAllocationOrder[] = loanProduct.advancedPaymentAllocationTypes;
     const advancedPaymentAllocationFutureInstallmentAllocationRules: FutureInstallmentAllocationRule[] =
-      loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules;
+      loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules || [];
     if (loanProduct.paymentAllocation) {
       loanProduct.paymentAllocation.forEach((item: PaymentAllocation) => {
+        const futureInstallmentAllocationRule = isLoanProduct
+          ? this.getItemByCode(
+              item.futureInstallmentAllocationRule,
+              advancedPaymentAllocationFutureInstallmentAllocationRules
+            )
+          : null;
         advancedPaymentAllocation.push({
           transaction: this.getItemByCode(item.transactionType, advancedPaymentAllocationTransactionTypes),
           paymentAllocationOrder: this.buildCurrentPaymentAllocationOrder(
             item.paymentAllocationOrder,
             advancedPaymentAllocationTypes
           ),
-          futureInstallmentAllocationRule: this.getItemByCode(
-            item.futureInstallmentAllocationRule,
-            advancedPaymentAllocationFutureInstallmentAllocationRules
-          ),
+          futureInstallmentAllocationRule: futureInstallmentAllocationRule,
           futureInstallmentAllocationRules: advancedPaymentAllocationFutureInstallmentAllocationRules
         });
       });
     }
     // If this is Empty, add the Default
     if (advancedPaymentAllocation.length === 0) {
+      const futureInstallmentAllocationRule = loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules
+        ? loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules[0]
+        : null;
       advancedPaymentAllocation.push({
         transaction: PaymentAllocationTransactionTypes.DEFAULT_TRANSACTION,
         paymentAllocationOrder: this.buildPaymentAllocationTransactionOrder(
@@ -147,8 +153,8 @@ export class AdvancedPaymentStrategy {
           [],
           loanProduct.advancedPaymentAllocationTypes
         ),
-        futureInstallmentAllocationRule: loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules[0],
-        futureInstallmentAllocationRules: loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules
+        futureInstallmentAllocationRule: futureInstallmentAllocationRule,
+        futureInstallmentAllocationRules: loanProduct.advancedPaymentAllocationFutureInstallmentAllocationRules || []
       });
     }
     return advancedPaymentAllocation;
@@ -225,7 +231,7 @@ export class AdvancedPaymentStrategy {
         paymentAllocations.push({
           transactionType: paymentAllocation.transaction.code,
           paymentAllocationOrder: this.buildPaymentAllocationOrder(paymentAllocation.paymentAllocationOrder),
-          futureInstallmentAllocationRule: paymentAllocation.futureInstallmentAllocationRule.code
+          futureInstallmentAllocationRule: paymentAllocation.futureInstallmentAllocationRule?.code
         });
       }
     });

@@ -17,6 +17,8 @@ import { Route } from '../core/route/route.service';
 import { ProductsComponent } from './products.component';
 import { LoanProductsComponent } from './loan-products/loan-products.component';
 import { CreateLoanProductComponent } from './loan-products/create-loan-product/create-loan-product.component';
+import { CreateLoanProductClassicComponent } from './loan-products/create-loan-product-classic/create-loan-product-classic.component';
+import { LoanProductSelectionComponent } from './loan-products/create-loan-product/loan-product-selection.component';
 import { ViewLoanProductComponent } from './loan-products/view-loan-product/view-loan-product.component';
 import { EditLoanProductComponent } from './loan-products/edit-loan-product/edit-loan-product.component';
 import { SavingProductsComponent } from './saving-products/saving-products.component';
@@ -134,12 +136,26 @@ import { ShareProductDatatableTabComponent } from './share-products/view-share-p
 import { ShareProductDatatablesResolver } from './share-products/share-product-datatables.resolver';
 import { ShareProductDatatableResolver } from './share-products/share-product-datatable.resolver';
 import { GlobalConfigurationsResolver } from 'app/system/configurations/global-configurations-tab/global-configurations.resolver';
+import { BreachConfigurationComponent } from './loan-products/working-capital/breach-configuration/breach-configuration.component';
+import { BreachesResolver } from './loan-products/working-capital/breach-configuration/breaches.resolver';
+import { BreachResolver } from './loan-products/working-capital/breach-configuration/breach.resolver';
+import { ViewBreachConfigurationComponent } from './loan-products/working-capital/breach-configuration/view-breach-configuration/view-breach-configuration.component';
+import { CreateBreachConfigurationComponent } from './loan-products/working-capital/breach-configuration/create-breach-configuration/create-breach-configuration.component';
+import { BreachTemplateResolver } from './loan-products/working-capital/breach-configuration/breach-template.resolver';
+import { EditBreachConfigurationComponent } from './loan-products/working-capital/breach-configuration/edit-breach-configuration/edit-breach-configuration.component';
+import { NearBreachConfigurationComponent } from './loan-products/working-capital/near-breach-configuration/near-breach-configuration.component';
+import { NearBreachesResolver } from './loan-products/working-capital/near-breach-configuration/near-breaches.resolver';
+import { CreateNearBreachConfigurationComponent } from './loan-products/working-capital/near-breach-configuration/create-near-breach-configuration/create-near-breach-configuration.component';
+import { NearBreachTemplateResolver } from './loan-products/working-capital/near-breach-configuration/near-breach-template.resolver';
+import { ViewNearBreachConfigurationComponent } from './loan-products/working-capital/near-breach-configuration/view-near-breach-configuration/view-near-breach-configuration.component';
+import { NearBreachResolver } from './loan-products/working-capital/near-breach-configuration/near-breach.resolver';
+import { EditNearBreachConfigurationComponent } from './loan-products/working-capital/near-breach-configuration/edit-near-breach-configuration/edit-near-breach-configuration.component';
 
 /** Products Routes */
 const routes: Routes = [
   Route.withShell([
     {
-      path: 'products',
+      path: '',
       data: { title: 'Products', breadcrumb: 'Products' },
       children: [
         {
@@ -152,15 +168,35 @@ const routes: Routes = [
           children: [
             {
               path: '',
-              component: LoanProductsComponent,
-              resolve: {
-                loanProducts: LoanProductsResolver
-              }
+              component: LoanProductsComponent
             },
             {
               path: 'create',
-              component: CreateLoanProductComponent,
+              component: LoanProductSelectionComponent,
+              data: { title: 'Create Loan Product', breadcrumb: 'Create' }
+            },
+            {
+              path: 'create/classic',
+              component: CreateLoanProductClassicComponent,
               data: { title: 'Create Loan Product', breadcrumb: 'Create' },
+              resolve: {
+                loanProductsTemplate: LoanProductsTemplateResolver,
+                configurations: GlobalConfigurationsResolver
+              }
+            },
+            {
+              path: 'personal-loan',
+              component: CreateLoanProductComponent,
+              data: { title: 'Create Personal Loan', breadcrumb: 'Personal Loan' },
+              resolve: {
+                loanProductsTemplate: LoanProductsTemplateResolver,
+                configurations: GlobalConfigurationsResolver
+              }
+            },
+            {
+              path: 'custom-advanced',
+              component: CreateLoanProductComponent,
+              data: { title: 'Custom / Advanced Loan Configuration', breadcrumb: 'Custom / Advanced' },
               resolve: {
                 loanProductsTemplate: LoanProductsTemplateResolver,
                 configurations: GlobalConfigurationsResolver
@@ -551,7 +587,7 @@ const routes: Routes = [
                   component: CreateBucketComponent,
                   data: { title: 'Create Delinquency Bucket', breadcrumb: 'Create' },
                   resolve: {
-                    delinquencyRanges: DelinquencyRangeComponentsResolver
+                    delinquencyBucketsTemplateData: DelinquencyRangeComponentsResolver
                   }
                 },
                 {
@@ -574,7 +610,7 @@ const routes: Routes = [
                       component: EditBucketComponent,
                       resolve: {
                         delinquencyBucket: DelinquencyBucketComponentsResolver,
-                        delinquencyRanges: DelinquencyRangeComponentsResolver
+                        delinquencyBucketsTemplateData: DelinquencyRangeComponentsResolver
                       }
                     }
                   ]
@@ -621,6 +657,7 @@ const routes: Routes = [
                 },
                 {
                   path: 'general',
+                  data: { title: 'General', breadcrumb: 'General', routeParamBreadcrumb: false },
                   component: RecurringDepositGeneralTabComponent,
                   resolve: {
                     recurringDepositProduct: RecurringDepositProductResolver
@@ -632,7 +669,6 @@ const routes: Routes = [
                     {
                       path: ':datatableName',
                       component: RecurringDepositDatatableTabComponent,
-                      data: { title: 'Data Table View', routeParamBreadcrumb: 'datatableName' },
                       resolve: {
                         recurringDepositDatatable: SavingProductDatatableResolver
                       }
@@ -685,6 +721,7 @@ const routes: Routes = [
                 },
                 {
                   path: 'general',
+                  data: { title: 'General', breadcrumb: 'General', routeParamBreadcrumb: false },
                   component: FixedDepositGeneralTabComponent,
                   resolve: {
                     fixedDepositProduct: FixedDepositProductResolver
@@ -696,7 +733,6 @@ const routes: Routes = [
                     {
                       path: ':datatableName',
                       component: FixedDepositDatatableTabComponent,
-                      data: { title: 'Data Table View', routeParamBreadcrumb: 'datatableName' },
                       resolve: {
                         fixedDepositDatatable: SavingProductDatatableResolver
                       }
@@ -892,6 +928,92 @@ const routes: Routes = [
               ]
             }
           ]
+        },
+        {
+          path: 'breach-configurations',
+          data: { title: 'Breach Configurations', breadcrumb: 'Breach Configurations' },
+          children: [
+            {
+              path: '',
+              component: BreachConfigurationComponent,
+              resolve: {
+                breaches: BreachesResolver
+              }
+            },
+            {
+              path: 'create',
+              component: CreateBreachConfigurationComponent,
+              data: { title: 'Create Breach', breadcrumb: 'Create' },
+              resolve: {
+                breachTemplate: BreachTemplateResolver
+              }
+            },
+            {
+              path: ':id',
+              data: { title: 'View Breach', routeParamBreadcrumb: 'id' },
+              children: [
+                {
+                  path: '',
+                  component: ViewBreachConfigurationComponent,
+                  resolve: {
+                    breachData: BreachResolver
+                  }
+                },
+                {
+                  path: 'edit',
+                  component: EditBreachConfigurationComponent,
+                  data: { title: 'Edit Breach', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                  resolve: {
+                    breachData: BreachResolver,
+                    breachTemplate: BreachTemplateResolver
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          path: 'near-breach-configurations',
+          data: { title: 'Near Breach Configurations', breadcrumb: 'Near Breach Configurations' },
+          children: [
+            {
+              path: '',
+              component: NearBreachConfigurationComponent,
+              resolve: {
+                nearBreaches: NearBreachesResolver
+              }
+            },
+            {
+              path: 'create',
+              component: CreateNearBreachConfigurationComponent,
+              data: { title: 'Create Near Breach', breadcrumb: 'Create' },
+              resolve: {
+                breachTemplate: BreachTemplateResolver
+              }
+            },
+            {
+              path: ':id',
+              data: { title: 'View Near Breach', routeParamBreadcrumb: 'id' },
+              children: [
+                {
+                  path: '',
+                  component: ViewNearBreachConfigurationComponent,
+                  resolve: {
+                    nearBreachData: NearBreachResolver
+                  }
+                },
+                {
+                  path: 'edit',
+                  component: EditNearBreachConfigurationComponent,
+                  data: { title: 'Edit Near Breach', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                  resolve: {
+                    nearBreachData: NearBreachResolver,
+                    breachTemplate: BreachTemplateResolver
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     }
@@ -951,7 +1073,12 @@ const routes: Routes = [
     CollateralsResolver,
     CollateralTemplateResolver,
     DelinquencyRangeComponentsResolver,
-    DelinquencyBucketComponentsResolver
+    DelinquencyBucketComponentsResolver,
+    BreachTemplateResolver,
+    BreachesResolver,
+    BreachResolver,
+    NearBreachesResolver,
+    NearBreachResolver
   ]
 })
 export class ProductsRoutingModule {}

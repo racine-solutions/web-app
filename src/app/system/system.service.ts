@@ -744,7 +744,10 @@ export class SystemService {
    * @returns {Observable<SmsMessagesPage>}
    */
   getSmsMessages(offset: number = 0, limit: number = 10): Observable<SmsMessagesPage> {
-    const httpParams = new HttpParams().set('offset', offset.toString()).set('limit', limit.toString()).set('paged', 'true');
+    const httpParams = new HttpParams()
+      .set('offset', offset.toString())
+      .set('limit', limit.toString())
+      .set('paged', 'true');
     return this.http.get<SmsMessagesPage>('/sms/messages', { params: httpParams });
   }
 
@@ -754,7 +757,10 @@ export class SystemService {
    * @returns {Observable<SmsWalletTransactionsPage>}
    */
   getSmsWalletTransactions(offset: number = 0, limit: number = 10): Observable<SmsWalletTransactionsPage> {
-    const httpParams = new HttpParams().set('offset', offset.toString()).set('limit', limit.toString()).set('paged', 'true');
+    const httpParams = new HttpParams()
+      .set('offset', offset.toString())
+      .set('limit', limit.toString())
+      .set('paged', 'true');
     return this.http.get<SmsWalletTransactionsPage>('/sms/getSmsWalletTransactions', { params: httpParams });
   }
 

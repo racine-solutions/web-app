@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports. */
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoansAccountCloseComponent } from './loans-account-close/loans-account-close.component';
 import { UndoApprovalComponent } from './undo-approval/undo-approval.component';
@@ -40,6 +41,11 @@ import { LoanReamortizeComponent } from './loan-reamortize/loan-reamortize.compo
 import { AddInterestPauseComponent } from './add-interest-pause/add-interest-pause.component';
 import { UndoWriteOffComponent } from './undo-write-off/undo-write-off.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { AttachOriginatorComponent } from './attach-originator/attach-originator.component';
+import { LoanProductBaseComponent } from 'app/products/loan-products/common/loan-product-base.component';
+import { UpdateDiscountComponent } from './update-discount/update-discount.component';
+import { NearBreachConfigComponent } from '../working-capital/loan-account-actions/near-breach-config/near-breach-config.component';
+import { BreachConfigComponent } from '../working-capital/loan-account-actions/breach-config/breach-config.component';
 
 /**
  * Loan Account Actions component.
@@ -47,7 +53,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 @Component({
   selector: 'mifosx-loan-account-actions',
   templateUrl: './loan-account-actions.component.html',
-  styleUrls: ['./loan-account-actions.component.scss'],
+  styleUrls: [],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     LoansAccountCloseComponent,
@@ -79,10 +85,16 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     LoanReagingComponent,
     LoanReamortizeComponent,
     AddInterestPauseComponent,
-    UndoWriteOffComponent
-  ]
+    UndoWriteOffComponent,
+    AttachOriginatorComponent,
+    UpdateDiscountComponent,
+    NearBreachConfigComponent,
+    BreachConfigComponent
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoanAccountActionsComponent {
+  private readonly destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -130,6 +142,10 @@ export class LoanAccountActionsComponent {
     'Contract Termination': boolean;
     'Buy Down Fee': boolean;
     'Undo Write-off': boolean;
+    'Attach Loan Originator': boolean;
+    'Discount Fee': boolean;
+    'Update Near Breach': boolean;
+    'Update Breach': boolean;
   } = {
     Close: false,
     'Undo Approval': false,
@@ -169,7 +185,11 @@ export class LoanAccountActionsComponent {
     'Capitalized Income': false,
     'Contract Termination': false,
     'Buy Down Fee': false,
-    'Undo Write-off': false
+    'Undo Write-off': false,
+    'Attach Loan Originator': false,
+    'Discount Fee': false,
+    'Update Near Breach': false,
+    'Update Breach': false
   };
 
   actionButtonData: any;
@@ -183,11 +203,11 @@ export class LoanAccountActionsComponent {
     // Safely access data with optional chaining
     this.navigationData = currentNavigation?.extras?.state?.data;
 
-    this.route.data.subscribe((data: { actionButtonData: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { actionButtonData: any }) => {
       this.actionButtonData = data.actionButtonData ? data.actionButtonData : {};
     });
 
-    this.route.params.subscribe((params) => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.actionName = params['action'];
       if (this.actionName === 'Change Loan Officer') {
         this.actionName = 'Assign Loan Officer';
@@ -199,5 +219,6 @@ export class LoanAccountActionsComponent {
     });
 
     this.actionButtonData['actionName'] = this.actionName;
+    this.actionButtonData['productType'] = LoanProductBaseComponent.resolveProductTypeDefault(this.route, 'loan');
   }
 }

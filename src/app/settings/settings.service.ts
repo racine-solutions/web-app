@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { AlertService } from 'app/core/alert/alert.service';
 import { Dates } from 'app/core/utils/dates';
 
@@ -31,12 +31,19 @@ export class SettingsService {
   minAllowedDate = new Date(1950, 0, 1);
   maxAllowedDate = new Date(2100, 0, 1);
 
+  /** Reactive backing for the business date so signal consumers recompute when it changes. */
+  private readonly businessDateValue = signal<string | null>(localStorage.getItem('mifosXServerDate'));
+
   /**
    * Sets date format setting throughout the app.
    * @param {string} dateFormat Date Format
    */
   setDateFormat(dateFormat: string) {
     localStorage.setItem('mifosXDateFormat', JSON.stringify(dateFormat));
+  }
+
+  setDatetimeFormat(datetimeFormat: string) {
+    localStorage.setItem('mifosXDatetimeFormat', JSON.stringify(datetimeFormat));
   }
 
   /**
@@ -101,6 +108,7 @@ export class SettingsService {
    */
   setBusinessDate(date: string) {
     localStorage.setItem('mifosXServerDate', date);
+    this.businessDateValue.set(date);
   }
 
   /**
@@ -112,10 +120,37 @@ export class SettingsService {
   }
 
   /**
-   * Returns date format setting.
+   * Returns date format setting with fallback precedence:
+   * 1. User setting (localStorage)
+   * 2. Global env var
+   * 3. Hardcoded default
    */
   get dateFormat() {
-    return JSON.parse(localStorage.getItem('mifosXDateFormat'));
+    const userSetting = localStorage.getItem('mifosXDateFormat');
+    if (userSetting) {
+      return JSON.parse(userSetting);
+    }
+    if (environment.defaultFormatDate) {
+      return environment.defaultFormatDate;
+    }
+    return 'dd MMMM yyyy';
+  }
+
+  /**
+   * Returns datetime format setting with fallback precedence:
+   * 1. User setting (localStorage)
+   * 2. Global env var
+   * 3. Hardcoded default
+   */
+  get datetimeFormat() {
+    const userSetting = localStorage.getItem('mifosXDatetimeFormat');
+    if (userSetting) {
+      return JSON.parse(userSetting);
+    }
+    if (environment.defaultFormatDatetime) {
+      return environment.defaultFormatDatetime;
+    }
+    return 'dd MMMM yyyy HH:mm:ss';
   }
 
   /**
@@ -195,7 +230,10 @@ export class SettingsService {
    * Returns current Business date server
    */
   get businessDate(): Date {
-    return this.dateUtils.convertToDate(localStorage.getItem('mifosXServerDate'), SettingsService.businessDateFormat);
+    return this.dateUtils.convertToDate(
+      this.businessDateValue() ?? localStorage.getItem('mifosXServerDate'),
+      SettingsService.businessDateFormat
+    );
   }
 
   /**

@@ -114,3 +114,15 @@
 @if (actions['Undo Write-off']) {
   <mifosx-undo-write-off [dataObject]="actionButtonData"></mifosx-undo-write-off>
 }
+@if (actions['Attach Loan Originator']) {
+  <mifosx-attach-originator [dataObject]="actionButtonData"></mifosx-attach-originator>
+}
+@if (actions['Discount Fee']) {
+  <mifosx-update-discount [dataObject]="actionButtonData"></mifosx-update-discount>
+}
+@if (actions['Update Near Breach']) {
+  <mifosx-near-breach-config [dataObject]="actionButtonData"></mifosx-near-breach-config>
+}
+@if (actions['Update Breach']) {
+  <mifosx-breach-config [dataObject]="actionButtonData"></mifosx-breach-config>
+}

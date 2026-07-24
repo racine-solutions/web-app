@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductsService } from 'app/products/products.service';
@@ -19,7 +19,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./edit-range.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditRangeComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -57,14 +58,14 @@ export class EditRangeComponent implements OnInit {
         [
           Validators.required,
           Validators.pattern('^(0*[1-9][0-9]*?)$'),
-          Validators.max(1000)
+          Validators.min(1)
         ]
       ],
       maximumAgeDays: [
         this.delinquencyRangeData.maximumAgeDays,
         [
           Validators.pattern('^(0*[1-9][0-9]*?)$'),
-          Validators.max(10000)
+          Validators.min(1)
         ]
       ]
     });

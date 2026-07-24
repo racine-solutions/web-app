@@ -40,7 +40,7 @@ export class ReportsService {
    * @returns {Observable<ReportParameter[]>}
    */
   getReportParams(reportName: string): Observable<ReportParameter[]> {
-    const httpParams = new HttpParams().set('R_reportListing', `'${reportName}'`).set('parameterType', 'true');
+    const httpParams = new HttpParams().set('R_reportListing', `${reportName}`).set('parameterType', 'true');
     return this.http
       .get(`/runreports/FullParameterList`, { params: httpParams })
       .pipe(map((response: any) => response.data.map((entry: any) => new ReportParameter(entry.row))));
@@ -139,5 +139,46 @@ export class ReportsService {
    */
   getAnalyticsReport(): Observable<any> {
     return this.http.get('/runreports/analyticsReport');
+  }
+
+  /**
+   * @param {number} reportId
+   * @returns {Observable<any>}
+   */
+  getBirtParams(reportId: number): Observable<any> {
+    const httpParams = new HttpParams().set('fields', 'reportParameters');
+    return this.http
+      .get(`/reports/${reportId}`, { params: httpParams })
+      .pipe(map((response: any) => response.reportParameters));
+  }
+
+  /**
+   * Run Report Data for BIRT.
+   * @param {any} reportName
+   * @param {object} formData
+   * @returns {Observable<any>}
+   */
+  getBirtRunReportData(
+    reportName: string,
+    formData: object,
+    tenantIdentifier: string,
+    locale: string,
+    dateFormat: string
+  ): Observable<any> {
+    let httpParams = new HttpParams()
+      .set('tenantIdentifier', tenantIdentifier)
+      .set('locale', locale)
+      .set('dateFormat', dateFormat);
+    for (const [
+      key,
+      value
+    ] of Object.entries(formData)) {
+      httpParams = httpParams.set(key, value);
+    }
+    return this.http.get(`/runreports/${reportName}`, {
+      responseType: 'arraybuffer',
+      observe: 'response',
+      params: httpParams
+    });
   }
 }

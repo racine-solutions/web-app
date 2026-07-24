@@ -6,7 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  inject
+} from '@angular/core';
 import {
   AdvancedCreditAllocation,
   AdvancedPaymentAllocation,
@@ -43,7 +52,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatIcon,
     FaIconComponent,
     MatTabContent
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoanProductPaymentStrategyStepComponent implements OnInit {
   private dialog = inject(MatDialog);
@@ -53,9 +63,9 @@ export class LoanProductPaymentStrategyStepComponent implements OnInit {
   @Input() advancedPaymentAllocations: AdvancedPaymentAllocation[] = [];
   @Input() advancedCreditAllocations: AdvancedCreditAllocation[] = [];
   @Input() advancedPaymentAllocationTransactionTypes: PaymentAllocationTransactionType[] = [];
-  @Input() paymentAllocationOrderDefault: PaymentAllocationOrder[];
+  @Input() paymentAllocationOrderDefault: PaymentAllocationOrder[] = [];
   @Input() advancedCreditAllocationTransactionTypes: PaymentAllocationTransactionType[] = [];
-  @Input() creditAllocationOrderDefault: CreditAllocationOrder[];
+  @Input() creditAllocationOrderDefault: CreditAllocationOrder[] = [];
 
   @Output() paymentAllocationChange = new EventEmitter<boolean>();
   @Output() setPaymentAllocation = new EventEmitter<PaymentAllocation[]>();
@@ -96,13 +106,15 @@ export class LoanProductPaymentStrategyStepComponent implements OnInit {
         transactionTypesOptions.push(option);
       }
     });
-    this.advancedCreditAllocationTransactionTypes.forEach((option: PaymentAllocationTransactionType) => {
-      if (transactionTypesCurrent.indexOf(option.code) < 0) {
-        option.credit = true;
-        option.value = this.translateService.instant('labels.catalogs.' + option.value);
-        transactionTypesOptions.push(option);
-      }
-    });
+    if (this.advancedCreditAllocationTransactionTypes) {
+      this.advancedCreditAllocationTransactionTypes.forEach((option: PaymentAllocationTransactionType) => {
+        if (transactionTypesCurrent.indexOf(option.code) < 0) {
+          option.credit = true;
+          option.value = this.translateService.instant('labels.catalogs.' + option.value);
+          transactionTypesOptions.push(option);
+        }
+      });
+    }
 
     const formfields: FormfieldBase[] = [
       new SelectBase({

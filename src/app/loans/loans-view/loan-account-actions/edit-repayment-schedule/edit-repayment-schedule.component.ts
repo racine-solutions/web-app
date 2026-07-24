@@ -6,14 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Dates } from 'app/core/utils/dates';
-import { LoansService } from 'app/loans/loans.service';
 import { EditableRepaymentSchedule, EditablePeriod, ScheduleChangeRecord } from 'app/loans/models/loan-account.model';
-import { SettingsService } from 'app/settings/settings.service';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
@@ -21,6 +18,7 @@ import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
 import { RepaymentScheduleTabComponent } from '../../repayment-schedule-tab/repayment-schedule-tab.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoanAccountActionsBaseComponent } from '../loan-account-actions-base.component';
 
 @Component({
   selector: 'mifosx-edit-repayment-schedule',
@@ -29,19 +27,14 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     RepaymentScheduleTabComponent
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditRepaymentScheduleComponent implements OnInit {
-  private loansService = inject(LoansService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+export class EditRepaymentScheduleComponent extends LoanAccountActionsBaseComponent implements OnInit {
   private dialog = inject(MatDialog);
   private dateUtils = inject(Dates);
   private translateService = inject(TranslateService);
-  private settingsService = inject(SettingsService);
 
-  /** Loan ID. */
-  loanId: string;
   /** Indicates If the Schedule has been changed */
   wasChanged = false;
   /** Indicates If the Schedule has been validated */
@@ -51,16 +44,8 @@ export class EditRepaymentScheduleComponent implements OnInit {
   /** Stores the Installments changed */
   repaymentScheduleChanges: Record<string, ScheduleChangeRecord> = {};
 
-  /**
-   * @param {LoansService} systemService Loan Service.
-   * @param {Router} router Router for navigation.
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {MatDialog} dialog Confirmation Dialogs.
-   * @param {Dates} dateUtils Dates Utils.
-   * @param {SettingsService} settingsService Settings Service
-   */
   constructor() {
-    this.loanId = this.route.snapshot.params['loanId'];
+    super();
     this.getRepaymentSchedule();
   }
 
@@ -69,7 +54,7 @@ export class EditRepaymentScheduleComponent implements OnInit {
   }
 
   getRepaymentSchedule(): void {
-    this.loansService.getLoanAccountResource(this.loanId, 'repaymentSchedule').subscribe({
+    this.loanService.getLoanAccountResource(this.loanId, 'repaymentSchedule').subscribe({
       next: (response: { repaymentSchedule: EditableRepaymentSchedule }) => {
         this.repaymentScheduleDetails = response.repaymentSchedule;
       },
@@ -157,7 +142,7 @@ export class EditRepaymentScheduleComponent implements OnInit {
     });
     recoverScheduleDialogRef.afterClosed().subscribe((responseConfirmation: { confirm?: boolean }) => {
       if (responseConfirmation.confirm) {
-        this.loansService.applyCommandLoanScheduleVariations(this.loanId, 'deleteVariations', {}).subscribe({
+        this.loanService.applyCommandLoanScheduleVariations(this.loanId, 'deleteVariations', {}).subscribe({
           next: () => {
             this.getRepaymentSchedule();
             this.wasChanged = false;
@@ -176,7 +161,7 @@ export class EditRepaymentScheduleComponent implements OnInit {
       return;
     }
 
-    this.loansService
+    this.loanService
       .applyCommandLoanScheduleVariations(this.loanId, 'calculateLoanSchedule', this.getPayload())
       .subscribe({
         next: (response: EditableRepaymentSchedule) => {
@@ -196,9 +181,9 @@ export class EditRepaymentScheduleComponent implements OnInit {
   }
 
   submit(): void {
-    this.loansService.applyCommandLoanScheduleVariations(this.loanId, 'addVariations', this.getPayload()).subscribe({
+    this.loanService.applyCommandLoanScheduleVariations(this.loanId, 'addVariations', this.getPayload()).subscribe({
       next: () => {
-        this.router.navigate(['../../repayment-schedule'], { relativeTo: this.route });
+        this.gotoLoanView('repayment-schedule');
       },
       error: (err) => {
         console.error('Failed to add schedule variations:', err);

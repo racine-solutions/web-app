@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -57,7 +66,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ManageDataTablesComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
@@ -147,12 +157,12 @@ export class ManageDataTablesComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showDatatablesPage === true) {
+    if (this.configurationWizardService.showDatatablesPage) {
       setTimeout(() => {
         this.showPopover(this.templateCreateDatatableRef, this.createDatatableRef.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showDatatablesList === true) {
+    if (this.configurationWizardService.showDatatablesList) {
       setTimeout(() => {
         this.showPopover(this.templateDatatablesList, this.datatablesList.nativeElement, 'top', true);
       });

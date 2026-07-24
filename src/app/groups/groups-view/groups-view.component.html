@@ -11,7 +11,12 @@
     <mat-card-title-group class="header-title-group">
       <div class="profile-image-container">
         <div>
-          <img mat-card-md-image class="profile-image" src="assets/images/group_placeholder.png" />
+          <img
+            mat-card-md-image
+            class="profile-image"
+            src="assets/images/group_placeholder.png"
+            alt="{{ 'labels.alt.Group profile placeholder' | translate }}"
+          />
         </div>
       </div>
 
@@ -198,7 +203,13 @@
           <button mat-menu-item *mifosxHasPermission="'CLOSE_GROUP'" (click)="doAction('Close')">
             {{ 'labels.buttons.Close' | translate }}
           </button>
-          <button mat-menu-item *mifosxHasPermission="'DELETE_GROUP'" (click)="doAction('Delete')">
+          <button
+            mat-menu-item
+            *mifosxHasPermission="'DELETE_GROUP'"
+            [disabled]="!canDeleteGroup()"
+            matTooltip="Only pending groups can be deleted"
+            (click)="doAction('Delete')"
+          >
             {{ 'labels.buttons.Delete' | translate }}
           </button>
         </mat-menu>

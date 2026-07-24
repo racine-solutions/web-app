@@ -3,6 +3,11 @@
     <fa-icon icon="building" size="lg"></fa-icon>
   </span>
   <mat-label>{{ 'labels.inputs.Tenant' | translate }}*</mat-label>
-  <input matInput [formControl]="tenantSelector" (input)="setTenantIdentifier()" class="tenantselector" [placeholder]="'labels.text.Enter Organisation Id' | translate"
+  <input
+    matInput
+    [formControl]="tenantSelector"
+    (input)="setTenantIdentifier()"
+    class="tenantselector"
+    [placeholder]="'labels.text.Enter Organisation Id' | translate"
   />
 </mat-form-field>

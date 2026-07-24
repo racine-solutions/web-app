@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import {
   UntypedFormArray,
   UntypedFormBuilder,
@@ -45,7 +45,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatCheckbox,
     MatIconButton,
     MatTooltip
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewCodeComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -136,8 +137,11 @@ export class ViewCodeComponent implements OnInit {
       ],
       description: [{ value: codeValue ? codeValue.description : '', disabled: true }],
       position: [
-        { value: codeValue ? codeValue.position : 0, disabled: true },
-        Validators.required
+        { value: codeValue ? codeValue.position : '', disabled: true },
+        [
+          Validators.required,
+          Validators.min(0)
+        ]
       ],
       isActive: [{ value: codeValue ? codeValue.active : false, disabled: true }]
     });
@@ -189,7 +193,7 @@ export class ViewCodeComponent implements OnInit {
       data: { deleteContext: this.translateService.instant('labels.inputs.Code') + ' ' + this.codeData.name }
     });
     deleteCodeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.systemService.deleteCode(this.codeData.id).subscribe(() => {
           this.router.navigate(['/system/codes']);
         });

@@ -6,6 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+@use 'assets/styles/colours' as c;
+
 .tab-container {
   padding: 1%;
   margin: 1%;
@@ -15,8 +17,69 @@
   }
 }
 
+.button-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 0.5%;
+  padding-bottom: 0;
+
+  button.export-kyc-button {
+    background-color: c.$belize-hole;
+    color: c.$white;
+    font-weight: 500;
+    padding: 0 16px;
+
+    &:hover {
+      background-color: c.$peter-river;
+    }
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+
+  .validate-docs-button {
+    font-weight: 500;
+    padding: 0 16px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.validation-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+
+  &.status-complete {
+    background-color: rgba(c.$msg-success, 0.15);
+    color: c.$nephritis;
+    border: 1px solid c.$msg-success;
+  }
+
+  &.status-incomplete {
+    background-color: rgba(c.$msg-warning, 0.15);
+    color: c.$pumpkin;
+    border: 1px solid c.$msg-warning;
+  }
+}
+
 .section {
   margin-bottom: 2%;
+  margin-top: 0;
 
   h3 {
     margin-bottom: 1%;
@@ -69,5 +132,56 @@
       font-style: italic;
       opacity: 0.7;
     }
+  }
+}
+
+// PDF Modal Overlay
+.pdf-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0 0 0 / 70%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.pdf-modal-content {
+  position: relative;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  height: 80%;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  display: flex;
+  flex-direction: column;
+
+  embed {
+    flex: 1;
+    border: none;
+  }
+}
+
+.pdf-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 1;
+
+  &:hover {
+    background-color: #d32f2f;
   }
 }

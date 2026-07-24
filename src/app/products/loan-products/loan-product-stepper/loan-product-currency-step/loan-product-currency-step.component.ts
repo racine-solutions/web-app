@@ -6,12 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, Input, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnInit, Input, inject, DestroyRef } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoanProductService } from '../../services/loan-product.service';
 
 @Component({
   selector: 'mifosx-loan-product-currency-step',
@@ -23,14 +24,17 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperPrevious,
     FaIconComponent,
     MatStepperNext
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoanProductCurrencyStepComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
+  protected loanProductService = inject(LoanProductService);
+  private destroyRef = inject(DestroyRef);
 
   @Input() loanProductsTemplate: any;
 
-  loanProductCurrencyForm: UntypedFormGroup;
+  loanProductCurrencyForm!: UntypedFormGroup;
 
   currencyData: any;
 
@@ -40,14 +44,34 @@ export class LoanProductCurrencyStepComponent implements OnInit {
 
   ngOnInit() {
     this.currencyData = this.loanProductsTemplate.currencyOptions;
+    const currency = this.loanProductsTemplate.currency ? this.loanProductsTemplate.currency : this.currencyData[0];
+
+    let decimalPlacesValue = '';
+    if (this.loanProductService.isWorkingCapital && !this.loanProductsTemplate.id) {
+      decimalPlacesValue = '';
+    } else {
+      decimalPlacesValue =
+        currency.decimalPlaces === undefined || currency.decimalPlaces === null ? '' : currency.decimalPlaces;
+    }
+
     this.loanProductCurrencyForm.patchValue({
-      currencyCode: this.loanProductsTemplate.currency.code || this.currencyData[0].code,
-      digitsAfterDecimal: this.loanProductsTemplate.currency.decimalPlaces
-        ? this.loanProductsTemplate.currency.decimalPlaces
-        : 2,
-      inMultiplesOf: this.loanProductsTemplate.currency.inMultiplesOf ?? 1,
-      installmentAmountInMultiplesOf: this.loanProductsTemplate.installmentAmountInMultiplesOf ?? 1
+      currencyCode: currency.code,
+      digitsAfterDecimal: decimalPlacesValue,
+      inMultiplesOf:
+        currency.inMultiplesOf === 0 || currency.inMultiplesOf === undefined || currency.inMultiplesOf === null
+          ? 0
+          : currency.inMultiplesOf
     });
+    if (this.loanProductService.isLoanProduct) {
+      this.loanProductCurrencyForm.patchValue({
+        installmentAmountInMultiplesOf:
+          this.loanProductsTemplate.installmentAmountInMultiplesOf === 0 ||
+          this.loanProductsTemplate.installmentAmountInMultiplesOf === undefined ||
+          this.loanProductsTemplate.installmentAmountInMultiplesOf === null
+            ? 1
+            : this.loanProductsTemplate.installmentAmountInMultiplesOf
+      });
+    }
   }
 
   createLoanProductCurrencyForm() {
@@ -57,30 +81,32 @@ export class LoanProductCurrencyStepComponent implements OnInit {
         Validators.required
       ],
       digitsAfterDecimal: [
-        2,
+        '',
         [
           Validators.required,
           Validators.min(0)
         ]
       ],
       inMultiplesOf: [
-        1,
+        0,
         [
           Validators.required,
-          Validators.min(1)
-        ]
-      ],
-      installmentAmountInMultiplesOf: [
-        '',
-        [
-          Validators.required,
-          Validators.min(1)
+          Validators.min(0)
         ]
       ]
     });
+
+    if (this.loanProductService.isLoanProduct) {
+      this.loanProductCurrencyForm.addControl('installmentAmountInMultiplesOf', new UntypedFormControl(''));
+    }
   }
 
   get loanProductCurrency() {
-    return this.loanProductCurrencyForm.value;
+    const formValue = this.loanProductCurrencyForm.getRawValue();
+    const result: any = {
+      ...formValue
+    };
+
+    return result;
   }
 }

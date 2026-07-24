@@ -7,10 +7,11 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
-import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
   MatTableDataSource,
   MatTable,
@@ -25,6 +26,7 @@ import {
   MatRow
 } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 
 /** Custom Services */
 import { TasksService } from '../../tasks.service';
@@ -57,8 +59,10 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow,
-    DateFormatPipe
-  ]
+    DateFormatPipe,
+    MatIcon
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckerInboxComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -68,7 +72,8 @@ export class CheckerInboxComponent implements OnInit {
   private translateService = inject(TranslateService);
   private tasksService = inject(TasksService);
   private settingsService = inject(SettingsService);
-  private formBuilder = inject(UntypedFormBuilder);
+  private formBuilder = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   /** Data to be displayed */
   searchData: any;
@@ -78,8 +83,10 @@ export class CheckerInboxComponent implements OnInit {
   noSearchedData = false;
   /** Checks if there is any checker data */
   checkerData = false;
+  /** Show/hide advanced search form */
+  showAdvancedSearch = false;
   /** Maker Checker Search Form */
-  makerCheckerSearchForm: UntypedFormGroup;
+  makerCheckerSearchForm: FormGroup;
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
   /** Maximum date allowed. */
@@ -110,15 +117,17 @@ export class CheckerInboxComponent implements OnInit {
    * @param {FormBuilder} formBuilder Form Builder.
    */
   constructor() {
-    this.route.data.subscribe((data: { makerCheckerResource: any; makerCheckerTemplate: any }) => {
-      this.searchData = data.makerCheckerResource;
-      if (this.searchData.length > 0) {
-        this.checkerData = true;
-      }
-      this.makerCheckerTemplate = data.makerCheckerTemplate;
-      this.dataSource = new MatTableDataSource(this.searchData);
-      this.selection = new SelectionModel(true, []);
-    });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: { makerCheckerResource: any; makerCheckerTemplate: any }) => {
+        this.searchData = data.makerCheckerResource;
+        if (this.searchData.length > 0) {
+          this.checkerData = true;
+        }
+        this.makerCheckerTemplate = data.makerCheckerTemplate;
+        this.dataSource = new MatTableDataSource(this.searchData);
+        this.selection = new SelectionModel(true, []);
+      });
   }
 
   ngOnInit() {
@@ -136,6 +145,13 @@ export class CheckerInboxComponent implements OnInit {
       entityName: [''],
       resourceId: ['']
     });
+  }
+
+  /**
+   * Toggle advanced search form visibility.
+   */
+  toggleAdvancedSearch() {
+    this.showAdvancedSearch = !this.showAdvancedSearch;
   }
 
   search() {

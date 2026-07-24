@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, Input, OnChanges, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Input, OnChanges, inject } from '@angular/core';
 // import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -27,7 +27,6 @@ import {
 /** Dialog Components */
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
-// import { LoansAccountAddCollateralDialogComponent } from 'app/loans/custom-dialog/loans-account-add-collateral-dialog/loans-account-add-collateral-dialog.component';
 
 /** Custom Services */
 import { DatepickerBase } from 'app/shared/form-dialog/formfield/model/datepicker-base';
@@ -35,14 +34,16 @@ import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-
 import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { ActivatedRoute } from '@angular/router';
+import { MatIconButton } from '@angular/material/button';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatDivider } from '@angular/material/divider';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { TranslateService } from '@ngx-translate/core';
+import { LoanCharge } from 'app/loans/models/loan-charge.model';
 
 /**
  * Recurring Deposit Account Charges Step
@@ -70,13 +71,15 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperNext,
     DateFormatPipe,
     FormatNumberPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
   dialog = inject(MatDialog);
   private dateUtils = inject(Dates);
   private route = inject(ActivatedRoute);
   private settingsService = inject(SettingsService);
+  private translateService = inject(TranslateService);
 
   // @Input loansAccountProductTemplate: LoansAccountProductTemplate
   @Input() loansAccountProductTemplate: any;
@@ -148,11 +151,13 @@ export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (this.loansAccountTemplate && this.loansAccountTemplate.charges) {
       this.chargesDataSource =
-        this.loansAccountTemplate.charges.map((charge: any) => {
+        this.loansAccountTemplate.charges.map((loanCharge: LoanCharge) => {
+          const amount = this.isPercentageCharge(loanCharge) ? loanCharge.percentage : loanCharge.amount;
           return {
-            ...charge,
-            id: charge.id,
-            chargeId: charge.chargeId
+            ...loanCharge,
+            amount,
+            id: loanCharge.id,
+            chargeId: loanCharge.chargeId
           };
         }) || [];
     }
@@ -189,11 +194,13 @@ export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
           })) || [];
       } else if (isModification && this.loansAccountTemplate && this.loansAccountTemplate.charges) {
         this.chargesDataSource =
-          this.loansAccountTemplate.charges.map((charge: any) => {
+          this.loansAccountTemplate.charges.map((loanCharge: LoanCharge) => {
+            const amount = this.isPercentageCharge(loanCharge) ? loanCharge.percentage : loanCharge.amount;
             return {
-              ...charge,
-              id: charge.id,
-              chargeId: charge.chargeId
+              ...loanCharge,
+              amount,
+              id: loanCharge.id,
+              chargeId: loanCharge.chargeId
             };
           }) || [];
       }
@@ -222,13 +229,17 @@ export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
       new InputBase({
         controlName: 'amount',
         label: 'Amount',
-        value: charge.amount,
+        value: this.isPercentageCharge(charge) ? charge.amountOrPercentage : charge.amount,
         type: 'number',
+        step: 'any',
         required: false
       })
     ];
     const data = {
-      title: 'Edit Charge Amount',
+      title:
+        this.translateService.instant('labels.buttons.Edit') +
+        ' ' +
+        this.translateService.instant('labels.inputs.Charge Amount'),
       layout: { addButtonText: 'Confirm' },
       formfields: formfields
     };
@@ -254,11 +265,15 @@ export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
         label: 'Date',
         value: charge.dueDate || charge.feeOnMonthDay || '',
         type: 'datetime-local',
+        maxDate: this.settingsService.maxFutureDate,
         required: false
       })
     ];
     const data = {
-      title: 'Edit Charge Date',
+      title:
+        this.translateService.instant('labels.buttons.Edit') +
+        ' ' +
+        this.translateService.instant('labels.inputs.Charge Date'),
       layout: { addButtonText: 'Confirm' },
       formfields: formfields
     };
@@ -379,5 +394,9 @@ export class LoansAccountChargesStepComponent implements OnInit, OnChanges {
     const len = this.activeClientMembers.length;
     this.selectAllItems =
       len === 0 ? false : this.activeClientMembers.filter((item: any) => item.selected).length === len;
+  }
+
+  private isPercentageCharge(loanCharge: LoanCharge): boolean {
+    return loanCharge.chargeCalculationType.code.includes('.percent.');
   }
 }

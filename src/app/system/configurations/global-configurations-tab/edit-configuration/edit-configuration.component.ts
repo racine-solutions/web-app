@@ -7,10 +7,11 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SettingsService } from 'app/settings/settings.service';
+import { Dates } from 'app/core/utils/dates';
 
 /** Custom Services */
 import { SystemService } from '../../../system.service';
@@ -27,7 +28,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     CdkTextareaAutosize
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditConfigurationComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -35,6 +37,7 @@ export class EditConfigurationComponent implements OnInit {
   private settingsService = inject(SettingsService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dateUtils = inject(Dates);
 
   /** Minimum transaction date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -94,20 +97,33 @@ export class EditConfigurationComponent implements OnInit {
       this.configurationForm.value.stringValue != null ||
       this.configurationForm.value.dateValue != null
     ) {
-      const payload = {
+      const payload: any = {
         ...this.configurationForm.value
       };
+
       if (!this.configurationForm.value.stringValue) {
         delete payload.stringValue;
       }
+
       if (this.configurationForm.value.dateValue != null) {
-        payload.locale = this.settingsService.language.code;
-        payload.dateFormat = this.settingsService.dateFormat;
+        // Format the date according to the dateFormat setting
+        const dateFormat = this.settingsService.dateFormat || 'dd MMMM yyyy';
+
+        const formattedDate = this.dateUtils.formatDate(this.configurationForm.value.dateValue, dateFormat);
+
+        if (formattedDate) {
+          payload.dateValue = formattedDate;
+          payload.locale = this.settingsService.language.code;
+          payload.dateFormat = dateFormat;
+        } else {
+          // Avoid sending invalid/null date to backend
+          delete payload.dateValue;
+        }
       } else {
         delete payload.dateValue;
       }
 
-      this.systemService.updateConfiguration(this.configuration.id, payload).subscribe((response: any) => {
+      this.systemService.updateConfiguration(this.configuration.id, payload).subscribe(() => {
         this.router.navigate(['../../'], { relativeTo: this.route });
       });
     }

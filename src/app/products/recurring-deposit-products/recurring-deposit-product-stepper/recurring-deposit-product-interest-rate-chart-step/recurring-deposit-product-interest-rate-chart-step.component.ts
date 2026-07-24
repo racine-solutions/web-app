@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Input, inject } from '@angular/core';
 import {
   UntypedFormGroup,
   UntypedFormBuilder,
@@ -84,7 +84,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperPrevious,
     MatStepperNext,
     FindPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecurringDepositProductInterestRateChartStepComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -468,28 +469,32 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
         value: values ? values.fromPeriod : undefined,
         type: 'number',
         required: true,
-        order: 2
+        order: 2,
+        min: 0
       }),
       new InputBase({
         controlName: 'toPeriod',
         label: this.translateService.instant('labels.inputs.Period To'),
         value: values ? values.toPeriod : undefined,
         type: 'number',
-        order: 3
+        order: 3,
+        min: 0
       }),
       new InputBase({
         controlName: 'amountRangeFrom',
         label: this.translateService.instant('labels.inputs.Amount Range From'),
         value: values ? values.amountRangeFrom : undefined,
         type: 'number',
-        order: 4
+        order: 4,
+        min: 0
       }),
       new InputBase({
         controlName: 'amountRangeTo',
         label: this.translateService.instant('labels.inputs.Amount Range To'),
         value: values ? values.amountRangeTo : undefined,
         type: 'number',
-        order: 5
+        order: 5,
+        min: 0
       }),
       new InputBase({
         controlName: 'annualInterestRate',
@@ -497,7 +502,8 @@ export class RecurringDepositProductInterestRateChartStepComponent implements On
         value: values ? values.annualInterestRate : undefined,
         type: 'number',
         required: true,
-        order: 6
+        order: 6,
+        min: 0
       }),
       new InputBase({
         controlName: 'description',

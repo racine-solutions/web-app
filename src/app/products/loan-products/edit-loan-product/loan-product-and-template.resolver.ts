@@ -15,6 +15,8 @@ import { Observable } from 'rxjs';
 
 /** Custom Services */
 import { ProductsService } from '../../products.service';
+import { LoanProductService } from '../services/loan-product.service';
+import { LOAN_PRODUCT_TYPE } from '../models/loan-product.model';
 
 /**
  * Loan product and template data resolver.
@@ -22,6 +24,7 @@ import { ProductsService } from '../../products.service';
 @Injectable()
 export class LoanProductAndTemplateResolver {
   private productsService = inject(ProductsService);
+  private loanProductService = inject(LoanProductService);
 
   /**
    * Returns the loan product and template data.
@@ -29,6 +32,12 @@ export class LoanProductAndTemplateResolver {
    */
   resolve(route: ActivatedRouteSnapshot): Observable<any> {
     const loanProductId = route.parent.paramMap.get('productId');
-    return this.productsService.getLoanProduct(loanProductId, true);
+    const productType = route.queryParams['productType'];
+    if (productType === 'loan') {
+      this.loanProductService.initialize(LOAN_PRODUCT_TYPE.LOAN);
+    } else {
+      this.loanProductService.initialize(LOAN_PRODUCT_TYPE.WORKING_CAPITAL);
+    }
+    return this.productsService.getLoanProduct(this.loanProductService.loanProductPath, loanProductId, true);
   }
 }

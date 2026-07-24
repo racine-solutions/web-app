@@ -20,8 +20,15 @@
     margin: 0;
   }
 
+  .table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+  }
+
   table {
     width: 100%;
+    min-width: 800px;
+    margin-top: 8px;
 
     .identity-action-button {
       min-width: 26px;

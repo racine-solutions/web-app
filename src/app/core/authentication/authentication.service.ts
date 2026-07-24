@@ -10,13 +10,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 /** rxjs Imports */
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, from } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 /** 3rd party Imports */
 import { OAuthService } from 'angular-oauth2-oidc';
 /** Custom Services */
 import { AlertService } from '../alert/alert.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Interceptors */
 import { AuthenticationInterceptor } from './authentication.interceptor';
@@ -38,6 +39,7 @@ export class AuthenticationService {
   private alertService = inject(AlertService);
   private authenticationInterceptor = inject(AuthenticationInterceptor);
   private oauthService = inject(OAuthService);
+  private translateService = inject(TranslateService);
 
   /**
    * Updates the password for the specified user.
@@ -66,6 +68,9 @@ export class AuthenticationService {
   private credentials: Credentials;
   private dialogShown = false;
   private authMode: AuthMode = AuthMode.Basic;
+
+  /** Promise that resolves once the OIDC discovery document has been loaded. */
+  private discoveryDocumentLoaded: Promise<boolean> = Promise.resolve(false);
 
   /** Key to store credentials in storage. */
   private readonly credentialsStorageKey = 'mifosXCredentials';
@@ -97,7 +102,19 @@ export class AuthenticationService {
     this.oauthService.configure(getOAuthConfig());
     const oauthStorage = environment.enableRememberMe ? localStorage : sessionStorage;
     this.oauthService.setStorage(oauthStorage);
-    this.oauthService.setupAutomaticSilentRefresh();
+
+    // Load the OIDC discovery document so the library knows the authorization/token endpoints.
+    // This must complete before initCodeFlow() or tryLoginCodeFlow() can work.
+    this.discoveryDocumentLoaded = this.oauthService
+      .loadDiscoveryDocumentAndTryLogin()
+      .then(() => {
+        this.oauthService.setupAutomaticSilentRefresh();
+        return true;
+      })
+      .catch((err) => {
+        console.error('Failed to load OIDC discovery document:', err);
+        return false;
+      });
 
     this.oauthService.events.subscribe((event) => {
       if (event.type === 'token_received' || event.type === 'token_refreshed') {
@@ -122,16 +139,19 @@ export class AuthenticationService {
     }
 
     if (this.authMode !== AuthMode.Basic) {
-      // OAuth2/OIDC: Use angular-oauth2-oidc library for token management
-      if (this.oauthService.hasValidAccessToken()) {
-        this.authenticationInterceptor.setAuthorizationToken(this.oauthService.getAccessToken());
-        this.userLoggedIn$.next(true);
-      } else if (this.oauthService.getRefreshToken()) {
-        this.oauthService
-          .refreshToken()
-          .then(() => this.userLoggedIn$.next(true))
-          .catch(() => this.logout().subscribe());
-      }
+      // OAuth2/OIDC: Wait for discovery document before attempting token refresh
+      this.discoveryDocumentLoaded.then((loaded) => {
+        if (!loaded) return;
+        if (this.oauthService.hasValidAccessToken()) {
+          this.authenticationInterceptor.setAuthorizationToken(this.oauthService.getAccessToken());
+          this.userLoggedIn$.next(true);
+        } else if (this.oauthService.getRefreshToken()) {
+          this.oauthService
+            .refreshToken()
+            .then(() => this.userLoggedIn$.next(true))
+            .catch(() => this.logout().subscribe());
+        }
+      });
     } else {
       // Basic Auth
       this.authenticationInterceptor.setAuthorizationToken(savedCredentials.base64EncodedAuthenticationKey);
@@ -177,12 +197,22 @@ export class AuthenticationService {
    * @returns {Observable<boolean>} True if authentication is successful.
    */
   login(loginContext?: LoginContext): Observable<boolean> {
-    this.alertService.alert({ type: 'Authentication Start', message: 'Please wait...' });
+    this.alertService.alert({
+      type: this.translateService.instant('errors.auth.startType'),
+      message: this.translateService.instant('errors.auth.pleaseWait')
+    });
 
     if (this.authMode !== AuthMode.Basic) {
-      // OAuth2/OIDC: Redirect to authorization server with PKCE
-      this.oauthService.initCodeFlow();
-      return of(true);
+      // OAuth2/OIDC: Wait for the discovery document, then redirect to authorization server with PKCE
+      return from(
+        this.discoveryDocumentLoaded.then((loaded) => {
+          if (!loaded) {
+            throw new Error('OIDC discovery document failed to load. Cannot redirect to login.');
+          }
+          this.oauthService.initCodeFlow();
+          return true;
+        })
+      );
     }
 
     if (!loginContext) {
@@ -270,21 +300,21 @@ export class AuthenticationService {
     if (credentials.isTwoFactorAuthenticationRequired) {
       this.credentials = credentials;
       this.alertService.alert({
-        type: 'Two Factor Authentication Required',
-        message: 'Two Factor Authentication Required'
+        type: this.translateService.instant('errors.auth.twoFactor.type'),
+        message: this.translateService.instant('errors.auth.twoFactor.message')
       });
     } else {
       if (credentials.shouldRenewPassword) {
         this.credentials = credentials;
         this.alertService.alert({
-          type: 'Password Expired',
-          message: 'Your password has expired, please reset your password!'
+          type: this.translateService.instant('errors.auth.passwordExpired.type'),
+          message: this.translateService.instant('errors.auth.passwordExpired.message')
         });
       } else {
         this.setCredentials(credentials);
         this.alertService.alert({
-          type: 'Authentication Success',
-          message: `${credentials.username} successfully logged in!`
+          type: this.translateService.instant('errors.auth.success.type'),
+          message: this.translateService.instant('errors.auth.success.message', { username: credentials.username })
         });
         delete this.credentials;
       }
@@ -297,6 +327,13 @@ export class AuthenticationService {
    */
   async handleOAuthCallback(): Promise<boolean> {
     try {
+      // Ensure the discovery document is loaded so the library knows the token endpoint
+      const discoveryLoaded = await this.discoveryDocumentLoaded;
+      if (!discoveryLoaded) {
+        console.error('OIDC discovery document not loaded. Cannot process OAuth callback.');
+        return false;
+      }
+
       // index.html preserves the OAuth callback query string in sessionStorage before redirecting to /#/callback, since Angular routing consumes query params before the OAuth library can process them.
       let queryString = sessionStorage.getItem('oauth_callback_query');
 
@@ -492,14 +529,14 @@ export class AuthenticationService {
     this.authenticationInterceptor.setTwoFactorAccessToken(response.token);
     if (this.credentials.shouldRenewPassword) {
       this.alertService.alert({
-        type: 'Password Expired',
-        message: 'Your password has expired, please reset your password!'
+        type: this.translateService.instant('errors.auth.passwordExpired.type'),
+        message: this.translateService.instant('errors.auth.passwordExpired.message')
       });
     } else {
       this.setCredentials(this.credentials);
       this.alertService.alert({
-        type: 'Authentication Success',
-        message: `${this.credentials.username} successfully logged in!`
+        type: this.translateService.instant('errors.auth.success.type'),
+        message: this.translateService.instant('errors.auth.success.message', { username: this.credentials.username })
       });
       delete this.credentials;
       this.storage.setItem(this.twoFactorAuthenticationTokenStorageKey, JSON.stringify(response));
@@ -513,7 +550,10 @@ export class AuthenticationService {
   resetPassword(passwordDetails: any) {
     return this.http.put(`/users/${this.credentials.userId}`, passwordDetails).pipe(
       map(() => {
-        this.alertService.alert({ type: 'Password Reset Success', message: `Your password was sucessfully reset!` });
+        this.alertService.alert({
+          type: this.translateService.instant('errors.auth.passwordReset.type'),
+          message: this.translateService.instant('errors.auth.passwordReset.message')
+        });
         this.authenticationInterceptor.removeAuthorization();
         this.authenticationInterceptor.removeTwoFactorAuthorization();
         const loginContext: LoginContext = {

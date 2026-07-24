@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,11 +33,10 @@ import {
   MatRowDef,
   MatRow
 } from '@angular/material/table';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 /** rxjs Imports */
-import { switchMap, catchError, finalize } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 /* Custom Services */
 import { PopoverService } from '../../configuration-wizard/popover/popover.service';
@@ -39,9 +47,13 @@ import { ErrorHandlerService } from 'app/core/error-handler/error-handler.servic
 import { ImportLoanProductDialogComponent } from './import-loan-product-dialog/import-loan-product-dialog.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatMenu, MatMenuTrigger, MatMenuItem } from '@angular/material/menu';
 import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { UntypedFormControl } from '@angular/forms';
+import { LOAN_PRODUCT_TYPE, PRODUCT_TYPES } from './models/loan-product.model';
+import { LoanProductBaseComponent } from './common/loan-product-base.component';
 
 @Component({
   selector: 'mifosx-loan-products',
@@ -64,19 +76,24 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator,
+    MatMenu,
+    MatMenuTrigger,
+    MatMenuItem,
     StatusLookupPipe,
     DateFormatPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoanProductsComponent implements OnInit, AfterViewInit {
+export class LoanProductsComponent extends LoanProductBaseComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private configurationWizardService = inject(ConfigurationWizardService);
   private popoverService = inject(PopoverService);
   private dialog = inject(MatDialog);
   private productsService = inject(ProductsService);
   private settingsService = inject(SettingsService);
   private errorHandler = inject(ErrorHandlerService);
+
+  loanProductSelector = new UntypedFormControl();
 
   loanProductsData: any;
   displayedColumns: string[] = [
@@ -86,6 +103,7 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
     'status'
   ];
   dataSource: MatTableDataSource<any>;
+  loanProductOptions: any = PRODUCT_TYPES;
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -106,6 +124,11 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
    * @param {PopoverService} popoverService PopoverService.
    */
   constructor() {
+    super();
+
+    const productType = this.route.snapshot.queryParamMap.get('productType') || 'loan';
+    this.loanProductService.initialize(productType);
+
     this.route.data.subscribe((data: { loanProducts: any }) => {
       this.loanProductsData = data.loanProducts;
     });
@@ -115,6 +138,8 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
     this.dataSource = new MatTableDataSource(this.loanProductsData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.loanProductSelector.patchValue(this.loanProductOptions[0].type);
+    this.fetchProducts();
   }
 
   applyFilter(filterValue: string) {
@@ -125,7 +150,7 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showLoanProductsPage === true) {
+    if (this.configurationWizardService.showLoanProductsPage) {
       setTimeout(() => {
         this.showPopover(
           this.templateButtonCreateLoanProduct,
@@ -136,7 +161,7 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
       });
     }
 
-    if (this.configurationWizardService.showLoanProductsList === true) {
+    if (this.configurationWizardService.showLoanProductsList) {
       setTimeout(() => {
         this.showPopover(this.templateLoanProductsTable, this.loanProductsTable.nativeElement, 'top', true);
       });
@@ -224,10 +249,11 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
         };
 
         // Call API to create loan product with proper error handling
+        const productType = this.loanProductSelector.value === LOAN_PRODUCT_TYPE.LOAN ? '' : 'workingcapital';
         this.productsService
-          .createLoanProduct(payload)
+          .createLoanProduct(productType, payload)
           .pipe(
-            switchMap(() => this.productsService.getLoanProducts()),
+            switchMap(() => this.productsService.getLoanProducts(productType)),
             catchError((error) => this.errorHandler.handleError(error, 'Loan Product Import'))
           )
           .subscribe({
@@ -248,5 +274,25 @@ export class LoanProductsComponent implements OnInit, AfterViewInit {
     };
 
     reader.readAsText(file);
+  }
+
+  fetchProducts(): void {
+    const productType: string = this.loanProductSelector.value === LOAN_PRODUCT_TYPE.LOAN ? '' : 'workingcapital';
+    if (productType === '') {
+      this.loanProductService.initialize(LOAN_PRODUCT_TYPE.LOAN);
+    } else {
+      this.loanProductService.initialize(LOAN_PRODUCT_TYPE.WORKING_CAPITAL);
+    }
+    this.loanProductsData = [];
+    this.dataSource.data = this.loanProductsData;
+    this.productsService.getLoanProducts(this.loanProductService.loanProductPath).subscribe({
+      next: (data: any) => {
+        this.loanProductsData = data;
+        this.dataSource.data = this.loanProductsData;
+      },
+      error: () => {
+        // Error already handled by ErrorHandlerService
+      }
+    });
   }
 }

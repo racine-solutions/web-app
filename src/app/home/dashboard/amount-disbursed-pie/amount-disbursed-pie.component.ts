@@ -7,14 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
-import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { startWith } from 'rxjs/operators';
 
 /** Custom Services */
 import { HomeService } from '../../home.service';
+import { ThemingService } from 'app/shared/theme-toggle/theming.service';
 
 /** Charting Imports */
 import { Chart, registerables } from 'chart.js';
@@ -38,14 +40,20 @@ Chart.register(...registerables);
     MatCardHeader,
     FaIconComponent,
     NgStyle
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AmountDisbursedPieComponent implements OnInit {
   private homeService = inject(HomeService);
   private route = inject(ActivatedRoute);
+  private themingService = inject(ThemingService);
+  private destroyRef = inject(DestroyRef);
+
+  /** Current theme */
+  private currentTheme = 'light-theme';
 
   /** Static Form control for office Id */
-  officeId = new UntypedFormControl();
+  officeId = new FormControl();
   /** Office Data */
   officeData: any;
   /** Chart.js chart */
@@ -61,7 +69,7 @@ export class AmountDisbursedPieComponent implements OnInit {
    * @param {ActivatedRoute} route Activated Route.
    */
   constructor() {
-    this.route.data.subscribe((data: { offices: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { offices: any }) => {
       this.officeData = data.offices;
     });
   }
@@ -73,13 +81,20 @@ export class AmountDisbursedPieComponent implements OnInit {
   ngOnInit() {
     this.officeId.patchValue(1);
     this.getChartData();
+    // Subscribe to theme changes to update chart legend colors
+    this.themingService.theme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
+      this.currentTheme = theme;
+      if (this.chart) {
+        this.updateChartColors();
+      }
+    });
   }
 
   /**
    * Subscribes to value changes of office Id fetches chart data accordingly.
    */
   getChartData() {
-    this.officeId.valueChanges.pipe(startWith(1)).subscribe((value: number) => {
+    this.officeId.valueChanges.pipe(startWith(1), takeUntilDestroyed(this.destroyRef)).subscribe((value: number) => {
       this.homeService.getDisbursedAmount(value).subscribe((response: any) => {
         const data = Object.entries(response[0]).map((entry) => entry[1]);
         if (!(data[0] === 0 && data[1] === 0)) {
@@ -100,6 +115,8 @@ export class AmountDisbursedPieComponent implements OnInit {
    * @param {any} data Chart Data.
    */
   setChart(data: any) {
+    const legendColor = this.getLegendColor();
+
     if (!this.chart) {
       this.chart = new Chart('disbursement-pie', {
         type: 'doughnut',
@@ -119,6 +136,13 @@ export class AmountDisbursedPieComponent implements OnInit {
           ]
         },
         options: {
+          plugins: {
+            legend: {
+              labels: {
+                color: legendColor
+              }
+            }
+          },
           layout: {
             padding: {
               top: 10,
@@ -129,6 +153,25 @@ export class AmountDisbursedPieComponent implements OnInit {
       });
     } else {
       this.chart.data.datasets[0].data = data;
+      this.chart.update();
+    }
+  }
+
+  /**
+   * Gets the legend color based on the current theme.
+   */
+  private getLegendColor(): string {
+    return this.currentTheme === 'dark-theme' ? 'white' : '#666';
+  }
+
+  /**
+   * Updates chart colors based on the current theme.
+   */
+  updateChartColors() {
+    const legendColor = this.getLegendColor();
+
+    if (this.chart?.options?.plugins?.legend?.labels) {
+      this.chart.options.plugins.legend.labels.color = legendColor;
       this.chart.update();
     }
   }

@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { Component, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 
 /** Custom Components */
@@ -42,7 +43,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     SavingsAccountTermsStepComponent,
     SavingsAccountChargesStepComponent,
     SavingsAccountPreviewStepComponent
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateSavingsAccountComponent {
   private route = inject(ActivatedRoute);
@@ -50,6 +52,7 @@ export class CreateSavingsAccountComponent {
   private dateUtils = inject(Dates);
   private savingsService = inject(SavingsService);
   private settingsService = inject(SettingsService);
+  private destroyRef = inject(DestroyRef);
 
   /** Savings Account Template */
   savingsAccountTemplate: any;
@@ -75,7 +78,7 @@ export class CreateSavingsAccountComponent {
    * @param {SettingsService} settingsService Settings Service
    */
   constructor() {
-    this.route.data.subscribe((data: { savingsAccountTemplate: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { savingsAccountTemplate: any }) => {
       this.savingsAccountTemplate = data.savingsAccountTemplate;
     });
   }
@@ -133,8 +136,10 @@ export class CreateSavingsAccountComponent {
       charges: this.savingsAccount.charges.map((charge: any) => ({
         chargeId: charge.id,
         amount: charge.amount,
-        dueDate: charge.dueDate,
-        feeOnMonthDay: charge.feeOnMonthDay,
+        dueDate: charge.dueDate ? this.dateUtils.formatDate(charge.dueDate, dateFormat) : charge.dueDate,
+        feeOnMonthDay: charge.feeOnMonthDay
+          ? this.dateUtils.formatDate(charge.feeOnMonthDay, monthDayFormat)
+          : charge.feeOnMonthDay,
         feeInterval: charge.feeInterval
       })),
       submittedOnDate: this.dateUtils.formatDate(this.savingsAccount.submittedOnDate, dateFormat),

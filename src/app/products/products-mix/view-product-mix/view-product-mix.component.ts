@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
@@ -31,7 +31,7 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { TranslateService } from '@ngx-translate/core';
 import { ProductsService } from 'app/products/products.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgClass } from '@angular/common';
+
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -50,7 +50,6 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderCellDef,
     MatHeaderCell,
     MatSortHeader,
-    NgClass,
     MatCellDef,
     MatCell,
     MatHeaderRowDef,
@@ -58,7 +57,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewProductMixComponent implements OnInit {
   private route = inject(ActivatedRoute);

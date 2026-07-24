@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Currency } from 'app/shared/models/general.model';
+import { CodeValue, Currency } from 'app/shared/models/general.model';
 
 export interface DelinquencyRange {
   id: number;
@@ -48,6 +48,7 @@ export interface LoanDelinquencyAction {
   action: string;
   startDate: number[];
   endDate: number[];
+  effectiveEndDate?: number[];
   createdById: number;
   createdOn: Date;
   updatedById: number;
@@ -171,4 +172,27 @@ export interface RepaymentScheduleEditCache {
 export interface ScheduleChangeRecord {
   dueDate: string;
   installmentAmount: number;
+}
+
+export interface LoanOriginator {
+  id: number;
+  externalId: string;
+  name: string;
+  status: string;
+  originatorType?: CodeValue;
+  channelType?: CodeValue;
+}
+
+export interface DelinquencyRangeSchedule {
+  id: number;
+  loanId: number;
+  periodNumber: number;
+  fromDate: string;
+  toDate: string;
+  expectedAmount: number;
+  paidAmount: number;
+  outstandingAmount: number;
+  minPaymentCriteriaMet?: boolean;
+  delinquentDays?: number;
+  delinquentAmount?: number;
 }

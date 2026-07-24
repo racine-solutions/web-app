@@ -7,8 +7,9 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 /** rxjs Imports */
 import { finalize } from 'rxjs/operators';
@@ -38,11 +39,14 @@ import { environment } from '../../../environments/environment';
     M3ButtonComponent,
     MatProgressBar,
     MatProgressSpinner
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginFormComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private authenticationService = inject(AuthenticationService);
+  private translateService = inject(TranslateService);
+  minPasswordLength = environment.minPasswordLength;
 
   /** Login form group. */
   loginForm: FormGroup;
@@ -98,8 +102,8 @@ export class LoginFormComponent implements OnInit {
         })
       )
       .subscribe({
-        error: () => {
-          // Error handling is managed by the authentication service
+        error: (err) => {
+          console.error('OAuth/OIDC login failed:', err);
         }
       });
   }
@@ -126,7 +130,7 @@ export class LoginFormComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(8)
+          Validators.minLength(environment.minPasswordLength)
         ]
       ],
       remember: false
@@ -143,10 +147,17 @@ export class LoginFormComponent implements OnInit {
   getErrorMessage(controlName: string): string {
     const control = this.loginForm.get(controlName);
     if (control?.hasError('required')) {
-      return 'This field is required';
-    } else if (control?.hasError('minlength')) {
-      return `Minimum length is ${control.errors?.minlength.requiredLength}`;
+      return this.translateService.instant('errors.validation.required');
     }
+    if (control?.hasError('minlength')) {
+      const requiredLength = control.errors?.['minlength']?.requiredLength;
+      return this.translateService.instant('errors.validation.minLength', { requiredLength });
+    }
+
     return '';
+  }
+
+  onEnter(event: any): void {
+    this.login();
   }
 }

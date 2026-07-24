@@ -10,6 +10,21 @@ import { DatePipe } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 import moment from 'moment';
 
+export enum Month {
+  Jan = 'Jan',
+  Feb = 'Feb',
+  Mar = 'Mar',
+  Apr = 'Apr',
+  May = 'May',
+  Jun = 'Jun',
+  Jul = 'Jul',
+  Aug = 'Aug',
+  Sep = 'Sep',
+  Oct = 'Oct',
+  Nov = 'Nov',
+  Dec = 'Dec'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,7 +44,19 @@ export class Dates {
   }
 
   public formatDateAsString(value: Date, dateFormat: string): string {
-    return moment(value).format(dateFormat);
+    const momentFormat = this.angularToMomentFormat(dateFormat);
+    return moment(value).format(momentFormat);
+  }
+
+  public angularToMomentFormat(angularFormat: string): string {
+    return angularFormat.replace(/y/g, 'Y').replace(/d/g, 'D').replace(/a/g, 'A');
+  }
+
+  public getMomentLocale(language?: { code: string }): string {
+    const langCode = language?.code;
+    if (!langCode) return 'en';
+    if (langCode.includes('-')) return langCode.split('-')[0];
+    return langCode;
   }
 
   public parseDate(value: any): Date {
@@ -40,12 +67,27 @@ export class Dates {
     }
   }
 
+  public isBefore(date1: Date, date2: Date): boolean {
+    return (
+      Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate()) <
+      Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate())
+    );
+  }
+
+  public isAfter(date1: Date, date2: Date): boolean {
+    return (
+      Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate()) >
+      Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate())
+    );
+  }
+
   public parseDatetime(value: any): Date {
     return moment(value).toDate();
   }
 
   public convertToDate(value: any, format: string): Date {
-    return moment(value).toDate();
+    const momentFormat = this.angularToMomentFormat(format);
+    return moment(value, momentFormat).toDate();
   }
 
   get language() {
@@ -61,5 +103,9 @@ export class Dates {
         Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate())) /
         (1000 * 60 * 60 * 24)
     );
+  }
+
+  get monthLabels(): Month[] {
+    return Object.values(Month);
   }
 }

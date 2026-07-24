@@ -7,16 +7,10 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import {
-  AbstractControl,
-  UntypedFormControl,
-  UntypedFormGroup,
-  ValidatorFn,
-  Validators,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 /** Custom Services */
 import { ReportsService } from '../reports.service';
@@ -27,15 +21,16 @@ import { ReportParameter } from '../common-models/report-parameter.model';
 import { SelectOption } from '../common-models/select-option.model';
 import { Dates } from 'app/core/utils/dates';
 import { GlobalConfiguration } from 'app/system/configurations/global-configurations-tab/configuration.model';
+import { sanitizeCsvValue } from 'app/core/utils/csv.utils';
 
 import * as ExcelJS from 'exceljs';
 import { AlertService } from 'app/core/alert/alert.service';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { TranslateService } from '@ngx-translate/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TableAndSmsComponent } from './table-and-sms/table-and-sms.component';
 import { ChartComponent } from './chart/chart.component';
 import { PentahoComponent } from './pentaho/pentaho.component';
+import { BirtComponent } from './birt/birt.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /**
@@ -45,15 +40,14 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   selector: 'mifosx-run-report',
   templateUrl: './run-report.component.html',
   styleUrls: ['./run-report.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    NgSwitch,
-    NgSwitchCase,
-    MatCheckbox,
     FaIconComponent,
     TableAndSmsComponent,
     ChartComponent,
-    PentahoComponent
+    PentahoComponent,
+    BirtComponent
   ]
 })
 export class RunReportComponent implements OnInit {
@@ -61,7 +55,10 @@ export class RunReportComponent implements OnInit {
   private reportsService = inject(ReportsService);
   private settingsService = inject(SettingsService);
   private alertService = inject(AlertService);
+  private translateService = inject(TranslateService);
   private dateUtils = inject(Dates);
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   /** Minimum date allowed. */
   minDate = new Date(2000, 0, 1);
@@ -80,9 +77,9 @@ export class RunReportComponent implements OnInit {
   dataObject: any;
 
   /** Initializes new form group eportForm */
-  reportForm = new UntypedFormGroup({});
+  reportForm = new FormGroup({});
   /** Static Form control for decimal places in output */
-  decimalChoice = new UntypedFormControl();
+  decimalChoice = new FormControl();
 
   /** Toggles Report form */
   isCollapsed = false;
@@ -92,6 +89,8 @@ export class RunReportComponent implements OnInit {
   hideChart = true;
   /** Toggles Pentaho output */
   hidePentaho = true;
+  /** Toggles BIRT output */
+  hideBirt = true;
   /** Report uses dates */
   reportUsesDates = false;
   exportToS3Allowed = false;
@@ -100,6 +99,17 @@ export class RunReportComponent implements OnInit {
   outputTypeOptions: any[] = [];
 
   isProcessing = false;
+
+  /** Options for the decimal-precision segmented control. */
+  readonly decimalOptions: string[] = [
+    '0',
+    '1',
+    '2',
+    '3',
+    '4'
+  ];
+
+  private dateRangeValidatorApplied = false;
 
   /**
    * Fetches report specifications from route params and retrieves report parameters data from `resolve`.
@@ -110,32 +120,37 @@ export class RunReportComponent implements OnInit {
    */
   constructor() {
     this.report.name = this.route.snapshot.params['name'];
-    this.route.queryParams.subscribe((queryParams: { type: any; id: any }) => {
-      this.report.type = queryParams.type;
-      this.report.id = queryParams.id;
-    });
-    this.route.data.subscribe((data: { reportParameters: ReportParameter[]; configurations: any }) => {
-      this.paramData = data.reportParameters;
-      if (this.isTableReport()) {
-        const amazonS3Config = data.configurations.globalConfiguration.find(
-          (config: GlobalConfiguration) => config.name === 'amazon-s3'
-        );
-        const reportExportS3Config = data.configurations.globalConfiguration.find(
-          (config: GlobalConfiguration) => config.name === 'report-export-s3-folder-name'
-        );
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((queryParams: { type: any; id: any }) => {
+        this.report.type = queryParams.type;
+        this.report.id = queryParams.id;
+      });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: { reportParameters: ReportParameter[]; configurations: any }) => {
+        this.paramData = data.reportParameters;
+        this.createRunReportForm();
+        if (this.isTableReport()) {
+          const amazonS3Config = data.configurations.globalConfiguration.find(
+            (config: GlobalConfiguration) => config.name === 'amazon-s3'
+          );
+          const reportExportS3Config = data.configurations.globalConfiguration.find(
+            (config: GlobalConfiguration) => config.name === 'report-export-s3-folder-name'
+          );
 
-        if (
-          amazonS3Config &&
-          amazonS3Config.enabled &&
-          reportExportS3Config &&
-          reportExportS3Config.enabled &&
-          reportExportS3Config.stringValue
-        ) {
-          this.exportToS3Allowed = true;
-          this.exportToS3Repository = reportExportS3Config.stringValue;
+          if (
+            amazonS3Config &&
+            amazonS3Config.enabled &&
+            reportExportS3Config &&
+            reportExportS3Config.enabled &&
+            reportExportS3Config.stringValue
+          ) {
+            this.exportToS3Allowed = true;
+            this.exportToS3Repository = reportExportS3Config.stringValue;
+          }
         }
-      }
-    });
+      });
   }
 
   isTableReport(): boolean {
@@ -146,12 +161,15 @@ export class RunReportComponent implements OnInit {
     return this.report.type === 'Pentaho';
   }
 
+  isBirtReport(): boolean {
+    return this.report.type === 'BIRT';
+  }
+
   /**
    * Creates and sets the run report form.
    */
   ngOnInit() {
     this.maxDate = this.settingsService.maxAllowedDate;
-    this.createRunReportForm();
   }
 
   /**
@@ -162,7 +180,7 @@ export class RunReportComponent implements OnInit {
     this.paramData.forEach((param: ReportParameter) => {
       if (!param.parentParameterName) {
         // Non Child Parameter
-        this.reportForm.addControl(param.name, new UntypedFormControl('', Validators.required));
+        this.reportForm.addControl(param.name, new FormControl('', Validators.required));
         if (param.displayType === 'select') {
           this.fetchSelectOptions(param, param.name);
         }
@@ -176,22 +194,52 @@ export class RunReportComponent implements OnInit {
       }
     });
     if (this.isPentahoReport()) {
-      this.reportForm.addControl('outputType', new UntypedFormControl('', Validators.required));
-      this.outputTypeOptions = [
-        { name: 'PDF format', value: 'PDF' },
-        { name: 'Normal format', value: 'HTML' },
-        { name: 'Excel format', value: 'XLS' },
-        { name: 'Excel 2007 format', value: 'XLSX' },
-        { name: 'CSV format', value: 'CSV' }
-      ];
+      this.reportForm.addControl('outputType', new FormControl('', Validators.required));
+      this.outputTypeOptions = this.buildOutputTypeOptions();
       this.mapPentahoParams();
     }
-    if (this.exportToS3Allowed) {
-      this.reportForm.addControl('exportOutputToS3', new UntypedFormControl(false));
+    if (this.isBirtReport()) {
+      this.reportForm.addControl('outputType', new FormControl('', Validators.required));
+      this.outputTypeOptions = this.buildOutputTypeOptions();
+      this.mapBirtParams();
     }
-    this.decimalChoice.patchValue('0');
+    if (this.exportToS3Allowed) {
+      this.reportForm.addControl('exportOutputToS3', new FormControl(false));
+    }
+    this.decimalChoice.patchValue('2');
     this.setChildControls();
     this.addDateRangeValidator();
+  }
+
+  private buildOutputTypeOptions() {
+    return [
+      { name: 'PDF format', value: 'PDF', i18nKey: 'labels.inputs.PDF format' },
+      { name: 'Normal format', value: 'HTML', i18nKey: 'labels.inputs.Normal format' },
+      { name: 'Excel format', value: 'XLS', i18nKey: 'labels.inputs.Excel format' },
+      { name: 'Excel 2007 format', value: 'XLSX', i18nKey: 'labels.inputs.Excel 2007 format' },
+      { name: 'CSV format', value: 'CSV', i18nKey: 'labels.inputs.CSV format' }
+    ];
+  }
+
+  setDecimal(value: string): void {
+    this.decimalChoice.setValue(value);
+  }
+
+  setOutputType(value: string): void {
+    const control = this.reportForm.get('outputType');
+    if (!control) {
+      return;
+    }
+    control.setValue(value as never);
+    control.markAsTouched();
+  }
+
+  toggleS3(): void {
+    const control = this.reportForm.get('exportOutputToS3');
+    if (!control) {
+      return;
+    }
+    control.setValue(!control.value as never);
   }
 
   /**
@@ -217,12 +265,36 @@ export class RunReportComponent implements OnInit {
     this.reportsService.getPentahoParams(this.report.id).subscribe((data: any) => {
       data.forEach((entry: any) => {
         const param: ReportParameter = this.paramData.find((_entry: any) => _entry.name === entry.parameterName);
-        param.pentahoName = `R_${entry.reportParameterName}`;
+        if (param && entry.reportParameterName) {
+          param.pentahoName = `R_${entry.reportParameterName}`;
+        } else if (!param) {
+          console.warn('Pentaho parameter not found in paramData:', entry.parameterName);
+        }
+      });
+    });
+  }
+
+  /**
+   * Maps BIRT specific names to form-control names.
+   */
+  mapBirtParams() {
+    this.reportsService.getBirtParams(this.report.id).subscribe((data: any) => {
+      data.forEach((entry: any) => {
+        const param: ReportParameter = this.paramData.find((_entry: any) => _entry.name === entry.parameterName);
+        if (param && entry.reportParameterName) {
+          param.pentahoName = `R_${entry.reportParameterName}`;
+        } else if (!param) {
+          console.warn('BIRT parameter not found in paramData:', entry.parameterName);
+        }
       });
     });
   }
 
   addDateRangeValidator(): void {
+    if (this.dateRangeValidatorApplied) {
+      return;
+    }
+
     const dateParams = this.paramData.filter((param: ReportParameter) => param.displayType === 'date');
     const startParam = dateParams.find((param: ReportParameter) => this.isStartDateParam(param));
     const endParam = dateParams.find((param: ReportParameter) => this.isEndDateParam(param));
@@ -240,7 +312,11 @@ export class RunReportComponent implements OnInit {
 
     endControl.addValidators(this.endDateAfterStartValidator(startParam.name));
     endControl.updateValueAndValidity({ emitEvent: false });
-    startControl.valueChanges.subscribe(() => endControl.updateValueAndValidity({ emitEvent: false }));
+    startControl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => endControl.updateValueAndValidity({ emitEvent: false }));
+
+    this.dateRangeValidatorApplied = true;
   }
 
   endDateAfterStartValidator(startControlName: string): ValidatorFn {
@@ -283,18 +359,30 @@ export class RunReportComponent implements OnInit {
    */
   setChildControls() {
     this.parentParameters.forEach((param: ReportParameter) => {
-      this.reportForm.get(param.name).valueChanges.subscribe((option: any) => {
+      const parentControl = this.reportForm.get(param.name);
+      if (!parentControl) {
+        return;
+      }
+      parentControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((option: any) => {
         param.childParameters.forEach((child: ReportParameter) => {
-          if (child.displayType === 'none') {
-            this.reportForm.addControl(child.name, new UntypedFormControl(child.defaultVal));
+          const newControl =
+            child.displayType === 'none' ? new FormControl(child.defaultVal) : new FormControl('', Validators.required);
+
+          if (this.reportForm.contains(child.name)) {
+            this.reportForm.setControl(child.name, newControl);
           } else {
-            this.reportForm.addControl(child.name, new UntypedFormControl('', Validators.required));
+            this.reportForm.addControl(child.name, newControl);
           }
+
           if (child.displayType === 'select') {
-            const inputstring = `${child.name}?${param.inputName}=${option.id}`;
+            child.selectOptions = [];
+            const parentId = option?.id ?? option;
+            const inputstring = `${child.name}?${param.inputName}=${parentId}`;
             this.fetchSelectOptions(child, inputstring);
           }
         });
+        this.addDateRangeValidator();
+        this.cdr.markForCheck();
       });
     });
   }
@@ -310,6 +398,7 @@ export class RunReportComponent implements OnInit {
       if (param.selectAll === 'Y') {
         param.selectOptions.push({ id: '-1', name: 'All' });
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -334,7 +423,12 @@ export class RunReportComponent implements OnInit {
       }
 
       const param: ReportParameter = this.paramData.find((_entry: any) => _entry.name === key);
-      newKey = this.isPentahoReport() ? param.pentahoName : param.inputName;
+      if (!param) {
+        console.warn('Parameter not found in paramData:', key);
+        continue;
+      }
+      newKey =
+        (this.isPentahoReport() || this.isBirtReport()) && param.pentahoName ? param.pentahoName : param.inputName;
       switch (param.displayType) {
         case 'text':
           formattedResponse[newKey] = value;
@@ -380,6 +474,8 @@ export class RunReportComponent implements OnInit {
     }
     if (this.reportToBeExportedInRepository) {
       formData['exportS3'] = true;
+    } else {
+      formData['exportS3'] = false;
     }
     this.dataObject = {
       formData: formData,
@@ -397,6 +493,9 @@ export class RunReportComponent implements OnInit {
       case 'Pentaho':
         this.hidePentaho = false;
         break;
+      case 'BIRT':
+        this.hideBirt = false;
+        break;
     }
   }
 
@@ -413,7 +512,10 @@ export class RunReportComponent implements OnInit {
     };
     this.reportsService.getRunReportData(reportName, payload).subscribe((res: any) => {
       if (res.data.length > 0) {
-        this.alertService.alert({ type: 'Report generation', message: `Report: ${reportName} data generated` });
+        this.alertService.alert({
+          type: this.translateService.instant('errors.report.type'),
+          message: this.translateService.instant('errors.report.generated', { reportName })
+        });
 
         const displayedColumns: string[] = [];
         res.columnHeaders.forEach((header: any) => {
@@ -422,7 +524,10 @@ export class RunReportComponent implements OnInit {
 
         this.exportToXLS(reportName, res.data, displayedColumns);
       } else {
-        this.alertService.alert({ type: 'Report generation', message: `Report: ${reportName} without data generated` });
+        this.alertService.alert({
+          type: this.translateService.instant('errors.report.type'),
+          message: this.translateService.instant('errors.report.generatedNoData', { reportName })
+        });
       }
       this.isProcessing = false;
     });
@@ -431,11 +536,11 @@ export class RunReportComponent implements OnInit {
   async exportToXLS(reportName: string, csvData: any, displayedColumns: string[]): Promise<void> {
     const fileName = `${reportName}.xlsx`;
 
-    // Format data for ExcelJS
+    // Format data for ExcelJS - sanitize all values to prevent formula injection
     const data = csvData.map((object: any) => {
       const row: Record<string, any> = {};
       for (let i = 0; i < displayedColumns.length; i++) {
-        row[displayedColumns[i]] = object.row[i];
+        row[displayedColumns[i]] = sanitizeCsvValue(object.row[i]);
       }
       return row;
     });
@@ -445,7 +550,7 @@ export class RunReportComponent implements OnInit {
     const worksheet = workbook.addWorksheet('report');
 
     // Add header
-    worksheet.addRow(displayedColumns);
+    worksheet.addRow(displayedColumns.map(sanitizeCsvValue));
 
     // Add data rows
     data.forEach((rowObj: any) => {

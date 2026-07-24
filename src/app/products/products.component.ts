@@ -7,8 +7,16 @@
  */
 
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  TemplateRef,
+  ViewChild,
+  inject
+} from '@angular/core';
+import { Router } from '@angular/router';
 
 /** Custom Services */
 import { ConfigurationWizardService } from '../configuration-wizard/configuration-wizard.service';
@@ -33,7 +41,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatIcon,
     FaIconComponent,
     MatLine
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductsComponent implements AfterViewInit {
   private router = inject(Router);
@@ -64,39 +73,39 @@ export class ProductsComponent implements AfterViewInit {
   @ViewChild('recurringDepositProducts') recurringDepositProducts: ElementRef<any>;
   /* Template for popover on recurring deposit products */
   @ViewChild('templateRecurringDepositProducts') templateRecurringDepositProducts: TemplateRef<any>;
-  // Initialize an array of 11 boolean values, all set to false
-  arrowBooleans: boolean[] = new Array(11).fill(false);
+  // Initialize an array of 13 boolean values, all set to false
+  arrowBooleans: boolean[] = new Array(13).fill(false);
 
   /**
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showCharges === true) {
+    if (this.configurationWizardService.showCharges) {
       setTimeout(() => {
         this.showPopover(this.templateCharges, this.charges.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showLoanProducts === true) {
+    if (this.configurationWizardService.showLoanProducts) {
       setTimeout(() => {
         this.showPopover(this.templateLoanProducts, this.loanProducts.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSavingsProducts === true) {
+    if (this.configurationWizardService.showSavingsProducts) {
       setTimeout(() => {
         this.showPopover(this.templateSavingsProducts, this.savingsProducts.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showShareProducts === true) {
+    if (this.configurationWizardService.showShareProducts) {
       setTimeout(() => {
         this.showPopover(this.templateShareProducts, this.shareProducts.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showFixedDepositProducts === true) {
+    if (this.configurationWizardService.showFixedDepositProducts) {
       setTimeout(() => {
         this.showPopover(this.templateFixedDepositProducts, this.fixedDepositProducts.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showRecurringDepositProducts === true) {
+    if (this.configurationWizardService.showRecurringDepositProducts) {
       setTimeout(() => {
         this.showPopover(
           this.templateRecurringDepositProducts,

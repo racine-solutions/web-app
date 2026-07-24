@@ -13,7 +13,9 @@
 @use 'theme/pink-bluegrey' as *;
 @use 'theme/deeppurple-amber' as *;
 @use 'theme/purple-green.scss' as *;
+@use 'assets/styles/design-tokens';
 @use 'assets/styles/helper';
+@use 'assets/styles/loader';
 @use 'lightgallery/scss/lightgallery' as *;
 @use 'lightgallery/scss/lg-thumbnail' as *;
 @use 'lightgallery/scss/lg-zoom' as *;
@@ -607,6 +609,8 @@
 }
 
 .mat-mdc-form-field {
+  margin-bottom: 16px;
+
   .mat-mdc-input-element::placeholder {
     font-size: 14px !important;
     color: #999 !important;
@@ -614,6 +618,16 @@
 
   .mdc-floating-label {
     font-size: 14px !important;
+  }
+}
+
+mat-stepper {
+  ::ng-deep .mat-vertical-content {
+    padding: 16px;
+  }
+
+  ::ng-deep .mat-vertical-stepper-content {
+    padding-top: 16px;
   }
 }
 
@@ -638,7 +652,6 @@
 .menu-explanation {
   font-size: 14px;
   margin: 0;
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
@@ -695,6 +708,21 @@ mifosx-notifications-page td {
 
 .red {
   color: red;
+}
+
+// ===== Global Delete/Trash Icon Styling =====
+// Makes standalone delete icons red, but keeps them white inside warn (red) buttons
+.fa-trash {
+  color: #f44336 !important;
+}
+
+.mat-mdc-raised-button.mat-warn .fa-trash {
+  color: inherit !important;
+}
+
+// Keep tighter icon spacing only inside Material buttons
+.mat-mdc-button-base .m-r-10 {
+  margin-right: 4px;
 }
 
 .full-width-flex {
@@ -799,5 +827,78 @@ mat-card {
     background-color: #303135 !important;
     border-color: #444 !important;
     color: rgb(255 255 255 / 60%) !important;
+  }
+}
+
+.app-sidenav {
+  .mat-mdc-nav-list .mat-mdc-list-item {
+    .mdc-list-item__primary-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    [matlisticon] {
+      flex-shrink: 0;
+      width: 24px;
+      min-width: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      fa-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .fa {
+        display: inline-block;
+        width: 1em;
+        text-align: center;
+      }
+    }
+  }
+}
+
+/* Print styles — hide app shell, show only receipt content */
+@media print {
+  mat-sidenav,
+  mifosx-toolbar,
+  mifosx-breadcrumb,
+  mifosx-footer,
+  .sidebar-panel,
+  .mat-mdc-tab-header,
+  .mat-stepper-vertical-line,
+  .mat-step-header {
+    display: none !important;
+  }
+
+  mat-sidenav-content.sidenav {
+    margin-left: 0 !important;
+  }
+
+  body,
+  html {
+    background: #fff !important;
+  }
+
+  @page {
+    /* stylelint-disable-next-line unit-allowed-list */
+    margin: 1.5cm;
+  }
+}
+
+// Breach select panel
+.breach-select-panel {
+  min-width: min(480px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px);
+
+  .mat-mdc-option {
+    .mdc-list-item__primary-text {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+    }
   }
 }

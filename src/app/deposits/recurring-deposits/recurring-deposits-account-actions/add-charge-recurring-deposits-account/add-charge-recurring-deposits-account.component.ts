@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import {
   UntypedFormGroup,
   UntypedFormBuilder,
@@ -33,7 +33,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   styleUrls: ['./add-charge-recurring-deposits-account.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddChargeRecurringDepositsAccountComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -146,7 +147,7 @@ export class AddChargeRecurringDepositsAccountComponent implements OnInit {
       savingsCharge.feeInterval = this.chargeDetails.feeInterval;
     }
     if (this.chargeDetails.dueDateNotRequired !== true) {
-      if (this.chargeDetails.chargeTimeTypeAnnualOrMonth === true) {
+      if (this.chargeDetails.chargeTimeTypeAnnualOrMonth) {
         const monthDayFormat = 'MMMM-dd'; // TODO: Update once language and date settings are setup
         savingsCharge.monthDayFormat = monthDayFormat;
         if (savingsCharge.feeOnMonthDay) {

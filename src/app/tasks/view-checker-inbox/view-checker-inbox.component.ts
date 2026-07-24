@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,7 +35,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatDivider,
     KeyValuePipe,
     DateFormatPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewCheckerInboxComponent {
   private route = inject(ActivatedRoute);
@@ -42,6 +44,7 @@ export class ViewCheckerInboxComponent {
   private router = inject(Router);
   private translateService = inject(TranslateService);
   private tasksService = inject(TasksService);
+  private destroyRef = inject(DestroyRef);
 
   /** Checker Inbox Details Data */
   checkerInboxDetail: any;
@@ -58,7 +61,7 @@ export class ViewCheckerInboxComponent {
    * @param {TasksService} tasksService Tasks Service.
    */
   constructor() {
-    this.route.data.subscribe((data: { checkerInboxDetail: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { checkerInboxDetail: any }) => {
       this.checkerInboxDetail = data.checkerInboxDetail;
       this.jsondata = JSON.parse(this.checkerInboxDetail.commandAsJson);
       this.displayJSONData = !_.isEmpty(this.jsondata);

@@ -23,6 +23,7 @@ import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DateFormatPipe } from '@pipes/date-format.pipe';
+import { DatatableDisplayLabelPipe } from '@pipes/datatable-display-label.pipe';
 import { DocumentationLinkPipe } from '@pipes/documentation-link.pipe';
 import { TranslatePipe as NgxTranslatePipe } from '@ngx-translate/core';
 import { TranslatePipe } from '@pipes/translate.pipe';
@@ -53,6 +54,7 @@ export const STANDALONE_SHARED_IMPORTS = [
   MatCheckbox,
   MatTabsModule,
   DateFormatPipe,
+  DatatableDisplayLabelPipe,
   DocumentationLinkPipe,
   HasPermissionDirective,
 

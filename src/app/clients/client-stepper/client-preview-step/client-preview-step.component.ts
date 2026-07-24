@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Output, EventEmitter, Input } from '@angular/core';
 import { MatDivider } from '@angular/material/divider';
 import { ExternalIdentifierComponent } from '../../../shared/external-identifier/external-identifier.component';
 import {
@@ -23,6 +23,7 @@ import { FindPipe } from '../../../pipes/find.pipe';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { YesnoPipe } from '../../../pipes/yesno.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LegalFormId } from 'app/clients/models/legal-form.enum';
 
 /**
  * Client Preview Step Component
@@ -45,7 +46,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     FindPipe,
     DateFormatPipe,
     YesnoPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientPreviewStepComponent {
   /** Client Address field configuration */
@@ -58,6 +60,9 @@ export class ClientPreviewStepComponent {
   /** Form submission event */
   @Output() submitEvent = new EventEmitter();
 
+  /** Expose enum to template */
+  readonly LegalFormId = LegalFormId;
+
   constructor() {}
 
   /**
@@ -67,7 +72,7 @@ export class ClientPreviewStepComponent {
    * @param {any} fieldId Field Id
    */
   getSelectedValue(fieldName: any, fieldId: any) {
-    return this.clientTemplate.address[0][fieldName].find((fieldObj: any) => fieldObj.id === fieldId);
+    return this.clientTemplate?.address?.[0]?.[fieldName]?.find((fieldObj: any) => fieldObj.id === fieldId);
   }
 
   /**

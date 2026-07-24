@@ -17,6 +17,9 @@ import env from './.env';
 // The `window.env` object is loaded in the `index.html` file
 const loadedEnv = window.env || {};
 
+const parsedMinLength = Number(loadedEnv.minPasswordLength);
+const resolvedMinPasswordLength = Number.isInteger(parsedMinLength) && parsedMinLength > 0 ? parsedMinLength : 8;
+
 export const environment = {
   production: false,
   version: env.mifos_x.version,
@@ -26,8 +29,7 @@ export const environment = {
   fineractPlatformTenantIds: loadedEnv.fineractPlatformTenantIds || 'default',
   // For connecting to others servers running elsewhere update the base API URL
   baseApiUrls:
-    loadedEnv.fineractApiUrls ||
-    'https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443,' + window.location.origin,
+    loadedEnv.fineractApiUrls || 'https://demo.mifos.community,https://localhost:8443,' + window.location.origin,
   // For connecting to server running elsewhere set the base API URL
   baseApiUrl:
     loadedEnv.fineractApiUrl ||
@@ -58,13 +60,18 @@ export const environment = {
   defaultLanguage: loadedEnv.defaultLanguage || 'en-US',
   supportedLanguages:
     loadedEnv.supportedLanguages || 'cs-CS,de-DE,en-US,es-MX,fr-FR,it-IT,ko-KO,lt-LT,lv-LV,ne-NE,pt-PT,sw-SW',
+  defaultFormatDate: loadedEnv.defaultFormatDate || '',
+  defaultFormatDatetime: loadedEnv.defaultFormatDatetime || '',
   preloadClients: loadedEnv['preloadClients'] || true,
 
   defaultCharDelimiter: loadedEnv.defaultCharDelimiter || ',',
 
   displayBackEndInfo: loadedEnv.displayBackEndInfo || 'true',
   displayTenantSelector: loadedEnv.displayTenantSelector || 'true',
-  tenantLogoUrl: loadedEnv.tenantLogoUrl || 'assets/images/mifos_lg-logo.jpg',
+  /** Production mode - when true, shows minimal hero with only branding at bottom */
+  productionMode: loadedEnv.productionMode === 'true' || loadedEnv.productionMode === true || false,
+  tenantLogoUrl: loadedEnv.tenantLogoUrl || 'assets/images/default_home.png',
+  tenantLogoUrlDark: loadedEnv.tenantLogoUrlDark || 'assets/images/white-mifos.png',
   documentationBaseUrl: loadedEnv.documentationBaseUrl || 'https://mifosforge.jira.com/wiki',
   // Time in seconds, default 60 seconds
   waitTimeForNotifications: loadedEnv.waitTimeForNotifications || 60,
@@ -77,12 +84,53 @@ export const environment = {
   },
   httpCacheEnabled: loadedEnv.httpCacheEnabled || false,
 
-  vNextApiUrl: window.env?.vNextApiUrl || 'https://apis.flexcore.mx',
-  vNextApiProvider: window.env?.vNextApiProvider || '/vnext1',
-  vNextApiVersion: window.env?.vNextApiVersion || '/v1.0',
-  interbankTransfers: window.env?.interbankTransfers || false,
+  mifosInterbankTransfersApiUrl: window.env?.mifosInterbankTransfersApiUrl || 'https://apis.mifos.community',
+  mifosInterbankTransfersApiProvider: window.env?.mifosInterbankTransfersApiProvider || '/vnext1',
+  mifosInterbankTransfersApiVersion: window.env?.mifosInterbankTransfersApiVersion || '/v1.0',
+  mifosInterbankTransfersEnabled:
+    window.env?.mifosInterbankTransfersEnabled !== 'false' && window.env?.mifosInterbankTransfersEnabled !== false,
 
-  minPasswordLength: loadedEnv.minPasswordLength || 12,
+  /**
+   * Mifos Copilot AI assistant: deployment master switch (level 1 feature flag).
+   * Off by default; set MIFOS_ENABLE_COPILOT=true to load the panel for a deployment.
+   * When off, the panel never renders and its lazy chunk is never downloaded.
+   */
+  enableCopilot: loadedEnv.enableCopilot === 'true' || loadedEnv.enableCopilot === true || false,
+  /** Base URL of the Mifos MCP server the Copilot talks to. */
+  copilotMcpBaseUrl: loadedEnv.copilotMcpBaseUrl || 'https://ai.mifos.community',
+
+  /** Remittance Module Integration */
+  mifosRemittanceApiUrl: window.env?.mifosRemittanceApiClientUrl || '',
+  mifosRemittanceApiProvider: window.env?.mifosRemittanceApiProvider || '',
+  mifosRemittanceApiVersion: window.env?.mifosRemittanceApiVersion || '',
+  mifosRemittanceEnabled:
+    loadedEnv['mifosRemittanceEnabled'] !== 'false' && loadedEnv['mifosRemittanceEnabled'] !== false,
+  mifosRemittanceApiHeader: window.env?.mifosRemittanceApiClientHeader || '',
+  mifosRemittanceApiKey: window.env?.mifosRemittanceApiClientKey || '',
+
+  /**
+   * External National ID System Integration
+   * When enabled, client creation/editing will lookup external National ID
+   * and auto-fill client details (name, DOB, gender) from the external system.
+   */
+  enableExternalNationalIdSystem:
+    loadedEnv.enableExternalNationalIdSystem === 'true' || loadedEnv.enableExternalNationalIdSystem === true || false,
+  externalNationalIdSystemUrl: loadedEnv.externalNationalIdSystemUrl || '',
+  externalNationalIdSystemApiHeader: loadedEnv.externalNationalIdSystemApiHeader || '',
+  externalNationalIdSystemApiKey: loadedEnv.externalNationalIdSystemApiKey || '',
+  externalNationalIdRegex: loadedEnv.externalNationalIdRegex || '',
+
+  /**
+   * Postal Code Lookup — auto-fill city/state/country from postal code.
+   * Uses external Zippopotam.us API. Disable for deployments with strict privacy requirements.
+   */
+  enablePostalCodeLookup:
+    loadedEnv.enablePostalCodeLookup === 'true' || loadedEnv.enablePostalCodeLookup === true || false,
+
+  minPasswordLength: resolvedMinPasswordLength,
+  passwordRegex:
+    loadedEnv.passwordRegex ||
+    `^(?!.*(.)\\1)(?!.*\\s)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{${resolvedMinPasswordLength},50}$`,
 
   /**
    * Hide client data information (mask client names with *)
@@ -91,6 +139,19 @@ export const environment = {
   complianceHideClientData:
     loadedEnv.complianceHideClientData === 'true' || loadedEnv.complianceHideClientData === true || false,
 
+  /**
+   * Enable Role-Based Access Control (RBAC) for menus and buttons
+   * When enabled, menus/buttons visibility is controlled by user permissions
+   * When disabled (default), shows all menus/buttons for backward compatibility
+   * Set via MIFOS_PRODUCTION_MODE_ENABLE_RBAC env var
+   */
+  productionModeEnableRBAC:
+    loadedEnv.productionModeEnableRBAC === 'true' || loadedEnv.productionModeEnableRBAC === true || false,
+
+  /** CB-ILD Credit Bureau plugin base URL — must be HTTPS in production */
+  /** CB-ILD feature flag — set cbIldEnabled=true in env to show CB-ILD tabs */
+  cbIldEnabled: loadedEnv.cbIldEnabled === 'true' || loadedEnv.cbIldEnabled === true || false,
+  pluginBaseUrl: loadedEnv.pluginBaseUrl || 'http://localhost:8084',
   OIDC: {
     // Support legacy FINERACT_PLUGIN_OIDC_* variable names for backward compatibility
     oidcServerEnabled:

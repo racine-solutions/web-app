@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import {
   UntypedFormGroup,
   UntypedFormBuilder,
@@ -43,7 +52,8 @@ import { ZITADEL_LANGUAGES } from 'app/zitadel/constants/languages';
   standalone: true,
   imports: [
     ...STANDALONE_SHARED_IMPORTS
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateUserComponent implements OnInit, AfterViewInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -265,7 +275,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
             if (selectedRoleIds?.length > 0) {
               this.usersService.assignRolesToUser(userId, selectedRoleIds).subscribe(
                 () => {
-                  if (this.configurationWizardService.showUsersForm === true) {
+                  if (this.configurationWizardService.showUsersForm) {
                     this.configurationWizardService.showUsersForm = false;
                     this.openDialog();
                   } else {
@@ -310,7 +320,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showUsersForm === true) {
+    if (this.configurationWizardService.showUsersForm) {
       setTimeout(() => {
         this.showPopover(this.templateUserFormRef, this.userFormRef.nativeElement, 'top', true);
       });

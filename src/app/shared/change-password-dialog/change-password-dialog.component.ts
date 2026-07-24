@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -46,7 +46,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     InputPasswordComponent,
     MatDialogActions,
     MatDialogClose
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangePasswordDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ChangePasswordDialogComponent>>(MatDialogRef);
@@ -54,7 +55,7 @@ export class ChangePasswordDialogComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
   private passwordsUtility = inject(PasswordsUtility);
 
-  minPasswordLength: number = environment.minPasswordLength | 12;
+  minPasswordLength: number = environment.minPasswordLength || 12;
 
   /** Change Password Form */
   changePasswordForm: any;

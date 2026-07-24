@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -75,7 +84,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateDataTableComponent implements OnInit, AfterViewInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -296,7 +306,7 @@ export class CreateDataTableComponent implements OnInit, AfterViewInit {
       delete payload.entitySubType;
     }
     this.systemService.createDataTable(payload).subscribe((response: any) => {
-      if (this.configurationWizardService.showDatatablesForm === true) {
+      if (this.configurationWizardService.showDatatablesForm) {
         this.configurationWizardService.showDatatablesForm = false;
         this.openDialog();
       } else {
@@ -331,7 +341,7 @@ export class CreateDataTableComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showDatatablesForm === true) {
+    if (this.configurationWizardService.showDatatablesForm) {
       setTimeout(() => {
         this.showPopover(this.templateDataTableFormRef, this.dataTableFormRef.nativeElement, 'bottom', true);
       });

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Input, inject } from '@angular/core';
 import {
   UntypedFormGroup,
   UntypedFormBuilder,
@@ -33,7 +33,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatStepperPrevious,
     FaIconComponent,
     MatStepperNext
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SavingProductSettingsStepComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
@@ -94,9 +95,15 @@ export class SavingProductSettingsStepComponent implements OnInit {
       ],
       enableLockinPeriod: [false],
       withdrawalFeeForTransfers: [false],
-      minBalanceForInterestCalculation: [''],
+      minBalanceForInterestCalculation: [
+        '',
+        [Validators.min(0)]
+      ],
       enforceMinRequiredBalance: [false],
-      minRequiredBalance: [''],
+      minRequiredBalance: [
+        '',
+        [Validators.min(0)]
+      ],
       allowOverdraft: [false],
       withHoldTax: [false],
       isDormancyTrackingActive: [false]
@@ -126,9 +133,15 @@ export class SavingProductSettingsStepComponent implements OnInit {
 
     this.savingProductSettingsForm.get('allowOverdraft').valueChanges.subscribe((allowOverdraft: any) => {
       if (allowOverdraft) {
-        this.savingProductSettingsForm.addControl('minOverdraftForInterestCalculation', new UntypedFormControl(''));
-        this.savingProductSettingsForm.addControl('nominalAnnualInterestRateOverdraft', new UntypedFormControl(''));
-        this.savingProductSettingsForm.addControl('overdraftLimit', new UntypedFormControl(''));
+        this.savingProductSettingsForm.addControl(
+          'minOverdraftForInterestCalculation',
+          new UntypedFormControl('', [Validators.min(0)])
+        );
+        this.savingProductSettingsForm.addControl(
+          'nominalAnnualInterestRateOverdraft',
+          new UntypedFormControl('', [Validators.min(0)])
+        );
+        this.savingProductSettingsForm.addControl('overdraftLimit', new UntypedFormControl('', [Validators.min(0)]));
       } else {
         this.savingProductSettingsForm.removeControl('minOverdraftForInterestCalculation');
         this.savingProductSettingsForm.removeControl('nominalAnnualInterestRateOverdraft');
@@ -148,9 +161,27 @@ export class SavingProductSettingsStepComponent implements OnInit {
       .get('isDormancyTrackingActive')
       .valueChanges.subscribe((isDormancyTrackingActive: any) => {
         if (isDormancyTrackingActive) {
-          this.savingProductSettingsForm.addControl('daysToInactive', new UntypedFormControl('', Validators.required));
-          this.savingProductSettingsForm.addControl('daysToDormancy', new UntypedFormControl('', Validators.required));
-          this.savingProductSettingsForm.addControl('daysToEscheat', new UntypedFormControl('', Validators.required));
+          this.savingProductSettingsForm.addControl(
+            'daysToInactive',
+            new UntypedFormControl('', [
+              Validators.required,
+              Validators.min(0)
+            ])
+          );
+          this.savingProductSettingsForm.addControl(
+            'daysToDormancy',
+            new UntypedFormControl('', [
+              Validators.required,
+              Validators.min(0)
+            ])
+          );
+          this.savingProductSettingsForm.addControl(
+            'daysToEscheat',
+            new UntypedFormControl('', [
+              Validators.required,
+              Validators.min(0)
+            ])
+          );
         } else {
           this.savingProductSettingsForm.removeControl('daysToInactive');
           this.savingProductSettingsForm.removeControl('daysToDormancy');

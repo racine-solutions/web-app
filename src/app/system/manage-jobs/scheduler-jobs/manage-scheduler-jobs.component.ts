@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -78,7 +87,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatPaginator,
     DatetimeFormatPipe,
     YesnoPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ManageSchedulerJobsComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
@@ -265,12 +275,12 @@ export class ManageSchedulerJobsComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showSchedulerJobsPage === true) {
+    if (this.configurationWizardService.showSchedulerJobsPage) {
       setTimeout(() => {
         this.showPopover(this.templateSchedulerStatus, this.schedulerStatus.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSchedulerJobsList === true) {
+    if (this.configurationWizardService.showSchedulerJobsList) {
       setTimeout(() => {
         this.showPopover(this.templateJobsTable, this.jobsTable.nativeElement, 'top', true);
       });

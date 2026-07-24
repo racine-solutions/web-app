@@ -8,8 +8,27 @@
 
 <div class="container">
   <mat-tab-group #tabGroup (selectChange)="onTabChange($event)">
-    <mat-tab label="Analytics Report">
-      <mifosx-analytics-report></mifosx-analytics-report>
+    <mat-tab label="Analytics Dashboard">
+      <div class="dashboard-layout">
+        <mat-card class="search-card">
+          <mat-card-content>
+            <mat-form-field>
+              <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
+              <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
+            </mat-form-field>
+
+            <mat-autocomplete #activitySearch="matAutocomplete">
+              @for (activity of filteredActivities | async; track activity) {
+                <mat-option [routerLink]="activity.path">
+                  <span>{{ activity.activity }}</span>
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-card-content>
+        </mat-card>
+
+        <mifosx-analytics-dashboard [dashboard]="dashboardDefinition" [offices]="offices"></mifosx-analytics-dashboard>
+      </div>
     </mat-tab>
     <mat-tab label="Client & Collection Trends">
       <ng-template matTabContent>
@@ -27,22 +46,16 @@
             <div class="layout-row search">
               <mat-form-field>
                 <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
-                <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
+                <input matInput [matAutocomplete]="activitySearch2" [formControl]="searchText" />
               </mat-form-field>
 
-              <mat-autocomplete #activitySearch="matAutocomplete">
+              <mat-autocomplete #activitySearch2="matAutocomplete">
                 @for (activity of filteredActivities | async; track activity) {
                   <mat-option [routerLink]="activity.path">
                     <span>{{ activity.activity }}</span>
                   </mat-option>
                 }
               </mat-autocomplete>
-            </div>
-
-            <div class="layout-row top-card">
-              <div class="trends-bar">
-                <mifosx-client-trends-bar></mifosx-client-trends-bar>
-              </div>
             </div>
 
             <div class="layout-row bottom-card">

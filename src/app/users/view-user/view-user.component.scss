@@ -41,7 +41,7 @@
   .content {
     div {
       margin: 1rem 0;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
 
       span {
         display: block;
@@ -84,6 +84,32 @@
 
   .back-button-container {
     margin-top: 2rem;
+  }
+
+  .self-service-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
+
+  .self-service-true {
+    background-color: #43a047;
+    border: 1px solid #388e3c;
+  }
+
+  .self-service-false {
+    background-color: #e53935;
+    border: 1px solid #b71c1c;
+  }
+
+  .self-service-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   button {

@@ -1,10 +1,11 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslateModule } from '@ngx-translate/core';
 import { PipesModule } from '../../pipes/pipes.module';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
 
 import { DashboardComponent } from './dashboard.component';
 
@@ -12,7 +13,7 @@ describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
@@ -20,12 +21,13 @@ describe('DashboardComponent', () => {
         MatDialogModule,
         MatSnackBarModule,
         TranslateModule.forRoot(),
-        PipesModule
+        PipesModule,
+        DashboardComponent
       ],
-      declarations: [DashboardComponent],
       providers: [
         { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] }
+        { provide: MAT_DIALOG_DATA, useValue: [] },
+        { provide: AuthenticationService, useValue: { getCredentials: () => ({}) } }
       ]
     }).compileComponents();
   }));

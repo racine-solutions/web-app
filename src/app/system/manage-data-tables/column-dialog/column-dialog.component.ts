@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -39,7 +39,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatCheckbox,
     MatDialogActions,
     MatDialogClose
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ColumnDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ColumnDialogComponent>>(MatDialogRef);
@@ -76,7 +77,10 @@ export class ColumnDialogComponent implements OnInit {
           value: this.data ? +this.data.columnLength : '',
           disabled: this.getColumnType(this.data.columnDisplayType) !== 'String' || this.data.type === 'existing'
         },
-        Validators.required
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
       ],
       mandatory: [{ value: this.data.isColumnNullable, disabled: this.data.type === 'existing' }],
       unique: [
@@ -110,7 +114,7 @@ export class ColumnDialogComponent implements OnInit {
         return 'Dropdown';
       }
       default: {
-        return columnDisplayType[0] + columnDisplayType.substr(1).toLowerCase();
+        return columnDisplayType[0] + columnDisplayType.substring(1).toLowerCase();
       }
     }
   }

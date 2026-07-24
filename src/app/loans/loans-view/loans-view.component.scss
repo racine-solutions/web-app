@@ -14,3 +14,49 @@
   min-width: 80%;
   font-weight: 400;
 }
+
+.datatable-scroll-x {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.loan-information-table {
+  margin-bottom: 10px;
+
+  table {
+    width: 100%;
+
+    td {
+      padding: 4px 0;
+      vertical-align: middle;
+
+      &:first-child {
+        font-weight: 500;
+        width: 180px;
+      }
+
+      i.fa-stop {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// White text and icons for all content projected into the account header.
+// Works for both light (#1074b9) and dark (#5ba2ec) theme primary backgrounds.
+mifosx-account-header {
+  td,
+  th,
+  b,
+  span:not(.status-dot),
+  h3,
+  p,
+  a {
+    color: var(--md-sys-color-on-primary, #fff);
+  }
+
+  // Action button (hamburger menu) and its icon
+  button.mat-mdc-icon-button {
+    color: var(--md-sys-color-on-primary, #fff);
+  }
+}

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -14,7 +14,7 @@ import {
   MatDialogActions,
   MatDialogClose
 } from '@angular/material/dialog';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FileUploadComponent } from '../../../../shared/file-upload/file-upload.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -28,15 +28,16 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     FileUploadComponent,
     MatDialogActions,
     MatDialogClose
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UploadDocumentDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<UploadDocumentDialogComponent>>(MatDialogRef);
-  private formBuilder = inject(UntypedFormBuilder);
+  private formBuilder = inject(FormBuilder);
   data = inject(MAT_DIALOG_DATA);
 
   /** Upload Document form. */
-  uploadDocumentForm: UntypedFormGroup;
+  uploadDocumentForm: FormGroup;
   /** Upload Document Data */
   uploadDocumentData: any = [];
   /** Triggers identity fields (documentType, status, documentKey) */
@@ -106,13 +107,16 @@ export class UploadDocumentDialogComponent implements OnInit {
   }
 
   /**
-   * Sets file form control value.
+   * Sets file form control value and auto-fills fileName.
    * @param {any} $event file change event.
    */
   onFileSelect($event: any) {
     if ($event.target.files.length > 0) {
       const file = $event.target.files[0];
       this.uploadDocumentForm.get('file').setValue(file);
+      if (!this.uploadDocumentForm.get('fileName').value) {
+        this.uploadDocumentForm.get('fileName').setValue(file.name);
+      }
     }
   }
 }

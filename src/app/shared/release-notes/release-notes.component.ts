@@ -8,7 +8,12 @@ import { inject } from '@angular/core';
   templateUrl: './release-notes.component.html',
   styleUrls: ['./release-notes.component.scss'],
   standalone: true,
-  imports: [FaIconComponent, MatDialogActions, MatDialogTitle, MatDialogContent]
+  imports: [
+    FaIconComponent,
+    MatDialogActions,
+    MatDialogTitle,
+    MatDialogContent
+  ]
 })
 export class ReleaseNotesComponent {
   dialogRef = inject(MatDialogRef<ReleaseNotesComponent>);

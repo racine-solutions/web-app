@@ -8,7 +8,10 @@ import { CommonModule } from '@angular/common';
   templateUrl: './analytics-report.component.html',
   styleUrls: ['./analytics-report.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatCardModule]
+  imports: [
+    CommonModule,
+    MatCardModule
+  ]
 })
 export class AnalyticsReportComponent implements OnInit {
   analyticsData: any;

@@ -7,12 +7,9 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-
-/** rxjs Imports */
-
-import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 /**
  * Interface for version information.
@@ -31,6 +28,7 @@ import { Alert } from '../core/alert/alert.model';
 /** Custom Services */
 import { AlertService } from '../core/alert/alert.service';
 import { ThemingService } from '../shared/theme-toggle/theming.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Environment Imports */
 import { environment } from '../../environments/environment';
@@ -58,19 +56,26 @@ import { VersionService } from '../system/version.service';
     ResetPasswordComponent,
     TwoFactorAuthenticationComponent,
     MatMenu,
-    MatMenuItem
-  ]
+    MatMenuItem,
+    M3IconComponent
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit {
+  /** Whether to show the tenant selector dropdown */
+  showTenantSelector = true;
   /** Show version info table if env allows */
   displayBackendInfo = environment.displayBackEndInfo !== 'false';
+  /** Production mode - minimal hero with branding only */
+  productionMode = environment.productionMode === true;
 
   private alertService = inject(AlertService);
   private settingsService = inject(SettingsService);
   private themingService = inject(ThemingService);
   private router = inject(Router);
-
   private versionService = inject(VersionService);
+  private translateService = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   public environment = environment;
 
@@ -79,15 +84,18 @@ export class LoginComponent implements OnInit, OnDestroy {
   /** Server info for display */
   server: string = '';
 
+  /** Get tenant display name with first letter capitalized */
+  get tenantDisplayName(): string {
+    const tenant = this.versions?.tenant || this.settingsService.tenantIdentifier || 'default';
+    return tenant.charAt(0).toUpperCase() + tenant.slice(1).toLowerCase();
+  }
+
   /** True if password requires a reset. */
   resetPassword = false;
   /** True if user requires two factor authentication. */
   twoFactorAuthenticationRequired = false;
-  /** Subscription to alerts. */
-  alert$: Subscription;
-  logoPath = 'assets/images/default_home.png';
-  /** Subscription to theme changes. */
-  theme$: Subscription;
+  logoPath = 'assets/images/racine_solutions.svg';
+  logoPathDark = 'assets/images/racine_solutions.svg';
 
   themeDarkEnabled: boolean = false;
 
@@ -95,10 +103,11 @@ export class LoginComponent implements OnInit, OnDestroy {
    * Subscribes to alert event of alert service and theme changes.
    */
   ngOnInit() {
+    this.showTenantSelector = this.calculateTenantSelectorVisibility();
     this.updateLogo();
     this.themeDarkEnabled = this.settingsService.themeDarkEnabled;
     // Subscribe to theme changes
-    this.theme$ = this.themingService.theme.subscribe((value: string) => {
+    this.themingService.theme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.themeDarkEnabled = this.settingsService.themeDarkEnabled;
     });
 
@@ -106,19 +115,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.themingService.setDarkMode(!!this.settingsService.themeDarkEnabled);
 
     // Subscribe to alerts
-    this.alert$ = this.alertService.alertEvent.subscribe((alertEvent: Alert) => {
+    this.alertService.alertEvent.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((alertEvent: Alert) => {
       const alertType = alertEvent.type;
-      if (alertType === 'Password Expired') {
+      if (alertType === this.translateService.instant('errors.auth.passwordExpired.type')) {
         this.twoFactorAuthenticationRequired = false;
         this.resetPassword = true;
-      } else if (alertType === 'Two Factor Authentication Required') {
+      } else if (alertType === this.translateService.instant('errors.auth.twoFactor.type')) {
         this.resetPassword = false;
         this.twoFactorAuthenticationRequired = true;
-      } else if (alertType === 'Authentication Success') {
+      } else if (alertType === this.translateService.instant('errors.auth.success.type')) {
         this.resetPassword = false;
         this.twoFactorAuthenticationRequired = false;
         this.router.navigate(['/'], { replaceUrl: true });
-      } else if (alertType === 'Tenant Changed') {
+      } else if (alertType === this.translateService.instant('errors.tenant.changed.type')) {
         this.updateLogo();
       }
     });
@@ -153,18 +162,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.server = this.settingsService.server;
   }
 
-  /**
-   * Unsubscribes from alerts and theme changes.
-   */
-  ngOnDestroy() {
-    if (this.alert$) {
-      this.alert$.unsubscribe();
-    }
-    if (this.theme$) {
-      this.theme$.unsubscribe();
-    }
-  }
-
   reloadSettings(): void {
     this.settingsService.setTenantIdentifier('');
     this.settingsService.setTenantIdentifier(environment.fineractPlatformTenantId || 'default');
@@ -173,12 +170,21 @@ export class LoginComponent implements OnInit, OnDestroy {
     window.location.reload();
   }
 
-  displayTenantSelector(): boolean {
-    // Hide tenant selector when OAuth2 is enabled (tenant is determined by OAuth server)
+  private calculateTenantSelectorVisibility(): boolean {
     if (environment.oauth.enabled) {
       return false;
     }
-    return environment.displayTenantSelector === 'false' ? false : true;
+    if (environment.displayTenantSelector === 'false') {
+      return false;
+    }
+    const tenantIds = environment.fineractPlatformTenantIds
+      .split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    if (tenantIds.length === 0 || (tenantIds.length === 1 && tenantIds[0] === 'default')) {
+      return false;
+    }
+    return true;
   }
 
   allowServerSwitch(): boolean {
@@ -186,19 +192,31 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   updateLogo(): void {
+    const tenant = this.settingsService.tenantIdentifier;
+    const isTenantSpecific = tenant && tenant !== 'default';
+
+    // Set light mode logo (env override takes priority)
     if (environment.tenantLogoUrl && environment.tenantLogoUrl.trim() !== '') {
       this.logoPath = environment.tenantLogoUrl;
-      return;
-    }
-    const tenant = this.settingsService.tenantIdentifier;
-    if (tenant && tenant !== 'default') {
-      this.logoPath = `assets/images/${tenant}_home.png`;
     } else {
-      this.logoPath = 'assets/images/default_home.png';
+      this.logoPath = isTenantSpecific ? `assets/images/${tenant}_home.png` : 'assets/images/racine_solutions.svg';
+    }
+
+    // Set dark mode logo (env override takes priority)
+    if (environment.tenantLogoUrlDark && environment.tenantLogoUrlDark.trim() !== '') {
+      this.logoPathDark = environment.tenantLogoUrlDark;
+    } else {
+      this.logoPathDark = isTenantSpecific
+        ? `assets/images/${tenant}_home_dark.png`
+        : 'assets/images/racine_solutions.svg';
     }
   }
 
   onLogoError(): void {
-    this.logoPath = 'assets/images/default_home.png';
+    this.logoPath = 'assets/images/racine_solutions.svg';
+  }
+
+  onLogoErrorDark(): void {
+    this.logoPathDark = 'assets/images/racine_solutions.svg';
   }
 }

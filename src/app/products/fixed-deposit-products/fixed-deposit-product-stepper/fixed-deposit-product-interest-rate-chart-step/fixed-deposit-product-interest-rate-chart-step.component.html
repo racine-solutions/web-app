@@ -24,18 +24,6 @@
       <div class="flex-fill layout-row-wrap responsive-column" formArrayName="charts">
         <mat-divider class="flex-98"></mat-divider>
         <div class="flex-fill layout-row-wrap responsive-column" [formGroupName]="chartIndex">
-          <div class="flex-100" align="end">
-            <button
-              type="button"
-              mat-icon-button
-              color="warn"
-              (click)="delete(charts, chartIndex)"
-              matTooltip="{{ 'tooltips.Delete Interest Rate Chart' | translate }}"
-              matTooltipPosition="left"
-            >
-              <fa-icon icon="trash"></fa-icon>
-            </button>
-          </div>
           <mat-form-field class="flex-28 m-r-5">
             <mat-label>{{ 'labels.inputs.Name' | translate }}</mat-label>
             <input matInput formControlName="name" required />
@@ -84,15 +72,26 @@
               {{ 'labels.inputs.Is primary grouping by amount?' | translate }}
             </mat-checkbox>
           </div>
-          <div class="center flex-100">
+          <div class="center flex-100 layout-row align-center m-b-10">
             <button type="button" mat-raised-button color="primary" (click)="addChartSlab(chart.controls.chartSlabs)">
               <fa-icon icon="plus" class="m-r-10"></fa-icon>
-              {{ 'labels.buttons.Add Slab' | translate }}
+              {{ 'labels.buttons.Submit' | translate }}
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              class="m-l-5"
+              (click)="delete(charts, chartIndex)"
+              matTooltip="{{ 'tooltips.Delete Interest Rate Chart' | translate }}"
+              matTooltipPosition="right"
+            >
+              <fa-icon icon="trash"></fa-icon>
             </button>
           </div>
           @if (chart.value.chartSlabs.length === 0) {
             <div class="flex-100">
-              <h3 class="mat-h3">{{ 'labels.heading.It is required to add at least one Slab' | translate }}</h3>
+              <h3 class="mat-h3">{{ 'labels.heading.It is required to add at least one Range' | translate }}</h3>
             </div>
           }
           @if (chart.value.chartSlabs.length !== 0) {

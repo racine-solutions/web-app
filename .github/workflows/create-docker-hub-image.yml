@@ -2,9 +2,9 @@ name: Racine Build and Push Docker Image
 
 on:
   push:
-    branches: [racine-dev-1.14.0-preview]
+    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
   pull_request:
-    branches: [racine-dev-1.14.0-preview]
+    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
 
 # Cancel in-progress runs on new pushes
 concurrency:
@@ -25,10 +25,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1 # Only fetch the latest commit
           fetch-tags: false # Don't fetch tags unless needed
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -43,7 +46,7 @@ jobs:
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}

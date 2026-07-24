@@ -7,8 +7,17 @@
  */
 
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
-import { UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  inject
+} from '@angular/core';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import {
   MatTable,
@@ -35,6 +44,7 @@ import {
 } from '../payment-allocation-model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoanProductService } from 'app/products/loan-products/services/loan-product.service';
 
 @Component({
   selector: 'mifosx-advance-payment-allocation-tab',
@@ -55,12 +65,14 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     CdkDrag
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdvancePaymentAllocationTabComponent implements OnInit {
   private dialog = inject(MatDialog);
   private advancedPaymentStrategy = inject(AdvancedPaymentStrategy);
   private translateService = inject(TranslateService);
+  protected loanProductService = inject(LoanProductService);
 
   @Input() advancedPaymentAllocation: AdvancedPaymentAllocation;
   @Input() advancedCreditAllocation: AdvancedCreditAllocation;

@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -63,7 +72,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRow,
     MatPaginator,
     AsyncPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClosingEntriesComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
@@ -184,13 +194,13 @@ export class ClosingEntriesComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showClosingEntriesPage === true) {
+    if (this.configurationWizardService.showClosingEntriesPage) {
       setTimeout(() => {
         this.showPopover(this.templateButtonCreateClosure, this.buttonCreateClosure.nativeElement, 'bottom', true);
       });
     }
 
-    if (this.configurationWizardService.showClosingEntriesList === true) {
+    if (this.configurationWizardService.showClosingEntriesList) {
       setTimeout(() => {
         this.showPopover(this.templateClosuresTable, this.closuresTable.nativeElement, 'top', true);
       });

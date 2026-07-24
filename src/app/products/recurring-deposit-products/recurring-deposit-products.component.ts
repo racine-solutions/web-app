@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -63,7 +72,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecurringDepositProductsComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
@@ -137,7 +147,7 @@ export class RecurringDepositProductsComponent implements OnInit, AfterViewInit 
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showRecurringDepositProductsPage === true) {
+    if (this.configurationWizardService.showRecurringDepositProductsPage) {
       setTimeout(() => {
         this.showPopover(
           this.templateButtonCreateRecurringProduct,
@@ -148,7 +158,7 @@ export class RecurringDepositProductsComponent implements OnInit, AfterViewInit 
       });
     }
 
-    if (this.configurationWizardService.showRecurringDepositProductsList === true) {
+    if (this.configurationWizardService.showRecurringDepositProductsList) {
       setTimeout(() => {
         this.showPopover(this.templateRecurringProductsTable, this.recurringProductsTable.nativeElement, 'top', true);
       });

@@ -7,7 +7,15 @@
  */
 
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  TemplateRef,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
@@ -33,7 +41,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatIcon,
     FaIconComponent,
     MatLine
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountingComponent implements AfterViewInit {
   private router = inject(Router);
@@ -84,17 +93,17 @@ export class AccountingComponent implements AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showChartofAccounts === true) {
+    if (this.configurationWizardService.showChartofAccounts) {
       setTimeout(() => {
         this.showPopover(this.templateChartofAccounts, this.chartofAccounts.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showAccountsLinked === true) {
+    if (this.configurationWizardService.showAccountsLinked) {
       setTimeout(() => {
         this.showPopover(this.templateAccountsLinked, this.accountsLinked.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showMigrateOpeningBalances === true) {
+    if (this.configurationWizardService.showMigrateOpeningBalances) {
       setTimeout(() => {
         this.showPopover(
           this.templateMigrateOpeningBalances,
@@ -104,12 +113,12 @@ export class AccountingComponent implements AfterViewInit {
         );
       });
     }
-    if (this.configurationWizardService.showClosingEntries === true) {
+    if (this.configurationWizardService.showClosingEntries) {
       setTimeout(() => {
         this.showPopover(this.templateClosingEntries, this.closingEntries.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showCreateJournalEntries === true) {
+    if (this.configurationWizardService.showCreateJournalEntries) {
       setTimeout(() => {
         this.showPopover(this.templateCreateJournalEntries, this.createJournalEntries.nativeElement, 'bottom', true);
       });

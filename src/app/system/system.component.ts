@@ -7,7 +7,15 @@
  */
 
 /** Angular Imports */
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  TemplateRef,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 /** Custom Services */
@@ -32,7 +40,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     FaIconComponent,
     MatLine,
     NgClass
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SystemComponent implements AfterViewInit {
   private router = inject(Router);
@@ -67,9 +76,9 @@ export class SystemComponent implements AfterViewInit {
   @ViewChild('manageReports') manageReports: ElementRef<any>;
   /* Template for popover on manage reports */
   @ViewChild('templateManageReports') templateManageReports: TemplateRef<any>;
-  // Initialize an array of 16 boolean values, all set to false
+  // Initialize an array of 17 boolean values, all set to false
   isDisabled: boolean = true;
-  arrowBooleans: boolean[] = new Array(16).fill(false);
+  arrowBooleans: boolean[] = new Array(17).fill(false);
 
   /**
    * Popover function
@@ -92,37 +101,37 @@ export class SystemComponent implements AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showDatatables === true) {
+    if (this.configurationWizardService.showDatatables) {
       setTimeout(() => {
         this.showPopover(this.templateDatatables, this.datatables.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSystemCodes === true) {
+    if (this.configurationWizardService.showSystemCodes) {
       setTimeout(() => {
         this.showPopover(this.templateCodes, this.codes.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showRolesandPermission === true) {
+    if (this.configurationWizardService.showRolesandPermission) {
       setTimeout(() => {
         this.showPopover(this.templateRolesandPermission, this.rolesandpermission.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showMakerCheckerTable === true) {
+    if (this.configurationWizardService.showMakerCheckerTable) {
       setTimeout(() => {
         this.showPopover(this.templateMakerCheckerTable, this.makerCheckerTable.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showConfigurations === true) {
+    if (this.configurationWizardService.showConfigurations) {
       setTimeout(() => {
         this.showPopover(this.templateConfigurations, this.configurations.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSchedulerJobs === true) {
+    if (this.configurationWizardService.showSchedulerJobs) {
       setTimeout(() => {
         this.showPopover(this.templateSchedulerJobs, this.schedulerJobs.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showManageReports === true) {
+    if (this.configurationWizardService.showManageReports) {
       setTimeout(() => {
         this.showPopover(this.templateManageReports, this.manageReports.nativeElement, 'bottom', true);
       });

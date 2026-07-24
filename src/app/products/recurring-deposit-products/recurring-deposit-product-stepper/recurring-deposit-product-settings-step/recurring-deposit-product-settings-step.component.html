@@ -26,6 +26,7 @@
       <mat-label>{{ 'labels.inputs.Frequency' | translate }}</mat-label>
       <input
         type="number"
+        min="0"
         matInput
         formControlName="lockinPeriodFrequency"
         matTooltip="{{ 'tooltips.The number at which lock in period occurs' | translate }}"
@@ -49,6 +50,7 @@
       <mat-label>{{ 'labels.inputs.Frequency' | translate }}</mat-label>
       <input
         type="number"
+        min="0"
         matInput
         formControlName="minDepositTerm"
         matTooltip="{{ 'tooltips.The number at which minimum deposit occurs' | translate }}"
@@ -81,6 +83,7 @@
       <mat-label>{{ 'labels.inputs.Frequency' | translate }}</mat-label>
       <input
         type="number"
+        min="0"
         matInput
         formControlName="inMultiplesOfDepositTerm"
         matTooltip="{{ 'tooltips.The number at which multiple deposits occurs' | translate }}"
@@ -104,6 +107,7 @@
       <mat-label>{{ 'labels.inputs.Frequency' | translate }}</mat-label>
       <input
         type="number"
+        min="0"
         matInput
         formControlName="maxDepositTerm"
         matTooltip="{{ 'tooltips.The number at which minimum deposit occurs' | translate }}"
@@ -131,7 +135,7 @@
 
     <mat-form-field class="flex-48">
       <mat-label>{{ 'labels.inputs.Penal Interest' | translate }} (%)</mat-label>
-      <input type="number" matInput formControlName="preClosurePenalInterest" />
+      <input type="number" min="0" matInput formControlName="preClosurePenalInterest" />
     </mat-form-field>
 
     <mat-form-field class="flex-48">

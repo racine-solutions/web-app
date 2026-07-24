@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -48,7 +48,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatHeaderRow,
     MatRowDef,
     MatRow
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -94,7 +95,10 @@ export class NotificationComponent implements OnInit {
   getConfigurationValue(configuration: any): string {
     const value = configuration.value;
     if (configuration.name === 'server_key') {
-      return value.replace(value.substr(1, value.length - 3), value.substr(1, value.length - 3).replace(/./g, '*'));
+      return value.replace(
+        value.substring(1, value.length - 2),
+        value.substring(1, value.length - 2).replace(/./g, '*')
+      );
     }
     return value;
   }

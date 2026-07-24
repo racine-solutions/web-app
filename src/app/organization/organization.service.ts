@@ -720,12 +720,16 @@ export class OrganizationService {
     return this.http.get(`/groups`, { params: httpParams });
   }
 
-  /*
-   * @param {any} officeId ID of office to retrieve staff from.
+  /**
+   * @param {number | string} officeId ID of office to retrieve staff from.
+   * @param {boolean} [isLoanOfficer] Optional flag to filter by loan officer status.
    * @returns {Observable<any>} Staff data.
    */
-  getStaff(officeId: any): Observable<any> {
-    const httpParams = new HttpParams().set('officeId', officeId.toString());
+  getStaff(officeId: number | string, isLoanOfficer?: boolean): Observable<any> {
+    let httpParams = new HttpParams().set('officeId', officeId.toString()).set('status', 'active');
+    if (isLoanOfficer !== undefined) {
+      httpParams = httpParams.set('isLoanOfficer', isLoanOfficer.toString());
+    }
     return this.http.get('/staff', { params: httpParams });
   }
 
@@ -830,5 +834,47 @@ export class OrganizationService {
     formData.append('locale', this.settingsService.language.code);
     formData.append('dateFormat', this.settingsService.dateFormat);
     return this.http.post(`${urlSuffix}/uploadtemplate`, formData, { params: httpParams });
+  }
+
+  /**
+   * @returns {Observable<any>} Loan Originators data
+   */
+  getLoanOriginators(): Observable<any> {
+    return this.http.get('/loan-originators');
+  }
+
+  /**
+   * @returns {Observable<any>} Loan Originators Template data
+   */
+  getLoanOriginatorsTemplate(): Observable<any> {
+    return this.http.get('/loan-originators/template');
+  }
+
+  /**
+   * @returns {Observable<any>} Loan Originator data
+   */
+  getLoanOriginator(originatorId: string): Observable<any> {
+    return this.http.get(`/loan-originators/${originatorId}`);
+  }
+
+  /**
+   * @returns {Observable<any>}
+   */
+  createLoanOriginator(payload: any): Observable<any> {
+    return this.http.post(`/loan-originators`, payload);
+  }
+
+  /**
+   * @returns {Observable<any>}
+   */
+  updateLoanOriginator(originatorId: number, payload: any): Observable<any> {
+    return this.http.put(`/loan-originators/${originatorId}`, payload);
+  }
+
+  /**
+   * @returns {Observable<any>}
+   */
+  deleteLoanOriginator(originatorId: number): Observable<any> {
+    return this.http.delete(`/loan-originators/${originatorId}`);
   }
 }

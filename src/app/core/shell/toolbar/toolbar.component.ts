@@ -8,6 +8,7 @@
 
 /** Angular Imports */
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   Input,
@@ -19,8 +20,10 @@ import {
   TemplateRef,
   AfterContentChecked,
   ChangeDetectorRef,
+  DestroyRef,
   inject
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -72,7 +75,8 @@ import { DocumentationLinksService } from 'app/shared/services/documentation-lin
     ThemeToggleComponent,
     MatMenu,
     MatMenuItem
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChecked {
   private breakpointObserver = inject(BreakpointObserver);
@@ -83,6 +87,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   private dialog = inject(MatDialog);
   private changeDetector = inject(ChangeDetectorRef);
   private documentationLinks = inject(DocumentationLinksService);
+  private destroyRef = inject(DestroyRef);
 
   /* Reference of institution */
   @ViewChild('institution') institution: ElementRef<any>;
@@ -111,7 +116,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
    * Subscribes to breakpoint for handset.
    */
   ngOnInit() {
-    this.isHandset$.subscribe((isHandset) => {
+    this.isHandset$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((isHandset) => {
       if (isHandset && this.sidenavCollapsed) {
         this.toggleSidenavCollapse(false);
       }
@@ -234,20 +239,17 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
    * To show popovers
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showToolbar === true) {
+    if (this.configurationWizardService.showToolbar) {
       setTimeout(() => {
         this.showPopover(this.templateInstitution, this.institution.nativeElement);
       });
     }
 
-    if (
-      this.configurationWizardService.showSideNav === true ||
-      this.configurationWizardService.showSideNavChartofAccounts === true
-    ) {
+    if (this.configurationWizardService.showSideNav || this.configurationWizardService.showSideNavChartofAccounts) {
       this.toggleSidenavCollapse();
     }
 
-    if (this.configurationWizardService.showToolbarAdmin === true) {
+    if (this.configurationWizardService.showToolbarAdmin) {
       setTimeout(() => {
         this.showPopover(this.templateAppMenu, this.appMenu.nativeElement);
       });

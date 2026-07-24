@@ -10,7 +10,7 @@
 @if (!oauthEnabled) {
   <div>
     <form class="layout-column" [formGroup]="loginForm" (ngSubmit)="login()" id="login-form">
-      <mat-form-field class="login-field flex-align-center">
+      <mat-form-field class="login-field flex-align-center" appearance="fill">
         <mat-label>{{ 'labels.inputs.Username' | translate }}</mat-label>
         <input
           matInput
@@ -37,6 +37,7 @@
           autocomplete="current-password"
           formControlName="password"
           [placeholder]="'labels.placeholders.Enter your password' | translate"
+          (keyup.enter)="onEnter($event)"
         />
         <mifosx-m3-icon matIconPrefix name="lock"></mifosx-m3-icon>
         @if (loginForm.controls.password.value && !loading) {
@@ -57,7 +58,19 @@
         @if (loginForm.controls.password.hasError('required')) {
           <mat-error>
             {{ 'labels.inputs.Password' | translate }}
-            <strong>{{ 'labels.commons.pass is required' | translate }}</strong>
+            <strong>
+              {{ 'labels.commons.pass is required' | translate: { min: minPasswordLength } }}
+            </strong>
+          </mat-error>
+        } @else if (loginForm.controls.password.hasError('minlength')) {
+          <mat-error>
+            {{
+              'Password is required'
+                | translate
+                  : {
+                      min: loginForm.controls.password.errors?.minlength?.requiredLength
+                    }
+            }}
           </mat-error>
         }
       </mat-form-field>
@@ -80,13 +93,6 @@
           <mat-spinner [diameter]="20" class="button-spinner"></mat-spinner>
         }
       </mifosx-m3-button>
-
-      <!-- Forgot Password Link -->
-      <div class="login-actions">
-        <a href="#" class="forgot-password-link">
-          {{ 'labels.links.Forgot Password?' | translate }}
-        </a>
-      </div>
     </form>
   </div>
 }

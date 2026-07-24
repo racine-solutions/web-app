@@ -7,7 +7,16 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, TemplateRef, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  TemplateRef,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
@@ -51,7 +60,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SavingProductsComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
@@ -104,13 +114,13 @@ export class SavingProductsComponent implements OnInit, AfterViewInit {
    * To show popover.
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showSavingsProductsPage === true) {
+    if (this.configurationWizardService.showSavingsProductsPage) {
       setTimeout(() => {
         this.showPopover(this.templateButtonSavingProduct, this.buttonSavingProduct.nativeElement, 'bottom', true);
       });
     }
 
-    if (this.configurationWizardService.showSavingsProductsList === true) {
+    if (this.configurationWizardService.showSavingsProductsList) {
       setTimeout(() => {
         this.showPopover(this.templateSavingProductTable, this.savingProductTable.nativeElement, 'top', true);
       });

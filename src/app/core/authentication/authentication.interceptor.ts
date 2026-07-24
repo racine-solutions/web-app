@@ -41,11 +41,31 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    * Intercepts a Http request and sets the request headers.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (this.isExternalUrl(request.url)) {
+      return next.handle(request);
+    }
     if (this.settingsService.tenantIdentifier) {
       httpOptions.headers['Fineract-Platform-TenantId'] = this.settingsService.tenantIdentifier;
     }
     request = request.clone({ setHeaders: httpOptions.headers });
     return next.handle(request);
+  }
+
+  /**
+   * Absolute URLs pointing at our own Fineract server are internal — ApiPrefixInterceptor
+   * (in HttpService's dynamic chain) may have already converted relative URLs to absolute ones.
+   */
+  private isExternalUrl(url: string): boolean {
+    try {
+      const requestOrigin = new URL(url).origin;
+      const server = this.settingsService.server;
+      if (server) {
+        return requestOrigin !== new URL(server).origin;
+      }
+      return true;
+    } catch {
+      return false; // Relative URL (new URL() throws) → internal
+    }
   }
 
   /**

@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -18,24 +19,18 @@ import { UnassignStaffDialogComponent } from './custom-dialogs/unassign-staff-di
 import { UploadSignatureDialogComponent } from './custom-dialogs/upload-signature-dialog/upload-signature-dialog.component';
 import { ViewSignatureDialogComponent } from './custom-dialogs/view-signature-dialog/view-signature-dialog.component';
 import { DeleteSignatureDialogComponent } from './custom-dialogs/delete-signature-dialog/delete-signature-dialog.component';
+import { DrawSignatureDialogComponent } from './custom-dialogs/draw-signature-dialog/draw-signature-dialog.component';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { UploadImageDialogComponent } from './custom-dialogs/upload-image-dialog/upload-image-dialog.component';
 import { CaptureImageDialogComponent } from './custom-dialogs/capture-image-dialog/capture-image-dialog.component';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
-import {
-  MatCard,
-  MatCardHeader,
-  MatCardTitleGroup,
-  MatCardMdImage,
-  MatCardTitle,
-  MatCardSubtitle,
-  MatCardContent
-} from '@angular/material/card';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { CreditBureauService } from 'app/credit-bureau/credit-bureau.service';
+import { LegalFormId } from '../models/legal-form.enum';
+import { MatCardMdImage } from '@angular/material/card';
+import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
-import { NgClass } from '@angular/common';
 import { EntityNameComponent } from '../../shared/entity-name/entity-name.component';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
@@ -43,10 +38,10 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AccountNumberComponent } from '../../shared/account-number/account-number.component';
 import { ExternalIdentifierComponent } from '../../shared/external-identifier/external-identifier.component';
 import { MatTabNav, MatTabLink, MatTabNavPanel } from '@angular/material/tabs';
-import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
+import { AccountHeaderComponent } from 'app/shared/account-header/account-header.component';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -54,18 +49,14 @@ import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
   styleUrls: ['./clients-view.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    MatCardHeader,
-    MatCardTitleGroup,
+    AccountHeaderComponent,
     MatCardMdImage,
     MatTooltip,
-    MatCardTitle,
-    NgClass,
     EntityNameComponent,
     MatIconButton,
     MatMenuTrigger,
     MatIcon,
     FaIconComponent,
-    MatCardSubtitle,
     AccountNumberComponent,
     ExternalIdentifierComponent,
     MatMenu,
@@ -75,9 +66,9 @@ import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
     RouterLinkActive,
     MatTabNavPanel,
     RouterOutlet,
-    StatusLookupPipe,
     DateFormatPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientsViewComponent implements OnInit {
   complianceHideClientData = environment.complianceHideClientData;
@@ -133,8 +124,10 @@ export class ClientsViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientsService = inject(ClientsService);
+  private creditBureauService = inject(CreditBureauService);
   private _sanitizer = inject(DomSanitizer);
   dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
 
   clientViewData: any;
   clientDatatables: any;
@@ -142,11 +135,28 @@ export class ClientsViewComponent implements OnInit {
   clientTemplateData: any;
 
   constructor() {
-    this.route.data.subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
-      this.clientViewData = data.clientViewData;
-      this.clientDatatables = data.clientDatatables;
-      this.clientTemplateData = data.clientTemplateData;
-    });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
+        this.clientViewData = data.clientViewData;
+        this.clientDatatables = this.filterDatatablesByClientSubtype(
+          data.clientDatatables,
+          data.clientViewData?.legalForm?.id
+        );
+        this.clientTemplateData = data.clientTemplateData;
+      });
+  }
+
+  /**
+   * Filters datatables based on the client's legal form (Person or Entity).
+   * Datatables without an entitySubType are kept visible for all client types.
+   */
+  private filterDatatablesByClientSubtype(datatables: any[], legalFormId: number): any[] {
+    if (!datatables || !legalFormId) {
+      return datatables || [];
+    }
+    const subtype = legalFormId === LegalFormId.PERSON ? 'person' : 'entity';
+    return datatables.filter((dt: any) => !dt.entitySubType || dt.entitySubType.toLowerCase() === subtype);
   }
 
   ngOnInit() {
@@ -259,6 +269,9 @@ export class ClientsViewComponent implements OnInit {
       data: { deleteContext: `client with id: ${this.clientViewData.id}` }
     });
     deleteClientDialogRef.afterClosed().subscribe((response: any) => {
+      if (!response) {
+        return;
+      }
       if (response.delete) {
         this.clientsService.deleteClient(this.clientViewData.id).subscribe(() => {
           this.router.navigate(['/clients'], { relativeTo: this.route });
@@ -273,6 +286,9 @@ export class ClientsViewComponent implements OnInit {
   private unassignStaff() {
     const unAssignStaffDialogRef = this.dialog.open(UnassignStaffDialogComponent);
     unAssignStaffDialogRef.afterClosed().subscribe((response: { confirm: any }) => {
+      if (!response) {
+        return;
+      }
       if (response.confirm) {
         this.clientsService
           .executeClientCommand(this.clientViewData.id, 'unassignStaff', { staffId: this.clientViewData.staffId })
@@ -295,8 +311,13 @@ export class ClientsViewComponent implements OnInit {
         }
       });
       viewSignatureDialogRef.afterClosed().subscribe((response: any) => {
+        if (!response) {
+          return;
+        }
         if (response.upload) {
           this.uploadSignature();
+        } else if (response.draw) {
+          this.drawSignature();
         } else if (response.delete) {
           this.deleteSignature();
         }
@@ -319,6 +340,20 @@ export class ClientsViewComponent implements OnInit {
   }
 
   /**
+   * Opens draw pad for client signature
+   */
+  private drawSignature() {
+    const drawSignatureDialogRef = this.dialog.open(DrawSignatureDialogComponent);
+    drawSignatureDialogRef.afterClosed().subscribe((signature: File) => {
+      if (signature) {
+        this.clientsService.uploadClientSignatureImage(this.clientViewData.id, signature).subscribe(() => {
+          this.reload();
+        });
+      }
+    });
+  }
+
+  /**
    * Deletes client signature
    */
   private deleteSignature() {
@@ -327,6 +362,9 @@ export class ClientsViewComponent implements OnInit {
         data: documents
       });
       deleteSignatureDialogRef.afterClosed().subscribe((response: any) => {
+        if (!response) {
+          return;
+        }
         if (response.delete) {
           this.clientsService.deleteClientDocument(this.clientViewData.id, response.id).subscribe(() => {
             this.reload();
@@ -380,5 +418,17 @@ export class ClientsViewComponent implements OnInit {
         });
       }
     });
+  }
+
+  /**
+   * Returns true if the current CB-ILD role is COMPLIANCE.
+   * Used to show/hide Audit Trail tab in the client profile nav.
+   */
+  get isCbildCompliance(): boolean {
+    return this.creditBureauService.getRole() === 'COMPLIANCE';
+  }
+
+  get cbIldEnabled(): boolean {
+    return environment.cbIldEnabled;
   }
 }

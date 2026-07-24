@@ -9,7 +9,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { LoansService } from '../loans.service';
+import { LoansService, LoanAccountPath } from '../loans.service';
 import { Dates } from 'app/core/utils/dates';
 
 /**
@@ -87,7 +87,7 @@ export class PenaltyManagementService {
       }
       // Check if it's a penalty charge
       const isPenalty =
-        charge.penalty === true ||
+        charge.penalty ||
         charge.penalty === 'true' ||
         (charge.chargeTimeType &&
           (charge.chargeTimeType.value?.toLowerCase().includes('overdue') ||
@@ -99,7 +99,7 @@ export class PenaltyManagementService {
       }
 
       // Check if already waived or paid
-      if (charge.waived === true || charge.waived === 'true' || charge.paid === true || charge.paid === 'true') {
+      if (charge.waived || charge.waived === 'true' || charge.paid || charge.paid === 'true') {
         return false;
       }
 
@@ -203,14 +203,14 @@ export class PenaltyManagementService {
    * @param penaltyIds Array of penalty/charge IDs to waive
    * @returns Observable that completes when all penalties are waived
    */
-  waivePenalties(loanId: string, penaltyIds: number[]): Observable<any[]> {
+  waivePenalties(loanAccountPath: LoanAccountPath, loanId: string, penaltyIds: number[]): Observable<any[]> {
     if (!penaltyIds || penaltyIds.length === 0) {
       return of([]);
     }
 
     // Create waive requests for each penalty
     const waiveRequests = penaltyIds.map((chargeId: number) =>
-      this.loanService.executeLoansAccountChargesCommand(loanId, 'waive', {}, chargeId).pipe(
+      this.loanService.executeLoansAccountChargesCommand(loanAccountPath, loanId, 'waive', {}, chargeId).pipe(
         catchError((error: any) => {
           console.error(`Error waiving penalty ${chargeId}:`, error);
           // Return null for failed waive operations so we can continue with others

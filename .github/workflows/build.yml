@@ -4,9 +4,9 @@ name: build-run
 on:
   # Triggers the workflow on push or pull request events for specific branches
   push:
-    branches: [main, dev, dev-angular-19]
+    branches: [main, dev]
   pull_request:
-    branches: [main, dev, dev-angular-19]
+    branches: [main, dev]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,15 +19,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Use Node.js 22
-        uses: actions/setup-node@v3
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
         with:
-          # no support for lts as of now with github actions.
-          # issue link : https://github.com/actions/setup-node/issues/26
-          # lts/gallium node v19.7.0 (npm v9.5.0)
-          node-version: '22.12.0'
+          node-version: '24.16.0'
 
       - name: Remove node_modules
         run: rm -rf node_modules
@@ -88,7 +85,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: dist/web-app
+          FOLDER: dist/web-app/browser
           #without preserve it only builds if you have untracked files
           PRESERVE: true
           # github user name and email shows up in the logs,

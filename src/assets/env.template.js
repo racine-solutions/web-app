@@ -25,11 +25,15 @@
   window['env']['fineractPlatformTenantIds'] = '$FINERACT_PLATFORM_TENANTS_IDENTIFIER';
 
   window['env']['tenantLogoUrl'] = '$TENANT_LOGO_URL';
+  window['env']['tenantLogoUrlDark'] = '$TENANT_LOGO_URL_DARK';
 
   // Language Environment variables
   window['env']['defaultLanguage'] = '$MIFOS_DEFAULT_LANGUAGE';
 
   window['env']['supportedLanguages'] = '$MIFOS_SUPPORTED_LANGUAGES';
+
+  window['env']['defaultFormatDate'] = '$MIFOS_DEFAULT_FORMAT_DATE';
+  window['env']['defaultFormatDatetime'] = '$MIFOS_DEFAULT_FORMAT_DATETIME';
 
   window['env']['preloadClients'] = '$MIFOS_PRELOAD_CLIENTS';
 
@@ -41,6 +45,9 @@
 
   // Display or not the BackEnd Info
   window['env']['displayBackEndInfo'] = '$MIFOS_DISPLAY_BACKEND_INFO';
+
+  // Show minimal production hero on login page
+  window['env']['productionMode'] = '$MIFOS_PRODUCTION_MODE';
 
   // Display or not the Tenant Selector
   window['env']['displayTenantSelector'] = '$MIFOS_DISPLAY_TENANT_SELECTOR';
@@ -63,10 +70,28 @@
   // OAuth Server URL
   window['env']['oauthServerUrl'] = '$MIFOS_OAUTH_SERVER_URL';
 
+  // OAuth Server Logout URL
+  window['env']['oauthServerLogoutUrl'] = '$MIFOS_OAUTH_SERVER_LOGOUT_URL';
+
   // OAuth Client Id
   window['env']['oauthAppId'] = '$MIFOS_OAUTH_CLIENT_ID';
 
+  // OAuth Authorize URL
+  window['env']['oauthAuthorizeUrl'] = '$MIFOS_OAUTH_AUTHORIZE_URL';
+
+  // OAuth Token URL
+  window['env']['oauthTokenUrl'] = '$MIFOS_OAUTH_TOKEN_URL';
+
+  // OAuth Redirect URI
+  window['env']['oauthRedirectUri'] = '$MIFOS_OAUTH_REDIRECT_URI';
+
+  // OAuth Scope
+  window['env']['oauthScope'] = '$MIFOS_OAUTH_SCOPE';
+
   // Min Password length
+  window['env']['minPasswordLength'] = '$MIFOS_MIN_PASSWORD_LENGTH';
+
+  // Password Regex
   window['env']['minPasswordLength'] = '$MIFOS_MIN_PASSWORD_LENGTH';
 
   // Enable or Disable HTTP Cache
@@ -75,10 +100,37 @@
   // Hide client data (mask names)
   window['env']['complianceHideClientData'] = '$MIFOS_COMPLIANCE_HIDE_CLIENT_DATA';
 
-  window['env']['vNextApiUrl'] = '$VNEXT_API_URL';
-  window['env']['vNextApiProvider'] = '$VNEXT_API_PROVIDER';
-  window['env']['vNextApiVersion'] = '$VNEXT_API_VERSION';
-  window['env']['interbankTransfers'] = '$VNEXT_INTERBANK_TRANSFERS';
+  window['env']['mifosInterbankTransfersApiUrl'] = '$MIFOS_INTERBANK_TRANSFERS_API_URL';
+  window['env']['mifosInterbankTransfersApiProvider'] = '$MIFOS_INTERBANK_TRANSFERS_API_PROVIDER';
+  window['env']['mifosInterbankTransfersApiVersion'] = '$MIFOS_INTERBANK_TRANSFERS_API_VERSION';
+  window['env']['mifosInterbankTransfersEnabled'] = '$MIFOS_INTERBANK_TRANSFERS_ENABLED';
+  window['env']['cbIldEnabled'] = '$CB_ILD_ENABLED';
+  window['env']['pluginBaseUrl'] = '$PLUGIN_BASE_URL';
+
+  // Remittance Module Environment variables
+  window['env']['mifosRemittanceApiClientUrl'] = '$MIFOS_REMITTANCE_API_CLIENT_URL';
+  window['env']['mifosRemittanceApiProvider'] = '$MIFOS_REMITTANCE_API_PROVIDER';
+  window['env']['mifosRemittanceApiVersion'] = '$MIFOS_REMITTANCE_API_VERSION';
+  window['env']['mifosRemittanceEnabled'] = '$MIFOS_REMITTANCE_ENABLED';
+  window['env']['mifosRemittanceApiClientHeader'] = '$MIFOS_REMITTANCE_API_CLIENT_HEADER';
+  window['env']['mifosRemittanceApiClientKey'] = '$MIFOS_REMITTANCE_API_CLIENT_KEY';
+
+  // Mifos Copilot AI assistant
+  // Set MIFOS_ENABLE_COPILOT=true to load the Copilot panel for this deployment (off by default)
+  window['env']['enableCopilot'] = '$MIFOS_ENABLE_COPILOT';
+  window['env']['copilotMcpBaseUrl'] = '$MIFOS_COPILOT_MCP_BASE_URL';
+
+  // Enable Role-Based Access Control (RBAC) for menu/button permissions
+  // Set to 'true' to enable RBAC, 'false' (default) for backward compatibility
+  window['env']['productionModeEnableRBAC'] = '$MIFOS_PRODUCTION_MODE_ENABLE_RBAC';
+
+  // External National ID System Integration
+  // API key is injected server-side via nginx proxy_set_header — not exposed to browser
+  window['env']['enableExternalNationalIdSystem'] = '$ENABLE_EXTERNAL_NATIONAL_ID_SYSTEM';
+  window['env']['externalNationalIdSystemUrl'] = '$EXTERNAL_NATIONAL_ID_SYSTEM_URL';
+  window['env']['externalNationalIdSystemApiHeader'] = '$EXTERNAL_NATIONAL_ID_SYSTEM_API_HEADER';
+  window['env']['externalNationalIdSystemApiKey'] = '$EXTERNAL_NATIONAL_ID_SYSTEM_API_KEY';
+  window['env']['externalNationalIdRegex'] = '$EXTERNAL_NATIONAL_ID_REGEX';
 
   // OIDC Plugin Environment variables
   window['env']['oidcServerEnabled'] = '$FINERACT_PLUGIN_OIDC_ENABLED';

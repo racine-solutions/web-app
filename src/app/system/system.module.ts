@@ -57,6 +57,7 @@ import { AuditTrailsComponent } from './audit-trails/audit-trails.component';
 import { ViewAuditComponent } from './audit-trails/view-audit/view-audit.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { WorkflowJobsComponent } from './manage-jobs/workflow-jobs/workflow-jobs.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ManageExternalEventsComponent } from './manage-external-events/manage-external-events.component';
 import { CobWorkflowComponent } from './manage-jobs/cob-workflow/cob-workflow.component';
@@ -71,6 +72,8 @@ import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.compone
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
+import { SystemInformationComponent } from './system-information/system-information.component';
+import { AboutUsComponent } from './about-us/about-us.component';
 
 @NgModule({
   imports: [
@@ -78,7 +81,6 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     SharedModule,
     PipesModule,
     NgxGraphModule,
-    BrowserAnimationsModule,
     DragDropModule,
     DirectivesModule,
     RunSelectedJobsPopoverComponent,
@@ -132,8 +134,35 @@ import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-ev
     ViewAuditComponent,
     RolesAndPermissionsComponent,
     AddRoleComponent,
-    TranslateModule
-  ],
-  declarations: []
+    TranslateModule,
+    ViewSchedulerJobComponent,
+    EditSchedulerJobComponent,
+    ViewRoleComponent,
+    EditRoleComponent,
+    EntityToEntityMappingComponent,
+    ConfigureMakerCheckerTasksComponent,
+    CreateSurveyComponent,
+    EditSchedulerJobComponent,
+    ViewHistorySchedulerJobComponent,
+    ViewSurveyComponent,
+    EditSurveyComponent,
+    BusinessDateTabComponent,
+    ConfigurationsComponent,
+    GlobalConfigurationsTabComponent,
+    ManageJobsComponent,
+    ManageSchedulerJobsComponent,
+    WorkflowJobsComponent,
+    WorkflowDiagramComponent,
+    ManageExternalEventsComponent,
+    CobWorkflowComponent,
+    LoanLockedComponent,
+    CustomParametersPopoverComponent,
+    CustomParametersTableComponent,
+    ErrorLogPopoverComponent,
+    RunSelectedJobsPopoverComponent,
+    RunSelectedJobsTableComponent,
+    SystemInformationComponent,
+    AboutUsComponent
+  ]
 })
 export class SystemModule {}

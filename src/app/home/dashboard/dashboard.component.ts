@@ -28,6 +28,7 @@ import { AsyncPipe } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DashboardEngineComponent } from 'app/analytics/dashboard-engine/dashboard-engine.component';
 import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.config';
+import { AnalyticsReportComponent } from '../components/analytics-report/analytics-report.component';
 
 /**
  * Dashboard component.
@@ -42,6 +43,7 @@ import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.confi
     MatAutocompleteTrigger,
     MatAutocomplete,
     DashboardEngineComponent,
+    AnalyticsReportComponent,
     AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

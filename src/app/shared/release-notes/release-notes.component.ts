@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { MatDialogRef, MatDialogActions, MatDialogTitle, MatDialogContent } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MatDialogActions,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogClose
+} from '@angular/material/dialog';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { inject } from '@angular/core';
 
@@ -12,7 +18,8 @@ import { inject } from '@angular/core';
     FaIconComponent,
     MatDialogActions,
     MatDialogTitle,
-    MatDialogContent
+    MatDialogContent,
+    MatDialogClose
   ]
 })
 export class ReleaseNotesComponent {

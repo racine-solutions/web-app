@@ -23,7 +23,6 @@ import { M3IconComponent } from '../m3-ui/m3-icon/m3-icon.component';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatPrefix,
-    FaIconComponent,
     M3IconComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

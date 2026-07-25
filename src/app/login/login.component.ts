@@ -58,13 +58,7 @@ import { VersionService } from '../system/version.service';
     TenantSelectorComponent,
     LoginFormComponent,
     ResetPasswordComponent,
-    TwoFactorAuthenticationComponent,
-    MatMenu,
-    MatMenuItem,
-    M3IconComponent,
-    LanguageSelectorComponent,
-    ThemeToggleComponent,
-    FaIconComponent
+    TwoFactorAuthenticationComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

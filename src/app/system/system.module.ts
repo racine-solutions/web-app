@@ -86,7 +86,6 @@ import { RunSelectedJobsPopoverComponent } from './manage-jobs/scheduler-jobs/ru
 import { RunSelectedJobsTableComponent } from './manage-jobs/scheduler-jobs/run-selected-jobs-popover/run-selected-jobs-table/run-selected-jobs-table.component';
 import { SystemInformationComponent } from './system-information/system-information.component';
 import { AboutUsComponent } from './about-us/about-us.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
 import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
@@ -102,7 +101,6 @@ import { TranslateModule } from '@ngx-translate/core';
     NgxGraphModule,
     DragDropModule,
     DirectivesModule,
-    BrowserAnimationsModule,
     PremiumFeatureComponent,
     SmsMessagesComponent,
     PremiumFeatureSmsComponent,

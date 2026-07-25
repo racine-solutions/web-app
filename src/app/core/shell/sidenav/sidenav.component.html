@@ -15,8 +15,8 @@
   <div class="navigation-panel layout-column">
     <!-- TODO: Allow customization by organization -->
     <div class="app-brand" [routerLink]="['/home']">
-      <img src="assets/images/MifosX_logo.png" alt="app-logo" class="app-logo" />
-      <span #logo class="app-logo-text text-muted">{{ 'APP_NAME' | translate }}</span>
+      <img src="assets/images/racine_solutions.svg" alt="app-logo" class="app-logo" />
+      <!--      <span #logo class="app-logo-text text-muted">{{ 'APP_NAME' | translate }}</span>-->
     </div>
 
     <div class="app-user">
@@ -221,12 +221,38 @@
           </mat-icon>
           <a matLine>{{ 'labels.menus.Keyboard Shortcuts' | translate }}</a>
         </mat-list-item>
-        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">
-          <mat-icon matListIcon (click)="help()">
-            <fa-icon icon="question-circle" size="sm"></fa-icon>
+
+        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Release Notes' | translate }}">
+          <mat-icon matListIcon (click)="showReleaseNotes()">
+            <fa-icon icon="sticky-note" size="sm"></fa-icon>
           </mat-icon>
-          <a matLine>{{ 'labels.menus.Help' | translate }}</a>
+          <a matLine>{{ 'labels.menus.Release Notes' | translate }}</a>
         </mat-list-item>
+        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Raise Issues' | translate }}">
+          <mat-icon matListIcon>
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLScRo1Q9l7HJt2WmqW2xv3SsVnn6H6RTvbqep6KOFZvwBaFn7Q/viewform"
+              target="_blank"
+            >
+              <fa-icon icon="anchor" size="sm"></fa-icon>
+            </a>
+          </mat-icon>
+          <a
+            matLine
+            href="https://docs.google.com/forms/d/e/1FAIpQLScRo1Q9l7HJt2WmqW2xv3SsVnn6H6RTvbqep6KOFZvwBaFn7Q/viewform"
+            target="_blank"
+            >{{ 'labels.menus.Raise Issues' | translate }}</a
+          >
+        </mat-list-item>
+
+        <!--         hide mifos help link for now-->
+
+        <!--        <mat-list-item [matTooltipPosition]="tooltipPosition" matTooltip="{{ 'tooltips.Help' | translate }}">-->
+        <!--          <mat-icon matListIcon (click)="help()">-->
+        <!--            <fa-icon icon="question-circle" size="sm"></fa-icon>-->
+        <!--          </mat-icon>-->
+        <!--          <a matLine>{{ 'labels.menus.Help' | translate }}</a>-->
+        <!--        </mat-list-item>-->
       </mat-nav-list>
     </div>
   </div>

@@ -33,8 +33,7 @@ describe('loan-product.config buildPayload', () => {
       charges: [
         { id: 10 },
         { id: 10 },
-        { id: '11' }
-      ],
+        { id: '11' }],
       loanChargeOffBehaviour: 'Regular',
       enableBuydownFees: true,
       allowVariableInstallments: true,
@@ -77,8 +76,7 @@ describe('loan-product.config buildPayload', () => {
     expect(payload.charges).toEqual([
       { id: 10 },
       { id: 11 },
-      { id: 91 }
-    ]);
+      { id: 91 }]);
     expect(payload.allowVariableInstallments).toBeUndefined();
     expect(payload.minimumGap).toBeUndefined();
     expect(payload.maximumGap).toBeUndefined();
@@ -212,8 +210,7 @@ describe('loan-product.config buildPayload', () => {
     expect(payload.overdueCharge).toBeUndefined();
     expect(payload.charges).toEqual([
       { id: 10 },
-      { id: 91 }
-    ]);
+      { id: 91 }]);
 
     // Fields the create endpoint never accepts are stripped.
     expect(payload.calculateInterestForExactDays).toBeUndefined();

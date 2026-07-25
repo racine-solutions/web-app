@@ -43,6 +43,9 @@ import { AuthService } from './zitadel/auth.service';
 import { environment } from '../environments/environment';
 import { CallbackComponent } from './zitadel/callback/callback.component';
 import { OAuthModule } from 'angular-oauth2-oidc';
+import { ReleaseNotesComponent } from './shared/release-notes/release-notes.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { provideLottieOptions } from 'ngx-lottie';
 
 export class CustomMissingTranslationHandler implements MissingTranslationHandler {
@@ -79,6 +82,9 @@ export class CustomMissingTranslationHandler implements MissingTranslationHandle
     AppRoutingModule,
     NotFoundComponent,
     CallbackComponent,
+    MatDialogModule,
+    FontAwesomeModule,
+    ReleaseNotesComponent,
     OAuthModule.forRoot()
   ],
   providers: [

@@ -27,10 +27,7 @@ export class ConfirmationCardComponent {
   @Output() cancelled = new EventEmitter<void>();
 
   /** Ordered label/value pairs for the confirmation summary. */
-  objectEntries(data: Record<string, string>): [
-    string,
-    string
-  ][] {
+  objectEntries(data: Record<string, string>): [string, string][] {
     return Object.entries(data ?? {});
   }
 }

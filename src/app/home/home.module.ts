@@ -9,6 +9,9 @@
 /** Angular Imports */
 import { NgModule } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
 
 /** Custom Modules */
 import { SharedModule } from '../shared/shared.module';
@@ -22,6 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { WarningDialogComponent } from './warning-dialog/warning-dialog.component';
 import { ReportingDashboardComponent } from './reporting-dashboard/reporting-dashboard.component';
 import { SessionTimeoutDialogComponent } from './timeout-dialog/session-timeout-dialog.component';
+import { AnalyticsReportComponent } from './components/analytics-report/analytics-report.component';
 
 /**
  * Home Component
@@ -31,6 +35,9 @@ import { SessionTimeoutDialogComponent } from './timeout-dialog/session-timeout-
 @NgModule({
   imports: [
     MatDialogModule,
+    MatIconModule,
+    MatCardModule,
+    MatTabsModule,
     SharedModule,
     PipesModule,
     HomeRoutingModule,
@@ -39,6 +46,7 @@ import { SessionTimeoutDialogComponent } from './timeout-dialog/session-timeout-
     DashboardComponent,
     WarningDialogComponent,
     SessionTimeoutDialogComponent,
+    AnalyticsReportComponent,
     ReportingDashboardComponent
   ],
   providers: []

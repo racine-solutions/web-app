@@ -7,10 +7,19 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ViewChild,
+  ChangeDetectorRef,
+  inject,
+  DestroyRef
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatTabGroup } from '@angular/material/tabs';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { activities } from '../activities';
@@ -19,6 +28,7 @@ import { AsyncPipe } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { DashboardEngineComponent } from 'app/analytics/dashboard-engine/dashboard-engine.component';
 import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.config';
+import { AnalyticsReportComponent } from '../components/analytics-report/analytics-report.component';
 
 /**
  * Dashboard component.
@@ -33,11 +43,14 @@ import { GLOBAL_ANALYTICS_DASHBOARD } from 'app/analytics/global-dashboard.confi
     MatAutocompleteTrigger,
     MatAutocomplete,
     DashboardEngineComponent,
+    AnalyticsReportComponent,
     AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
+  private router = inject(Router);
+  private changeDetectorRef = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
@@ -52,6 +65,8 @@ export class DashboardComponent implements OnInit {
   /** Office options from resolver */
   offices: any[] = [];
 
+  @ViewChild('tabGroup') tabGroup: MatTabGroup;
+
   constructor() {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { offices: any[] }) => {
       this.offices = data.offices || [];
@@ -60,6 +75,16 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.setFilteredActivities();
+  }
+
+  onTabChange(event: any) {
+    if (event.index === 1) {
+      const tab = this.tabGroup._tabs.toArray()[1];
+      if (tab.content) {
+        tab.content.viewContainerRef.createEmbeddedView(tab.content.templateRef);
+        this.changeDetectorRef.detectChanges();
+      }
+    }
   }
 
   /**

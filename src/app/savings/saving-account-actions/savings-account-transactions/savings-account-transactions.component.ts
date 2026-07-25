@@ -127,6 +127,7 @@ export class SavingsAccountTransactionsComponent implements OnInit {
         '',
         Validators.required
       ],
+      externalId: '',
       note: ['']
     });
   }

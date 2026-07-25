@@ -216,12 +216,15 @@
 
 <!-- Application User Help Menu -->
 <mat-menu #applicationMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item (click)="help()" tabindex="0">
-    <mat-icon matListIcon>
-      <fa-icon icon="question-circle" size="sm"></fa-icon>
-    </mat-icon>
-    <span>{{ 'labels.menus.Help' | translate }}</span>
-  </button>
+  <!--  Hide mifos help button for now-->
+
+  <!--  <button mat-menu-item (click)="help()" tabindex="0">-->
+  <!--    <mat-icon matListIcon>-->
+  <!--      <fa-icon icon="question-circle" size="sm"></fa-icon>-->
+  <!--    </mat-icon>-->
+  <!--    <span>{{ 'labels.menus.Help' | translate }}</span>-->
+  <!--  </button>-->
+
   <button mat-menu-item [routerLink]="['/profile']" tabindex="0">
     <mat-icon>
       <fa-icon icon="user" size="sm"></fa-icon>

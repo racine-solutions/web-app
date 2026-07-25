@@ -1,0 +1,38 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.wallet-transactions-card {
+  border-radius: 1.25rem;
+}
+
+.table-container {
+  overflow: auto;
+  border-radius: 1rem;
+  margin-top: 0.5rem;
+}
+
+.wallet-transactions-table {
+  width: 100%;
+  min-width: 70rem;
+}
+
+.note-cell {
+  max-width: 28rem;
+  white-space: normal;
+  line-height: 1.45;
+  padding: 0.5rem 0;
+}
+
+.no-data-cell {
+  padding: 1rem;
+  text-align: center;
+}
+
+mat-paginator {
+  margin-top: 1rem;
+}

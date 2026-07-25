@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /** rxjs Imports */
 import { forkJoin, merge } from 'rxjs';
-import { skip } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
 
 /** Custom Services */
 import { HomeService } from '../../home.service';

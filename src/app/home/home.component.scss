@@ -8,6 +8,13 @@
 
 .container {
   max-width: 37rem;
+  margin: 0 auto;
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
 
   .title {
     font-size: 1.25rem;
@@ -23,4 +30,10 @@
 a {
   text-decoration: none;
   color: black;
+}
+
+.racine-logo {
+  display: block;
+  margin: 0 auto 15px;
+  width: 80%;
 }

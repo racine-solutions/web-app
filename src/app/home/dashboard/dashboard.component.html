@@ -7,24 +7,38 @@
 -->
 
 <div class="container">
-  <div class="dashboard-layout">
-    <mat-card class="search-card">
-      <mat-card-content>
-        <mat-form-field>
-          <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
-          <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
-        </mat-form-field>
+  <mat-tab-group #tabGroup (selectChange)="onTabChange($event)">
+    <mat-tab label="Analytics Report">
+      <div class="dashboard-layout">
+        <mifosx-analytics-report></mifosx-analytics-report>
+      </div>
+    </mat-tab>
+    <mat-tab label="Client & Collection Trends">
+      <ng-template matTabContent>
+        <div class="dashboard-layout">
+          <mat-card class="search-card">
+            <mat-card-content>
+              <mat-form-field>
+                <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
+                <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
+              </mat-form-field>
 
-        <mat-autocomplete #activitySearch="matAutocomplete">
-          @for (activity of filteredActivities | async; track activity) {
-            <mat-option [routerLink]="activity.path">
-              <span>{{ activity.activity }}</span>
-            </mat-option>
-          }
-        </mat-autocomplete>
-      </mat-card-content>
-    </mat-card>
+              <mat-autocomplete #activitySearch="matAutocomplete">
+                @for (activity of filteredActivities | async; track activity) {
+                  <mat-option [routerLink]="activity.path">
+                    <span>{{ activity.activity }}</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-card-content>
+          </mat-card>
 
-    <mifosx-analytics-dashboard [dashboard]="dashboardDefinition" [offices]="offices"></mifosx-analytics-dashboard>
-  </div>
+          <mifosx-analytics-dashboard
+            [dashboard]="dashboardDefinition"
+            [offices]="offices"
+          ></mifosx-analytics-dashboard>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
 </div>

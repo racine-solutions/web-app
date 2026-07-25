@@ -6,16 +6,16 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<div class="layout-row align-end gap-2px responsive-column container m-b-20">
-  <div #buttonDashboard class="in-block">
-    <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
+<div class="container">
+  <!-- Dashboard button aligned to the right -->
+  <div class="button-container">
+    <button mat-raised-button color="primary" [routerLink]="['/dashboard']" #buttonDashboard>
       <fa-icon icon="tachometer-alt" class="m-r-10"></fa-icon>
       {{ 'labels.buttons.Dashboard' | translate }}
     </button>
   </div>
-</div>
 
-<div class="container">
+  <!-- Welcome card -->
   <mat-card>
     <mat-card-header>
       <mat-card-title class="title">
@@ -41,12 +41,7 @@
       </mat-autocomplete>
     </mat-card-content>
 
-    <img
-      mat-card-image
-      [src]="'assets/images/' + tenant + '_home.png'"
-      (error)="onImageMissing($event)"
-      alt="Mifos X"
-    />
+    <img mat-card-image src="assets/images/racine_solutions.svg" alt="Racine Solutions" class="racine-logo" />
   </mat-card>
 </div>
 

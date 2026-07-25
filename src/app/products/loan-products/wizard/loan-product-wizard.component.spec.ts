@@ -150,8 +150,7 @@ describe('LoanProductWizardComponent', () => {
         { id: 4, code: 'PRINCIPAL', value: 'Principal' }
       ],
       advancedPaymentAllocationFutureInstallmentAllocationRules: [
-        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }
-      ]
+        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }]
     };
 
     component.ngOnInit();
@@ -177,16 +176,14 @@ describe('LoanProductWizardComponent', () => {
     component.loanProductsTemplate = {
       currencyOptions: [{ code: 'INR' }],
       transactionProcessingStrategyOptions: [
-        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }
-      ],
+        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }],
       advancedPaymentAllocationTransactionTypes: [{ id: 1, code: 'DEFAULT', value: 'Default' }],
       advancedPaymentAllocationTypes: [
         { id: 1, code: 'PENALTY', value: 'Penalty' },
         { id: 2, code: 'FEE', value: 'Fee' }
       ],
       advancedPaymentAllocationFutureInstallmentAllocationRules: [
-        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }
-      ]
+        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }]
     };
 
     component.ngOnInit();
@@ -217,13 +214,11 @@ describe('LoanProductWizardComponent', () => {
     component.loanProductsTemplate = {
       currencyOptions: [{ code: 'INR' }],
       transactionProcessingStrategyOptions: [
-        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }
-      ],
+        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }],
       advancedPaymentAllocationTransactionTypes: [{ id: 1, code: 'DEFAULT', value: 'Default' }],
       advancedPaymentAllocationTypes: [{ id: 1, code: 'PENALTY', value: 'Penalty' }],
       advancedPaymentAllocationFutureInstallmentAllocationRules: [
-        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }
-      ]
+        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }]
     };
 
     component.ngOnInit();
@@ -325,16 +320,14 @@ describe('LoanProductWizardComponent', () => {
     component.loanProductsTemplate = {
       currencyOptions: [{ code: 'INR' }],
       transactionProcessingStrategyOptions: [
-        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }
-      ],
+        { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }],
       advancedPaymentAllocationTransactionTypes: [{ id: 1, code: 'DEFAULT', value: 'Default' }],
       advancedPaymentAllocationTypes: [
         { id: 1, code: 'PENALTY', value: 'Penalty' },
         { id: 2, code: 'FEE', value: 'Fee' }
       ],
       advancedPaymentAllocationFutureInstallmentAllocationRules: [
-        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }
-      ],
+        { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }],
       supportedInterestRefundTypes: [{ id: 'MERCHANT_ISSUED_REFUND' }]
     };
 
@@ -557,16 +550,14 @@ describe('LoanProductWizardComponent', () => {
       component.loanProductsTemplate = {
         currencyOptions: [{ code: 'INR' }],
         transactionProcessingStrategyOptions: [
-          { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }
-        ],
+          { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }],
         advancedPaymentAllocationTransactionTypes: [{ id: 1, code: 'DEFAULT', value: 'Default' }],
         advancedPaymentAllocationTypes: [
           { id: 1, code: 'PENALTY', value: 'Penalty' },
           { id: 2, code: 'FEE', value: 'Fee' }
         ],
         advancedPaymentAllocationFutureInstallmentAllocationRules: [
-          { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }
-        ]
+          { id: 1, code: 'NEXT_INSTALLMENT', value: 'Next installment' }]
       };
 
       component.ngOnInit();
@@ -619,8 +610,7 @@ describe('LoanProductWizardComponent', () => {
       component.loanProductsTemplate = {
         currencyOptions: [{ code: 'INR' }],
         transactionProcessingStrategyOptions: [
-          { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }
-        ]
+          { code: LoanProducts.ADVANCED_PAYMENT_ALLOCATION_STRATEGY, name: 'Advanced Payment Allocation' }]
       };
       component.ngOnInit();
       return component;

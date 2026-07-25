@@ -34,7 +34,6 @@ import { SidenavComponent } from './sidenav/sidenav.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { ContentComponent } from './content/content.component';
-import { FooterComponent } from '../../shared/footer/footer.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { environment } from '../../../environments/environment';
 
@@ -55,7 +54,6 @@ import { environment } from '../../../environments/environment';
     ToolbarComponent,
     BreadcrumbComponent,
     ContentComponent,
-    FooterComponent,
     AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

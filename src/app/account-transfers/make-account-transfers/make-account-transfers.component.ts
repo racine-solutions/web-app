@@ -269,7 +269,11 @@ export class MakeAccountTransfersComponent implements OnInit, AfterViewInit {
 
   amountExceedsBalanceValidator(control: AbstractControl): ValidationErrors | null {
     const amount = control.value;
-    return amount > this.balance ? { amountExceedsBalance: true } : null;
+
+    if (amount > this.accountTransferTemplateData?.fromAccount?.amtForTransfer) {
+      return { amountExceedsBalance: true };
+    }
+    return null;
   }
 
   /** Sets options value */

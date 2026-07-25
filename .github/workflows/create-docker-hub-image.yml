@@ -1,52 +1,99 @@
-name: Publish Image in Docker Hub
+name: Racine Build and Push Docker Image
 
 on:
   push:
-    branches: [main, dev]
+    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
+  pull_request:
+    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
+
+# Cancel in-progress runs on new pushes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: hero78/racinepayfrontend
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_ORGANIZATION: ${{ secrets.DOCKER_ORGANIZATION }}
+    timeout-minutes: 30 # Set a reasonable timeout to prevent hanging builds
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1 # Only fetch the latest commit
+          fetch-tags: false # Don't fetch tags unless needed
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Node.js cache
+        uses: actions/cache@v3
         with:
-          install: true
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
         with:
-          username: ${{ secrets.DOCKER_USER }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Get Git Hashes
+      - name: Use Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.12.0'
+
+      - name: Install dependencies (robust)
         run: |
-          echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        id: git_hashes
+          npm ci || (echo 'npm ci failed, running npm install as fallback' && rm -rf node_modules package-lock.json && npm install)
 
-      - name: Build and Push Multi-Arch Docker Image
+      - name: Run production build
+        run: npm run build:prod -- --base-href=/
+
+      - name: Create minimal Dockerfile for static nginx image
         run: |
-          TAGS="--tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}"
+          echo 'FROM nginx:1.29-alpine' > dist/web-app/browser/Dockerfile
+          echo 'COPY . /usr/share/nginx/html' >> dist/web-app/browser/Dockerfile
+          echo 'EXPOSE 80' >> dist/web-app/browser/Dockerfile
+          echo 'CMD ["/bin/sh", "-c", "if [ -f /usr/share/nginx/html/assets/env.template.js ]; then envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js; fi && exec nginx -g '\''daemon off;'\''"]' >> dist/web-app/browser/Dockerfile
 
-          if [ "${{ steps.extract_branch.outputs.branch }}" == "main" ]; then
-            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.short_hash }} --tag $DOCKER_ORGANIZATION/web-app:${{ steps.git_hashes.outputs.long_hash }}"
-          else
-            TAGS="$TAGS --tag $DOCKER_ORGANIZATION/web-app:${{ steps.extract_branch.outputs.branch }}-${{ steps.git_hashes.outputs.short_hash }}"
-          fi
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: dist/web-app/browser
+          file: dist/web-app/browser/Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-          docker build --push --build-arg="PUPPETEER_SKIP_DOWNLOAD_ARG=true" --platform linux/amd64,linux/arm64 $TAGS .
+      - name: Image digest
+        run: echo ${{ steps.build.outputs.digest }}

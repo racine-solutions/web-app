@@ -49,6 +49,11 @@ import { CreateSurveyComponent } from './manage-surveys/create-survey/create-sur
 import { EditSurveyComponent } from './manage-surveys/edit-survey/edit-survey.component';
 import { ManageSurveysComponent } from './manage-surveys/manage-surveys.component';
 import { ViewSurveyComponent } from './manage-surveys/view-survey/view-survey.component';
+import { PremiumFeatureComponent } from './premium-feature/premium-feature.component';
+import { SmsAccountResolver } from './premium-feature/sms/sms-account.resolver';
+import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
+import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
+import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -98,6 +103,8 @@ import { ManageSurveysResolver } from './manage-surveys/manage-surveys.resolver'
 import { SurveyResolver } from './manage-surveys/survey.resolver';
 import { RolesAndPermissionsResolver } from './roles-and-permissions/roles-and-permissions.resolver';
 import { ViewRoleResolver } from './roles-and-permissions/view-role/view-role.resolver';
+import { SmsEventConfigurationComponent } from './sms-event-configuration/sms-event-configuration.component';
+import { SmsEventConfigurationResolver } from './sms-event-configuration/sms.event.configuration.resolver';
 
 const routes: Routes = [
   Route.withShell([
@@ -614,6 +621,57 @@ const routes: Routes = [
               }
             }
           ]
+        },
+        {
+          path: 'premium-feature',
+          data: { title: 'RacinePay Premium', breadcrumb: 'RacinePay Premium' },
+          children: [
+            {
+              path: '',
+              component: PremiumFeatureComponent
+            },
+            {
+              path: 'sms',
+              data: { title: 'SMS', breadcrumb: 'SMS' },
+              children: [
+                {
+                  path: '',
+                  component: PremiumFeatureSmsComponent,
+                  resolve: {
+                    smsAccount: SmsAccountResolver
+                  }
+                },
+                {
+                  path: 'sms-event-configuration',
+                  data: { title: 'SMS Event Configuration', breadcrumb: 'SMS Event Configuration' },
+                  children: [
+                    {
+                      path: '',
+                      component: SmsEventConfigurationComponent,
+                      resolve: {
+                        events: SmsEventConfigurationResolver
+                      }
+                    }
+                  ]
+                },
+                {
+                  path: 'messages',
+                  data: { title: 'Messages', breadcrumb: 'Messages' },
+                  component: SmsMessagesComponent
+                },
+                {
+                  path: 'wallet-transactions',
+                  data: { title: 'Wallet Transactions', breadcrumb: 'Wallet Transactions' },
+                  component: SmsWalletTransactionsComponent
+                }
+              ]
+            }
+          ]
+        },
+        {
+          path: 'sms-event-configuration',
+          pathMatch: 'full',
+          redirectTo: 'premium-feature/sms/sms-event-configuration'
         }
       ]
     }
@@ -653,7 +711,8 @@ const routes: Routes = [
     ViewRoleResolver,
     EntityToEntityMappingResolver,
     MakerCheckerTasksResolver,
-    ViewHistorySchedulerJobsResolver
+    ViewHistorySchedulerJobsResolver,
+    SmsAccountResolver
   ]
 })
 export class SystemRoutingModule {}

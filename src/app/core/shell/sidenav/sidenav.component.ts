@@ -24,6 +24,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 /** Custom Components */
 import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { ReleaseNotesComponent } from 'app/shared/release-notes/release-notes.component';
 
 /** Custom Services */
 import { AuthenticationService } from '../../authentication/authentication.service';
@@ -46,6 +47,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { remittanceConfig } from '../../../remittances/remittance.config';
 
 import { catchError, finalize, of, take } from 'rxjs';
+
+export type TooltipPosition = 'left' | 'right' | 'above' | 'below' | 'before' | 'after';
 
 /**
  * Sidenav component.
@@ -81,12 +84,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   /** True if sidenav is in collapsed state. */
   @Input() sidenavCollapsed: boolean;
-  /** Tooltip position */
-  tooltipPosition = 'after';
   /** Username of authenticated user. */
   username: string;
   /** Array of all user activities */
-  userActivity: string[];
+  userActivity: string[] = JSON.parse(localStorage.getItem('mifosXLocation'));
   /** Mapped Activites */
   mappedActivities: any[] = [];
   /** Collection of possible frequent activities */
@@ -103,17 +104,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   /* Template for popover on chart of accounts */
   @ViewChild('templateChartOfAccounts') templateChartOfAccounts: TemplateRef<any>;
 
-  /**
-   * @param {Router} router Router for navigation.
-   * @param {MatDialog} dialog Mat Dialog
-   * @param {AuthenticationService} authenticationService Authentication Service.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
-   * @param {PopoverService} popoverService PopoverService.
-   */
-  constructor() {
-    this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
-  }
+  tooltipPosition: TooltipPosition = 'right';
 
   /**
    * Sets the username of the authenticated user.
@@ -151,7 +142,18 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    */
   showKeyboardShortcuts() {
     const dialogRef = this.dialog.open(KeyboardShortcutsDialogComponent);
-    dialogRef.afterClosed().subscribe((response: any) => {});
+    dialogRef.afterClosed().subscribe(() => {});
+  }
+
+  /**
+   * Opens Release Notes dialog.
+   */
+  showReleaseNotes() {
+    const dialogRef = this.dialog.open(ReleaseNotesComponent, {
+      width: '500px',
+      height: '600px'
+    });
+    dialogRef.afterClosed().subscribe(() => {});
   }
 
   /**
@@ -165,7 +167,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       frequencyCounts[activity] = (frequencyCounts[activity] || 0) + 1;
     }
     const frequencyCountsArray = Object.entries(frequencyCounts);
-    const topThreeFrequentActivities = frequencyCountsArray
+    return frequencyCountsArray
       .sort((a: any, b: any) => b[1] - a[1])
       .map((entry: any[]) => entry[0])
       .filter(
@@ -177,7 +179,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           ].includes(activity)
       )
       .slice(0, 3);
-    return topThreeFrequentActivities;
   }
 
   /**

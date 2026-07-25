@@ -33,17 +33,16 @@ import { TranslateService } from '@ngx-translate/core';
 /** Environment Imports */
 import { environment } from '../../environments/environment';
 import { SettingsService } from 'app/settings/settings.service';
-import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
-import { ThemeToggleComponent } from '../shared/theme-toggle/theme-toggle.component';
-import { ServerSelectorComponent } from '../shared/server-selector/server-selector.component';
 import { TenantSelectorComponent } from '../shared/tenant-selector/tenant-selector.component';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication/two-factor-authentication.component';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatMenu, MatMenuItem } from '@angular/material/menu';
+import { M3IconComponent } from '../shared/m3-ui/m3-icon/m3-icon.component';
+import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
+import { ThemeToggleComponent } from '../shared/theme-toggle/theme-toggle.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { M3IconComponent } from '../shared/m3-ui/m3-icon/m3-icon.component';
 
 import { VersionService } from '../system/version.service';
 
@@ -56,18 +55,10 @@ import { VersionService } from '../system/version.service';
   styleUrls: ['./login.component.scss'],
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    LanguageSelectorComponent,
-    ThemeToggleComponent,
-    ServerSelectorComponent,
     TenantSelectorComponent,
     LoginFormComponent,
     ResetPasswordComponent,
-    TwoFactorAuthenticationComponent,
-    MatMenuTrigger,
-    FaIconComponent,
-    MatMenu,
-    MatMenuItem,
-    M3IconComponent
+    TwoFactorAuthenticationComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -104,8 +95,8 @@ export class LoginComponent implements OnInit {
   resetPassword = false;
   /** True if user requires two factor authentication. */
   twoFactorAuthenticationRequired = false;
-  logoPath = 'assets/images/default_home.png';
-  logoPathDark = 'assets/images/white-mifos.png';
+  logoPath = 'assets/images/racine_solutions.svg';
+  logoPathDark = 'assets/images/racine_solutions.svg';
 
   themeDarkEnabled: boolean = false;
 
@@ -184,16 +175,6 @@ export class LoginComponent implements OnInit {
     if (environment.oauth.enabled) {
       return false;
     }
-    if (environment.displayTenantSelector === 'false') {
-      return false;
-    }
-    const tenantIds = environment.fineractPlatformTenantIds
-      .split(',')
-      .map((id) => id.trim())
-      .filter((id) => id.length > 0);
-    if (tenantIds.length === 0 || (tenantIds.length === 1 && tenantIds[0] === 'default')) {
-      return false;
-    }
     return true;
   }
 
@@ -209,22 +190,24 @@ export class LoginComponent implements OnInit {
     if (environment.tenantLogoUrl && environment.tenantLogoUrl.trim() !== '') {
       this.logoPath = environment.tenantLogoUrl;
     } else {
-      this.logoPath = isTenantSpecific ? `assets/images/${tenant}_home.png` : 'assets/images/default_home.png';
+      this.logoPath = isTenantSpecific ? `assets/images/${tenant}_home.png` : 'assets/images/racine_solutions.svg';
     }
 
     // Set dark mode logo (env override takes priority)
     if (environment.tenantLogoUrlDark && environment.tenantLogoUrlDark.trim() !== '') {
       this.logoPathDark = environment.tenantLogoUrlDark;
     } else {
-      this.logoPathDark = isTenantSpecific ? `assets/images/${tenant}_home_dark.png` : 'assets/images/white-mifos.png';
+      this.logoPathDark = isTenantSpecific
+        ? `assets/images/${tenant}_home_dark.png`
+        : 'assets/images/racine_solutions.svg';
     }
   }
 
   onLogoError(): void {
-    this.logoPath = 'assets/images/default_home.png';
+    this.logoPath = 'assets/images/racine_solutions.svg';
   }
 
   onLogoErrorDark(): void {
-    this.logoPathDark = 'assets/images/white-mifos.png';
+    this.logoPathDark = 'assets/images/racine_solutions.svg';
   }
 }

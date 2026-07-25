@@ -23,7 +23,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 /** Custom Imports. */
 import { activities } from './activities';
@@ -93,9 +93,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('searchActivity', { static: false }) searchActivity: ElementRef<any>;
   /* Template for popover on search activity */
   @ViewChild('templateSearchActivity', { static: false }) templateSearchActivity: TemplateRef<any>;
-
-  // All dependencies are injected using inject() above. No constructor needed.
-  constructor() {}
 
   /**
    * Sets the username of the authenticated user.

@@ -52,8 +52,7 @@ describe('CreateEditComponent', () => {
         { provide: ActivatedRoute, useValue: { data: of({ templateData: data, mode }) } },
         { provide: Router, useValue: router },
         { provide: TemplatesService, useValue: templatesService },
-        { provide: ThemingService, useValue: { theme: of('light-theme') } }
-      ]
+        { provide: ThemingService, useValue: { theme: of('light-theme') } }]
     });
 
     let component: CreateEditComponent;

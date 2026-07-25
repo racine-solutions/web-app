@@ -12,6 +12,8 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { startWith } from 'rxjs/operators';
+
 /** Custom Services */
 import { HomeService } from '../../home.service';
 import { ThemingService } from 'app/shared/theme-toggle/theming.service';
@@ -77,8 +79,8 @@ export class AmountDisbursedPieComponent implements OnInit {
    * Initialize with office Id 1 for better UX.
    */
   ngOnInit() {
-    this.getChartData();
     this.officeId.patchValue(1);
+    this.getChartData();
     // Subscribe to theme changes to update chart legend colors
     this.themingService.theme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
       this.currentTheme = theme;
@@ -92,7 +94,7 @@ export class AmountDisbursedPieComponent implements OnInit {
    * Subscribes to value changes of office Id fetches chart data accordingly.
    */
   getChartData() {
-    this.officeId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value: number) => {
+    this.officeId.valueChanges.pipe(startWith(1), takeUntilDestroyed(this.destroyRef)).subscribe((value: number) => {
       this.homeService.getDisbursedAmount(value).subscribe((response: any) => {
         const data = Object.entries(response[0]).map((entry) => entry[1]);
         if (!(data[0] === 0 && data[1] === 0)) {

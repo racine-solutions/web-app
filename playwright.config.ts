@@ -67,8 +67,7 @@ export default defineConfig({
   reporter: [
     [
       'html',
-      { outputFolder: 'playwright-report', open: 'never' }
-    ],
+      { outputFolder: 'playwright-report', open: 'never' }],
     ['list']
   ],
 

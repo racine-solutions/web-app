@@ -12,8 +12,9 @@ import { SettingsService } from 'app/settings/settings.service';
 import { AlertService } from 'app/core/alert/alert.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MatFormField, MatPrefix, MatLabel } from '@angular/material/form-field';
-import { M3IconComponent } from 'app/shared/m3-ui/m3-icon/m3-icon.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { M3IconComponent } from '../m3-ui/m3-icon/m3-icon.component';
 
 @Component({
   selector: 'mifosx-tenant-selector',

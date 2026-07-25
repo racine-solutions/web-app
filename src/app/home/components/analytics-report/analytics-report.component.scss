@@ -1,0 +1,53 @@
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.analytics-section {
+  h3 {
+    margin-bottom: 10px;
+  }
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 32%);
+  gap: 16px;
+}
+
+.analytics-item {
+  border: 1px solid #eee;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.analytics-icon {
+  font-family: 'Material Icons', sans-serif;
+  font-size: 48px;
+  color: #3f51b5;
+  margin-bottom: 10px;
+}
+
+.mat-icon {
+  height: 50px !important;
+  width: 50px !important;
+}
+
+.analytics-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a237e;
+}
+
+.analytics-label {
+  font-size: 14px;
+  color: #00695c;
+}

@@ -34,18 +34,24 @@ RUN npm cache clear --force
 RUN npm config set fetch-retry-maxtimeout 120000
 RUN npm config set registry $NPM_REGISTRY_URL --location=global
 
-RUN npm ci
+RUN npm install
 
-RUN sh -c "ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS"
+# Build for Release 1.14.0
+RUN npx ng build --configuration production --output-path=/dist/browser
 
 ###############
 ### STAGE 2: Serve app with nginx ###
 ###############
 FROM $NGINX_IMAGE
 
+LABEL org.opencontainers.image.title="Fineract Webapp" \
+      org.opencontainers.image.version="1.14.0" \
+      org.opencontainers.image.description="Fineract Webapp Release 1.14.0"
+
+# Correct build output path for Angular CLI >= v8 (defaultProject):
 COPY --from=builder /dist/browser /usr/share/nginx/html
 
 EXPOSE 80
 
-# When the container starts, replace the env.js with values from environment variables
-CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]
+# When the container starts, replace the env.js with values from environment variables if template exists
+CMD ["/bin/sh", "-c", "if [ -f /usr/share/nginx/html/assets/env.template.js ]; then envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js; fi && exec nginx -g 'daemon off;'"]

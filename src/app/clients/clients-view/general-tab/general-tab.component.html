@@ -242,8 +242,7 @@
                 <button
                   class="row-action primary"
                   matTooltip="{{ 'tooltips.Make Repayment' | translate }}"
-                  (click)="routeEdit($event)"
-                  [routerLink]="['../', 'loans-accounts', loan.id, 'actions', 'Make Repayment']"
+                  (click)="navigateToMakeRepayment(loan, $event)"
                 >
                   <i class="fa fa-dollar"></i>
                 </button>

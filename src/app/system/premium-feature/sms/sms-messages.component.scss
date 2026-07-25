@@ -1,0 +1,68 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.messages-card {
+  border-radius: 1.25rem;
+}
+
+.table-container {
+  overflow: auto;
+  border-radius: 1rem;
+  margin-top: 0.5rem;
+}
+
+.messages-table {
+  width: 100%;
+  min-width: 64rem;
+}
+
+.message-cell {
+  max-width: 30rem;
+  white-space: normal;
+  line-height: 1.45;
+  padding: 0.5rem 0;
+}
+
+.message-status-pill {
+  display: inline-block;
+  min-width: 4.75rem;
+  text-align: center;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status-success {
+  background: rgb(92 184 92 / 16%);
+  color: #2d7d2d;
+}
+
+.status-failed {
+  background: rgb(220 53 69 / 12%);
+  color: #b42318;
+}
+
+.no-data-cell {
+  padding: 1rem;
+  text-align: center;
+}
+
+mat-paginator {
+  margin-top: 1rem;
+}
+
+:host-context(.dark-theme) {
+  .status-success {
+    color: #8fe38f;
+  }
+
+  .status-failed {
+    color: #ff9a9a;
+  }
+}

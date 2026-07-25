@@ -181,16 +181,6 @@ export class LoginComponent implements OnInit {
     if (environment.oauth.enabled) {
       return false;
     }
-    if (environment.displayTenantSelector === 'false') {
-      return false;
-    }
-    const tenantIds = environment.fineractPlatformTenantIds
-      .split(',')
-      .map((id) => id.trim())
-      .filter((id) => id.length > 0);
-    if (tenantIds.length === 0 || (tenantIds.length === 1 && tenantIds[0] === 'default')) {
-      return false;
-    }
     return true;
   }
 

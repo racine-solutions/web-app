@@ -52,16 +52,16 @@
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #1074b914;
+      background-color: #2874ec14;
     }
 
     &.mat-mdc-option-active {
-      background-color: #1074b91f;
+      background-color: #2874ec1f;
     }
 
     &.mdc-list-item--selected {
-      background-color: #1074b91f;
-      color: var(--md-sys-color-primary, #1074b9);
+      background-color: #2874ec1f;
+      color: var(--md-sys-color-primary, #2874ec);
       font-weight: 500;
     }
 

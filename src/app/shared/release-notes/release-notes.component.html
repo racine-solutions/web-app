@@ -1,21 +1,56 @@
-<h2 mat-dialog-title>Release Notes</h2>
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>Release Notes (Version 1.15.0)</h2>
 
 <mat-dialog-content class="mat-typography">
   <h3><fa-icon icon="tags" class="icon-green"></fa-icon> New Features</h3>
   <ul>
-    <li>Sms configuration</li>
-    <li>Dashboard analytics report</li>
+    <li><strong>Sms Configuration:</strong> SMS notification and template management systems.</li>
+    <li>
+      <strong>Dashboard Analytics:</strong> Custom stats component showing active loans, interest, penalties, and
+      arrears statistics.
+    </li>
+    <li>
+      <strong>Configurable Analytics Dashboard (Community):</strong> Configurable metrics and charts foundation for
+      dashboard.
+    </li>
+    <li>
+      <strong>Reporting Dashboard (Community):</strong> Interactive dashboard displaying client and collection trends.
+    </li>
+    <li><strong>Credit Profile Tab (Community):</strong> Credit Profile section in the client details view.</li>
+    <li><strong>Bureau Readiness Tab (Community):</strong> Bureau Readiness verification tab in client details.</li>
+    <li>
+      <strong>Working Capital Loans (Community):</strong> Support for pause/resume delinquency classification, charge
+      adjustments, and originator configuration.
+    </li>
   </ul>
 
   <h3><fa-icon icon="bug" class="icon-red"></fa-icon> Bug Fixes</h3>
   <ul>
-    <li>Route to loan repayment at the dollar sign in client/group profile</li>
-    <li>Fix all pentaho reports to be able to export in csv,excell,normal format</li>
+    <li>Route to loan repayment at the dollar sign in client/group profile.</li>
+    <li>Fix all pentaho reports to be able to export in csv, excell, normal format.</li>
+    <li><strong>2FA Authentication:</strong> Resolved 2FA email OTP not working during login.</li>
+    <li><strong>Identifier Images:</strong> Fixed rendering of identifier images after refresh.</li>
+    <li><strong>Datatable Scrolling:</strong> Restored horizontal scrolling on custom datatable views.</li>
+    <li><strong>Formula Injection Prevention:</strong> Sanitized CSV/XLSX exports to prevent formula injection.</li>
+    <li><strong>Templates ID:</strong> Ensured template ID is included on template updates.</li>
   </ul>
 
   <h3><fa-icon icon="anchor" class="icon-coral"></fa-icon> Improvements</h3>
   <ul>
-    <li>Enhance on dashboard reports</li>
+    <li>Enhance on dashboard reports.</li>
+    <li><strong>Datatable Data Refreshing:</strong> Automatically refresh datatable tab data on route updates.</li>
+    <li>
+      <strong>Localization and Translation:</strong> Improved loan product creation localization and external event
+      labels translations.
+    </li>
+    <li><strong>Autocomplete Results:</strong> Refresh transfer client autocomplete results on demand.</li>
   </ul>
 </mat-dialog-content>
 

@@ -8,10 +8,18 @@
 
 /* eslint-disable @angular-eslint/prefer-inject */
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges
+} from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subscription, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 /** Custom Services */
 import { AuthenticationService } from 'app/core/authentication/authentication.service';
@@ -50,13 +58,14 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
   widgetStateMap: Record<string, AnalyticsWidgetState> = {};
 
   private filtersSubscription?: Subscription;
-  private loadSubscription?: Subscription;
+  private widgetSubscriptions: Subscription[] = [];
 
   constructor(
     private formBuilder: UntypedFormBuilder,
     private authenticationService: AuthenticationService,
     private analyticsDataSourceService: AnalyticsDataSourceService,
-    private analyticsVisibilityService: AnalyticsVisibilityService
+    private analyticsVisibilityService: AnalyticsVisibilityService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
   get metricWidgets(): AnalyticsWidgetDefinition[] {
     return this.visibleWidgets.filter((widget) => widget.type === 'metric');
@@ -107,9 +116,8 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
       this.filtersSubscription.unsubscribe();
     }
 
-    if (this.loadSubscription) {
-      this.loadSubscription.unsubscribe();
-    }
+    this.widgetSubscriptions.forEach((sub) => sub.unsubscribe());
+    this.widgetSubscriptions = [];
   }
 
   reloadDashboard(forceRefresh: boolean = false): void {
@@ -121,9 +129,8 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
       this.analyticsDataSourceService.clearCache();
     }
 
-    if (this.loadSubscription) {
-      this.loadSubscription.unsubscribe();
-    }
+    this.widgetSubscriptions.forEach((sub) => sub.unsubscribe());
+    this.widgetSubscriptions = [];
 
     const filters = this.filtersForm.getRawValue() as AnalyticsFilters;
     this.widgetStateMap = this.visibleWidgets.reduce(
@@ -137,37 +144,21 @@ export class DashboardEngineComponent implements OnInit, OnChanges, OnDestroy {
       {}
     );
 
-    this.loadSubscription = forkJoin(
-      this.visibleWidgets.map((widget) =>
-        this.analyticsDataSourceService.loadWidget(widget, filters).pipe(
-          map((state) => ({
-            widgetId: widget.id,
-            state
-          }))
-        )
-      )
-    ).subscribe({
-      next: (results) => {
-        this.widgetStateMap = results.reduce(
-          (accumulator, result) => ({
-            ...accumulator,
-            [result.widgetId]: result.state
-          }),
-          {}
-        );
-      },
-      error: () => {
-        this.widgetStateMap = this.visibleWidgets.reduce(
-          (accumulator, widget) => ({
-            ...accumulator,
-            [widget.id]: {
-              loading: false,
-              empty: true
-            }
-          }),
-          {}
-        );
-      }
+    this.visibleWidgets.forEach((widget) => {
+      const sub = this.analyticsDataSourceService.loadWidget(widget, filters).subscribe({
+        next: (state) => {
+          this.widgetStateMap[widget.id] = state;
+          this.changeDetectorRef.markForCheck();
+        },
+        error: () => {
+          this.widgetStateMap[widget.id] = {
+            loading: false,
+            empty: true
+          };
+          this.changeDetectorRef.markForCheck();
+        }
+      });
+      this.widgetSubscriptions.push(sub);
     });
   }
 

@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AnalyticsReportComponent implements OnInit {
   analyticsData: any;
+  objectKeys = Object.keys;
   private reportsService = inject(ReportsService);
 
   ngOnInit() {

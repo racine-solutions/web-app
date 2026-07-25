@@ -2,9 +2,9 @@ name: Racine Build and Push Docker Image
 
 on:
   push:
-    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
+    branches: [racine-dev-1.15.0-preview]
   pull_request:
-    branches: [racine-dev-1.14.0-preview, merge-1.15.0-preview-into-racine-pay-1.14.0]
+    branches: [racine-dev-1.15.0-preview]
 
 # Cancel in-progress runs on new pushes
 concurrency:

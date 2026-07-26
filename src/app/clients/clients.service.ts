@@ -474,4 +474,33 @@ export class ClientsService {
 
     return this.externalHttp.post(apiUrl, { externalId }, { headers });
   }
+
+  /**
+   * Performs sanction screening for the client.
+   * @param {string} clientId Client Id
+   * @param {any} data Screening payload
+   * @returns {Observable<any>}
+   */
+  screenClient(clientId: string, data: any): Observable<any> {
+    return this.http.post(`/clients/screening/${clientId}`, data);
+  }
+
+  /**
+   * Retrieves the sanction screening history for the client.
+   * @param {string} clientId Client Id
+   * @returns {Observable<any>}
+   */
+  getClientScreeningHistory(clientId: string): Observable<any> {
+    return this.http.get(`/clients/screening/${clientId}`);
+  }
+
+  /**
+   * Reviews a client sanction screening run.
+   * @param {string} screeningId Screening Id
+   * @param {any} data Review payload containing status (MATCH or NOT_MATCH)
+   * @returns {Observable<any>}
+   */
+  reviewClientScreening(screeningId: string, data: { status: string }): Observable<any> {
+    return this.http.post(`/clients/screening/review/${screeningId}`, data);
+  }
 }

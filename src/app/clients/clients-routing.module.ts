@@ -57,6 +57,8 @@ import { ClientChargeViewResolver } from './common-resolvers/client-charge-view.
 import { ClientTransactionPayResolver } from './common-resolvers/client-transaction-pay.resolver';
 import { ClientDataAndTemplateResolver } from './common-resolvers/client-and-template.resolver';
 import { ClientCollateralResolver } from './common-resolvers/client-collateral.resolver';
+import { SanctionScreeningTabComponent } from './clients-view/sanction-screening-tab/sanction-screening-tab.component';
+import { ClientScreeningResolver } from './common-resolvers/client-screening.resolver';
 
 const routes: Routes = [
   Route.withShell([
@@ -186,6 +188,14 @@ const routes: Routes = [
               path: 'credit-profile',
               component: CreditProfileComponent,
               data: { title: 'Credit Profile', breadcrumb: 'Credit Profile', routeParamBreadcrumb: false }
+            },
+            {
+              path: 'sanction-screening',
+              component: SanctionScreeningTabComponent,
+              data: { title: 'Sanction Screening', breadcrumb: 'Sanction Screening', routeParamBreadcrumb: false },
+              resolve: {
+                screeningHistory: ClientScreeningResolver
+              }
             },
             {
               path: 'datatables',
@@ -330,7 +340,8 @@ const routes: Routes = [
     ClientChargeViewResolver,
     ClientTransactionPayResolver,
     ClientDataAndTemplateResolver,
-    ClientCollateralResolver
+    ClientCollateralResolver,
+    ClientScreeningResolver
   ]
 })
 export class ClientsRoutingModule {}

@@ -1,0 +1,155 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.dialog-header {
+  border-bottom: 1px solid rgb(0 0 0 / 8%);
+
+  h2 {
+    font-size: 1.25rem;
+    color: var(--color-text-primary, #333);
+  }
+}
+
+.dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-top: 24px;
+}
+
+.summary-card {
+  background-color: rgb(0 0 0 / 1%);
+  border: 1px solid rgb(0 0 0 / 8%);
+
+  .label {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    color: #2c3e50;
+    font-size: 0.9375rem;
+  }
+}
+
+.warn-chip {
+  --mdc-chip-elevated-disabled-container-color: #d32f2f;
+
+  background-color: #d32f2f !important;
+  border: none !important;
+  font-weight: 600;
+
+  &,
+  ::ng-deep .mdc-evolution-chip__text-label,
+  ::ng-deep .mat-mdc-chip-action-label,
+  ::ng-deep fa-icon,
+  ::ng-deep span {
+    color: #fff !important;
+  }
+}
+
+.success-chip {
+  --mdc-chip-elevated-disabled-container-color: #2e7d32;
+
+  background-color: #2e7d32 !important;
+  border: none !important;
+  font-weight: 600;
+
+  &,
+  ::ng-deep .mdc-evolution-chip__text-label,
+  ::ng-deep .mat-mdc-chip-action-label,
+  ::ng-deep fa-icon,
+  ::ng-deep span {
+    color: #fff !important;
+  }
+}
+
+.pending-chip {
+  --mdc-chip-elevated-disabled-container-color: #f57f17;
+
+  background-color: #f57f17 !important;
+  border: none !important;
+  font-weight: 600;
+
+  &,
+  ::ng-deep .mdc-evolution-chip__text-label,
+  ::ng-deep .mat-mdc-chip-action-label,
+  ::ng-deep fa-icon,
+  ::ng-deep span {
+    color: #fff !important;
+  }
+}
+
+.details-tab-group {
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    margin-top: 8px;
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid rgb(0 0 0 / 8%);
+}
+
+.sanction-table {
+  background: transparent;
+
+  th {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+  }
+
+  td {
+    font-size: 0.875rem;
+    color: #34495e;
+    padding: 12px 16px;
+    vertical-align: top;
+  }
+
+  .badge {
+    background: #ebedf0;
+    color: #4a5568;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .remarks-cell {
+    max-width: 250px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+}
+
+.empty-tab-card {
+  border: 1px dashed rgb(0 0 0 / 12%);
+  background-color: rgb(0 0 0 / 1%);
+  color: #7f8c8d;
+}
+
+.d-block {
+  display: block;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.success-btn {
+  background-color: #2e7d32 !important;
+  color: #fff !important;
+}

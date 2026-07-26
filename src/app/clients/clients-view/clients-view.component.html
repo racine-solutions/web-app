@@ -10,6 +10,7 @@
   <mifosx-account-header
     [statusCode]="clientViewData.status.code"
     [statusTooltip]="'labels.status.' + clientViewData.status.value | translate"
+    [class.match-red-header]="isLatestScreeningMatch"
   >
     <!-- Profile image -->
     <img

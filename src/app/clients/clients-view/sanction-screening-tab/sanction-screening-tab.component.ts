@@ -134,8 +134,10 @@ export class SanctionScreeningTabComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (history) => {
-          this.screeningHistory = Array.isArray(history) ? history : [];
+          const list = Array.isArray(history) ? history : [];
+          this.screeningHistory = list;
           this.isLoading = false;
+          this.clientsService.announceScreeningUpdate(list);
           this.cdr.markForCheck();
         },
         error: () => {

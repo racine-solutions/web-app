@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -128,11 +128,42 @@ export class ClientsViewComponent implements OnInit {
   private _sanitizer = inject(DomSanitizer);
   dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   clientViewData: any;
   clientDatatables: any;
   clientImage: any;
   clientTemplateData: any;
+  latestReviewStatus = '';
+  isLatestScreeningMatch = false;
+
+  updateScreeningStatus(history: any[]): void {
+    if (Array.isArray(history) && history.length > 0) {
+      const sortedHistory = [...history].sort((a, b) => b.screeningId - a.screeningId);
+      const latestRun = sortedHistory[0];
+      this.latestReviewStatus = latestRun.reviewStatus;
+      this.isLatestScreeningMatch = latestRun.reviewStatus === 'MATCH';
+    } else {
+      this.latestReviewStatus = '';
+      this.isLatestScreeningMatch = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  loadScreeningStatus(): void {
+    if (this.clientViewData?.id) {
+      this.clientsService.getClientScreeningHistory(this.clientViewData.id).subscribe({
+        next: (history) => {
+          this.updateScreeningStatus(history);
+        },
+        error: () => {
+          this.latestReviewStatus = '';
+          this.isLatestScreeningMatch = false;
+          this.cdr.detectChanges();
+        }
+      });
+    }
+  }
 
   constructor() {
     this.route.data
@@ -144,7 +175,16 @@ export class ClientsViewComponent implements OnInit {
           data.clientViewData?.legalForm?.id
         );
         this.clientTemplateData = data.clientTemplateData;
+        this.loadScreeningStatus();
       });
+
+    this.clientsService.screeningUpdated$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((updatedHistory) => {
+      if (updatedHistory) {
+        this.updateScreeningStatus(updatedHistory);
+      } else {
+        this.loadScreeningStatus();
+      }
+    });
   }
 
   /**

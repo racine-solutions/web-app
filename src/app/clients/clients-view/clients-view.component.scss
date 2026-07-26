@@ -145,3 +145,7 @@ mifosx-account-header {
     opacity: 0.85;
   }
 }
+
+::ng-deep mifosx-clients-view .account-card mifosx-account-header.match-red-header .header {
+  background-color: #d32f2f !important;
+}

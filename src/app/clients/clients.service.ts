@@ -11,7 +11,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpBackend, HttpHeaders } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, Subject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';
@@ -28,6 +28,13 @@ export class ClientsService {
 
   /** Separate HttpClient that bypasses interceptors (for external API calls) */
   private externalHttp = new HttpClient(this.httpBackend);
+
+  private screeningUpdatedSource = new Subject<any>();
+  screeningUpdated$ = this.screeningUpdatedSource.asObservable();
+
+  announceScreeningUpdate(data?: any) {
+    this.screeningUpdatedSource.next(data);
+  }
 
   getFilteredClients(
     orderBy: string,

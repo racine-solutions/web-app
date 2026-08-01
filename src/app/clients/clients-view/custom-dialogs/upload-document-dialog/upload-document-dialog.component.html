@@ -13,11 +13,12 @@
     {{ 'labels.heading.Upload' | translate }} {{ entityType }} {{ 'labels.heading.Documents' | translate }}
   }
 </h1>
-<div class="m-l-10 m-r-10">
-  <form [formGroup]="uploadDocumentForm" class="layout-column">
+
+<form [formGroup]="uploadDocumentForm" class="dialog-form">
+  <mat-dialog-content class="dialog-content">
     <!-- Identity-specific fields -->
     @if (documentIdentifier) {
-      <mat-form-field class="flex-fill">
+      <mat-form-field class="w-100">
         <mat-label>{{ 'labels.inputs.Document Type' | translate }}</mat-label>
         <mat-select formControlName="documentTypeId" required>
           @for (docType of allowedDocumentTypes; track docType) {
@@ -33,7 +34,8 @@
           </mat-error>
         }
       </mat-form-field>
-      <mat-form-field class="flex-fill">
+
+      <mat-form-field class="w-100">
         <mat-label>{{ 'labels.inputs.Status' | translate }}</mat-label>
         <mat-select formControlName="status" required>
           @for (status of statusOptions; track status) {
@@ -49,7 +51,8 @@
           </mat-error>
         }
       </mat-form-field>
-      <mat-form-field class="flex-fill">
+
+      <mat-form-field class="w-100">
         <mat-label>{{ 'labels.inputs.Document Key' | translate }}</mat-label>
         <input formControlName="documentKey" required matInput />
         @if (uploadDocumentForm.controls.documentKey?.hasError('required')) {
@@ -59,13 +62,14 @@
           </mat-error>
         }
       </mat-form-field>
-      <mat-form-field class="flex-fill">
+
+      <mat-form-field class="w-100">
         <mat-label>{{ 'labels.inputs.Description' | translate }}</mat-label>
         <input formControlName="description" matInput />
       </mat-form-field>
     }
 
-    <mat-form-field class="flex-fill">
+    <mat-form-field class="w-100">
       <mat-label>{{ 'labels.inputs.File Name' | translate }}</mat-label>
       <input formControlName="fileName" required matInput />
       @if (uploadDocumentForm.controls.fileName.hasError('required')) {
@@ -77,28 +81,31 @@
     </mat-form-field>
 
     @if (!documentIdentifier) {
-      <mat-form-field class="flex-fill">
+      <mat-form-field class="w-100">
         <mat-label>{{ 'labels.inputs.Description' | translate }}</mat-label>
         <input formControlName="description" matInput />
       </mat-form-field>
     }
 
-    <mifosx-file-upload flex="60%" (change)="onFileSelect($event)"></mifosx-file-upload>
+    <div class="file-upload-wrapper">
+      <mifosx-file-upload flex="65%" (change)="onFileSelect($event)"></mifosx-file-upload>
+    </div>
+  </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-      <button mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
-      <button
-        mat-raised-button
-        color="primary"
-        [disabled]="!uploadDocumentForm.valid"
-        [mat-dialog-close]="uploadDocumentForm.value"
-      >
-        @if (documentIdentifier) {
-          {{ 'labels.buttons.Add' | translate }}
-        } @else {
-          {{ 'labels.buttons.Upload' | translate }}
-        }
-      </button>
-    </mat-dialog-actions>
-  </form>
-</div>
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button mat-dialog-close type="button">{{ 'labels.buttons.Cancel' | translate }}</button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!uploadDocumentForm.valid"
+      [mat-dialog-close]="uploadDocumentForm.value"
+    >
+      @if (documentIdentifier) {
+        {{ 'labels.buttons.Add' | translate }}
+      } @else {
+        {{ 'labels.buttons.Upload' | translate }}
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

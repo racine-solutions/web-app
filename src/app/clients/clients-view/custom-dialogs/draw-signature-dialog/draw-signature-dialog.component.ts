@@ -9,6 +9,7 @@
 /** Angular Imports */
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ViewChild,
   ElementRef,
@@ -39,6 +40,7 @@ import SignaturePad from 'signature_pad';
 })
 export class DrawSignatureDialogComponent implements AfterViewInit, OnDestroy {
   dialogRef = inject<MatDialogRef<DrawSignatureDialogComponent>>(MatDialogRef);
+  private cdr = inject(ChangeDetectorRef);
 
   /** Canvas element reference */
   @ViewChild('signatureCanvas', { static: true }) signatureCanvas: ElementRef<HTMLCanvasElement>;
@@ -57,6 +59,7 @@ export class DrawSignatureDialogComponent implements AfterViewInit, OnDestroy {
 
     this.signaturePad.addEventListener('endStroke', () => {
       this.isEmpty = this.signaturePad.isEmpty();
+      this.cdr.markForCheck();
     });
 
     this.resizeCanvas();

@@ -7,7 +7,7 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -47,6 +47,7 @@ export class ViewSignatureDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ViewSignatureDialogComponent>>(MatDialogRef);
   private clientsService = inject(ClientsService);
   private sanitizer = inject(DomSanitizer);
+  private cdr = inject(ChangeDetectorRef);
   data = inject<{
     documents: any[];
     id: string;
@@ -74,7 +75,9 @@ export class ViewSignatureDialogComponent implements OnInit {
       this.clientsService.getClientSignatureImage(this.clientId, this.signatureId).subscribe(
         async (blob: any) => {
           const buffer = Buffer.from(await blob.arrayBuffer());
-          this.signatureImage = 'data:' + blob.type + ';base64,' + buffer.toString('base64');
+          const dataUrl = 'data:' + blob.type + ';base64,' + buffer.toString('base64');
+          this.signatureImage = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+          this.cdr.markForCheck();
         },
         (error: any) => {}
       );

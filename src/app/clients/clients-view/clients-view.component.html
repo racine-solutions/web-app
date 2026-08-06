@@ -10,6 +10,7 @@
   <mifosx-account-header
     [statusCode]="clientViewData.status.code"
     [statusTooltip]="'labels.status.' + clientViewData.status.value | translate"
+    [class.match-red-header]="isLatestScreeningMatch"
   >
     <!-- Profile image -->
     <img
@@ -488,6 +489,18 @@
           ></path>
         </svg>
         {{ 'labels.inputs.Notes' | translate }}
+      </a>
+      <a
+        mat-tab-link
+        [routerLink]="['./sanction-screening']"
+        routerLinkActive
+        #sanctionScreening="routerLinkActive"
+        [active]="sanctionScreening.isActive"
+      >
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        {{ 'labels.inputs.Sanction Screening' | translate }}
       </a>
       @if (cbIldEnabled) {
         <a

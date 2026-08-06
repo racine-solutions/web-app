@@ -11,7 +11,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpBackend, HttpHeaders } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, Subject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';
@@ -28,6 +28,13 @@ export class ClientsService {
 
   /** Separate HttpClient that bypasses interceptors (for external API calls) */
   private externalHttp = new HttpClient(this.httpBackend);
+
+  private screeningUpdatedSource = new Subject<any>();
+  screeningUpdated$ = this.screeningUpdatedSource.asObservable();
+
+  announceScreeningUpdate(data?: any) {
+    this.screeningUpdatedSource.next(data);
+  }
 
   getFilteredClients(
     orderBy: string,
@@ -473,5 +480,34 @@ export class ClientsService {
     }
 
     return this.externalHttp.post(apiUrl, { externalId }, { headers });
+  }
+
+  /**
+   * Performs sanction screening for the client.
+   * @param {string} clientId Client Id
+   * @param {any} data Screening payload
+   * @returns {Observable<any>}
+   */
+  screenClient(clientId: string, data: any): Observable<any> {
+    return this.http.post(`/clients/screening/${clientId}`, data);
+  }
+
+  /**
+   * Retrieves the sanction screening history for the client.
+   * @param {string} clientId Client Id
+   * @returns {Observable<any>}
+   */
+  getClientScreeningHistory(clientId: string): Observable<any> {
+    return this.http.get(`/clients/screening/${clientId}`);
+  }
+
+  /**
+   * Reviews a client sanction screening run.
+   * @param {string} screeningId Screening Id
+   * @param {any} data Review payload containing status (MATCH or NOT_MATCH)
+   * @returns {Observable<any>}
+   */
+  reviewClientScreening(screeningId: string, data: { status: string }): Observable<any> {
+    return this.http.post(`/clients/screening/review/${screeningId}`, data);
   }
 }

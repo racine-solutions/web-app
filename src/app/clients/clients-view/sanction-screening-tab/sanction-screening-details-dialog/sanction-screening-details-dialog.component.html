@@ -1,0 +1,218 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="dialog-header p-24">
+  <h2 mat-dialog-title class="m-0 font-weight-semi-bold align-center">
+    <fa-icon icon="shield-alt" class="m-r-8 text-primary"></fa-icon>
+    {{ 'labels.inputs.Sanction Screening Details' | translate }} - #{{ run.screeningId }}
+  </h2>
+</div>
+
+<mat-dialog-content class="dialog-content p-x-24 p-b-24">
+  <!-- Run Summary Header Card -->
+  <div class="summary-card p-16 m-b-24 rounded border flex-row justify-between align-center">
+    <div class="summary-details">
+      <div class="m-b-8">
+        <span class="label text-muted">{{ 'labels.inputs.Screened Name' | translate }}:</span>
+        <span class="value font-weight-bold m-l-8">{{ run.displayName }}</span>
+      </div>
+      <div class="meta-row flex-row gap-16">
+        <div>
+          <span class="label text-muted">{{ 'labels.inputs.Match Threshold' | translate }}:</span>
+          <span class="value font-weight-semi-bold m-l-8">{{ run.matchThreshold }}</span>
+        </div>
+        <div>
+          <span class="label text-muted">{{ 'labels.inputs.Limit' | translate }}:</span>
+          <span class="value font-weight-semi-bold m-l-8">{{ run.limit }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="status-badge flex-row gap-8">
+      <mat-chip-listbox>
+        @if (run.isMatchFound) {
+          <mat-chip-option color="warn" selected="true" class="warn-chip">
+            <fa-icon icon="exclamation-triangle" class="m-r-4"></fa-icon>
+            {{ 'labels.inputs.Sanction screening match found' | translate }}
+          </mat-chip-option>
+        } @else {
+          <mat-chip-option color="accent" selected="true" class="success-chip">
+            <fa-icon icon="check-circle" class="m-r-4"></fa-icon>
+            {{ 'labels.inputs.Sanction screening clear (no match)' | translate }}
+          </mat-chip-option>
+        }
+        @if (run.reviewStatus) {
+          @if (run.reviewStatus === 'PENDING') {
+            <mat-chip-option color="primary" selected="true" class="pending-chip">
+              <fa-icon icon="clock" class="m-r-4"></fa-icon>
+              {{ 'labels.inputs.PENDING' | translate }}
+            </mat-chip-option>
+          } @else if (
+            run.reviewStatus === 'NOT_MATCH' || run.reviewStatus === 'APPROVED' || run.reviewStatus === 'CLEARED'
+          ) {
+            <mat-chip-option color="accent" selected="true" class="success-chip">
+              <fa-icon icon="check-circle" class="m-r-4"></fa-icon>
+              {{ 'labels.inputs.' + run.reviewStatus | translate }}
+            </mat-chip-option>
+          } @else {
+            <mat-chip-option color="warn" selected="true" class="warn-chip">
+              <fa-icon icon="exclamation-triangle" class="m-r-4"></fa-icon>
+              {{ 'labels.inputs.' + run.reviewStatus | translate }}
+            </mat-chip-option>
+          }
+        }
+      </mat-chip-listbox>
+    </div>
+  </div>
+
+  <!-- Detail Tabs -->
+  <mat-tab-group class="details-tab-group" animationDuration="200ms">
+    <!-- SDN Tab -->
+    <mat-tab label="{{ 'labels.inputs.Specially Designated Nationals (SDNs)' | translate }}">
+      <div class="tab-pane-content p-t-16">
+        @if (run.SDNs && run.SDNs.length > 0) {
+          <div class="table-responsive">
+            <table mat-table [dataSource]="run.SDNs" class="mat-elevation-z1 w-100 sanction-table">
+              <ng-container matColumnDef="entityID">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Entity ID' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn">{{ sdn.entityID }}</td>
+              </ng-container>
+              <ng-container matColumnDef="sdnName">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Name' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn" class="font-weight-semi-bold text-warn">{{ sdn.sdnName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="sdnType">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Type' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn">{{ sdn.sdnType }}</td>
+              </ng-container>
+              <ng-container matColumnDef="program">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Program' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn">
+                  @for (prog of sdn.program; track prog) {
+                    <span class="badge m-r-4">{{ prog }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Title' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn">{{ sdn.title || '-' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="match">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Match Score' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn" class="font-weight-semi-bold text-warn">
+                  {{ sdn.match | percent: '1.0-2' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="remarks">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Remarks' | translate }}</th>
+                <td mat-cell *matCellDef="let sdn" class="remarks-cell">{{ sdn.remarks || '-' }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="sdnColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: sdnColumns"></tr>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-tab-card p-24 text-center border rounded m-t-8 bg-light">
+            <fa-icon icon="check-circle" size="2x" class="text-success m-b-8"></fa-icon>
+            <p class="m-0 text-muted">{{ 'labels.inputs.No SDN sanction list matches found.' | translate }}</p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- UK List Tab -->
+    <mat-tab label="{{ 'labels.inputs.UK Consolidated Sanctions List' | translate }}">
+      <div class="tab-pane-content p-t-16">
+        @if (run.ukConsolidatedSanctionsList && run.ukConsolidatedSanctionsList.length > 0) {
+          <div class="table-responsive">
+            <table
+              mat-table
+              [dataSource]="run.ukConsolidatedSanctionsList"
+              class="mat-elevation-z1 w-100 sanction-table"
+            >
+              <ng-container matColumnDef="names">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Names' | translate }}</th>
+                <td mat-cell *matCellDef="let uk" class="font-weight-semi-bold text-warn">
+                  @for (name of uk.Names; track name; let last = $last) {
+                    <span>{{ name }}{{ !last ? ', ' : '' }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="datesOfBirth">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Dates of Birth' | translate }}</th>
+                <td mat-cell *matCellDef="let uk">
+                  @for (dob of uk.DatesOfBirth; track dob) {
+                    <span class="d-block">{{ dob }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="townsOfBirth">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Towns of Birth' | translate }}</th>
+                <td mat-cell *matCellDef="let uk">
+                  @for (town of uk.TownsOfBirth; track town) {
+                    <span class="d-block">{{ town }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="countries">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Countries' | translate }}</th>
+                <td mat-cell *matCellDef="let uk">
+                  @for (country of uk.Countries; track country; let last = $last) {
+                    <span>{{ country }}{{ !last ? ', ' : '' }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="match">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Match Score' | translate }}</th>
+                <td mat-cell *matCellDef="let uk" class="font-weight-semi-bold text-warn">
+                  {{ uk.match | percent: '1.0-2' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="otherInfos">
+                <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Other Info' | translate }}</th>
+                <td mat-cell *matCellDef="let uk" class="remarks-cell">
+                  @for (info of uk.OtherInfos; track info) {
+                    <p class="m-b-4">{{ info }}</p>
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="ukColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: ukColumns"></tr>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-tab-card p-24 text-center border rounded m-t-8 bg-light">
+            <fa-icon icon="check-circle" size="2x" class="text-success m-b-8"></fa-icon>
+            <p class="m-0 text-muted">
+              {{ 'labels.inputs.No UK consolidated sanctions list matches found.' | translate }}
+            </p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions justify-between p-24 p-t-0">
+  <div class="review-actions flex-row gap-8">
+    @if (run.reviewStatus === 'PENDING') {
+      <button mat-raised-button color="warn" (click)="reviewScreening('MATCH')">
+        <fa-icon icon="exclamation-triangle" class="m-r-4"></fa-icon>
+        {{ 'labels.buttons.Mark as Match' | translate }}
+      </button>
+      <button mat-raised-button color="accent" (click)="reviewScreening('NOT_MATCH')" class="success-btn">
+        <fa-icon icon="check" class="m-r-4"></fa-icon>
+        {{ 'labels.buttons.Mark as Not Match' | translate }}
+      </button>
+    }
+  </div>
+  <button mat-raised-button mat-dialog-close color="primary">
+    {{ 'labels.buttons.Close' | translate }}
+  </button>
+</mat-dialog-actions>

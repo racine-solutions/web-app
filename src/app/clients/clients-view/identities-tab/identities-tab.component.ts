@@ -170,6 +170,10 @@ export class IdentitiesTabComponent implements OnDestroy {
     ];
 
     const dialogRef = this.dialog.open(UploadDocumentDialogComponent, {
+      width: '440px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      autoFocus: false,
       data: {
         documentIdentifier: true,
         allowedDocumentTypes: translatedDocTypes,

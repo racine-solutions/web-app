@@ -11,6 +11,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialogTitle,
+  MatDialogContent,
   MatDialogActions,
   MatDialogClose
 } from '@angular/material/dialog';
@@ -25,6 +26,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     MatDialogTitle,
+    MatDialogContent,
     FileUploadComponent,
     MatDialogActions,
     MatDialogClose

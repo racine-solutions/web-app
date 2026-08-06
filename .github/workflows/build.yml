@@ -4,9 +4,9 @@ name: build-run
 on:
   # Triggers the workflow on push or pull request events for specific branches
   push:
-    branches: [main, RPAY-119]
+    branches: [racine-dev-1.15.0-preview, RPAY-121]
   pull_request:
-    branches: [main, RPAY-119]
+    branches: [racine-dev-1.15.0-preview, RPAY-121]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

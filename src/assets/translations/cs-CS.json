@@ -4288,7 +4288,8 @@
       "Above the daily limit": "Nad denním limitem",
       "Other": "Jiné",
       "No transfers in this period": "V tomto období nejsou žádné převody",
-      "No refused transfers in this period": "V tomto období nejsou žádné zamítnuté převody"
+      "No refused transfers in this period": "V tomto období nejsou žádné zamítnuté převody",
+      "Mobile App Reports": "Přehledy mobilní aplikace"
     },
     "permissions": {
       "actions": {

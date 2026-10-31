@@ -20,7 +20,7 @@
     <mat-form-field>
       <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
       <mat-select formControlName="officeId">
-        <mat-option [value]="null">{{ 'labels.inputs.All offices' | translate }}</mat-option>
+        <mat-option [value]="0">{{ 'labels.inputs.All offices' | translate }}</mat-option>
         @for (office of offices; track office.id) {
           <mat-option [value]="office.id">{{ office.name }}</mat-option>
         }

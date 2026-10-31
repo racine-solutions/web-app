@@ -4379,7 +4379,8 @@
       "Above the daily limit": "Above the daily limit",
       "Other": "Other",
       "No transfers in this period": "No transfers in this period",
-      "No refused transfers in this period": "No refused transfers in this period"
+      "No refused transfers in this period": "No refused transfers in this period",
+      "Mobile App Reports": "Mobile App Reports"
     },
     "Mifos Reporting Plugin for Eclipse Birt": "Mifos Reporting Plugin for Eclipse Birt",
     "licensing": {

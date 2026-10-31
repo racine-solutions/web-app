@@ -4287,7 +4287,8 @@
       "Above the daily limit": "Pārsniedz dienas limitu",
       "Other": "Cits",
       "No transfers in this period": "Šajā periodā nav pārskaitījumu",
-      "No refused transfers in this period": "Šajā periodā nav noraidītu pārskaitījumu"
+      "No refused transfers in this period": "Šajā periodā nav noraidītu pārskaitījumu",
+      "Mobile App Reports": "Mobilās lietotnes pārskati"
     },
     "permissions": {
       "actions": {

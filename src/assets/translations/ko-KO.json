@@ -4287,7 +4287,8 @@
       "Above the daily limit": "일일 한도 초과",
       "Other": "기타",
       "No transfers in this period": "이 기간에 이체가 없습니다",
-      "No refused transfers in this period": "이 기간에 거절된 이체가 없습니다"
+      "No refused transfers in this period": "이 기간에 거절된 이체가 없습니다",
+      "Mobile App Reports": "모바일 앱 보고서"
     },
     "permissions": {
       "actions": {

@@ -4289,7 +4289,8 @@
       "Above the daily limit": "Supera el límite diario",
       "Other": "Otro",
       "No transfers in this period": "No hay transferencias en este período",
-      "No refused transfers in this period": "No hay transferencias rechazadas en este período"
+      "No refused transfers in this period": "No hay transferencias rechazadas en este período",
+      "Mobile App Reports": "Reportes de la app móvil"
     },
     "permissions": {
       "actions": {

@@ -4290,7 +4290,8 @@
       "Above the daily limit": "Au-dessus du plafond journalier",
       "Other": "Autre",
       "No transfers in this period": "Aucun virement sur cette période",
-      "No refused transfers in this period": "Aucun virement refusé sur cette période"
+      "No refused transfers in this period": "Aucun virement refusé sur cette période",
+      "Mobile App Reports": "Rapports de l'application mobile"
     },
     "permissions": {
       "actions": {

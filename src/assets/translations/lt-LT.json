@@ -4288,7 +4288,8 @@
       "Above the daily limit": "Viršija dienos limitą",
       "Other": "Kita",
       "No transfers in this period": "Šiuo laikotarpiu pervedimų nėra",
-      "No refused transfers in this period": "Šiuo laikotarpiu atmestų pervedimų nėra"
+      "No refused transfers in this period": "Šiuo laikotarpiu atmestų pervedimų nėra",
+      "Mobile App Reports": "Mobiliosios programėlės ataskaitos"
     },
     "permissions": {
       "actions": {

@@ -70,7 +70,8 @@ export class SelfServiceReportsComponent implements OnInit {
   ];
 
   form = new FormGroup({
-    officeId: new FormControl<number | null>(null),
+    /** 0 = all offices in the staff member's range. */
+    officeId: new FormControl<number>(0),
     months: new FormControl<number>(12),
     fromDate: new FormControl<string>(isoDate(new Date(Date.now() - 29 * 24 * 3600 * 1000))),
     toDate: new FormControl<string>(isoDate(new Date()))
@@ -94,7 +95,8 @@ export class SelfServiceReportsComponent implements OnInit {
   }
 
   load() {
-    const { officeId, months, fromDate, toDate } = this.form.getRawValue();
+    const { months, fromDate, toDate } = this.form.getRawValue();
+    const officeId = this.form.value.officeId || null;
     this.loading = true;
     this.changeDetector.markForCheck();
     forkJoin({

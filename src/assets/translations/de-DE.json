@@ -4289,7 +4289,8 @@
       "Above the daily limit": "Über dem Tageslimit",
       "Other": "Sonstige",
       "No transfers in this period": "Keine Überweisungen in diesem Zeitraum",
-      "No refused transfers in this period": "Keine abgelehnten Überweisungen in diesem Zeitraum"
+      "No refused transfers in this period": "Keine abgelehnten Überweisungen in diesem Zeitraum",
+      "Mobile App Reports": "Berichte zur Mobile App"
     },
     "permissions": {
       "actions": {

@@ -4284,7 +4284,8 @@
       "Above the daily limit": "Juu ya kikomo cha siku",
       "Other": "Nyingine",
       "No transfers in this period": "Hakuna uhamisho katika kipindi hiki",
-      "No refused transfers in this period": "Hakuna uhamisho uliokataliwa katika kipindi hiki"
+      "No refused transfers in this period": "Hakuna uhamisho uliokataliwa katika kipindi hiki",
+      "Mobile App Reports": "Ripoti za programu ya simu"
     },
     "permissions": {
       "actions": {

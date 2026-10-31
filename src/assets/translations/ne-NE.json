@@ -4287,7 +4287,8 @@
       "Above the daily limit": "दैनिक सीमाभन्दा बढी",
       "Other": "अन्य",
       "No transfers in this period": "यस अवधिमा कुनै स्थानान्तरण छैन",
-      "No refused transfers in this period": "यस अवधिमा कुनै अस्वीकृत स्थानान्तरण छैन"
+      "No refused transfers in this period": "यस अवधिमा कुनै अस्वीकृत स्थानान्तरण छैन",
+      "Mobile App Reports": "मोबाइल एप रिपोर्टहरू"
     },
     "permissions": {
       "actions": {

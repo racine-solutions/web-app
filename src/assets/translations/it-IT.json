@@ -4288,7 +4288,8 @@
       "Above the daily limit": "Oltre il limite giornaliero",
       "Other": "Altro",
       "No transfers in this period": "Nessun bonifico in questo periodo",
-      "No refused transfers in this period": "Nessun bonifico rifiutato in questo periodo"
+      "No refused transfers in this period": "Nessun bonifico rifiutato in questo periodo",
+      "Mobile App Reports": "Report dell'app mobile"
     },
     "permissions": {
       "actions": {

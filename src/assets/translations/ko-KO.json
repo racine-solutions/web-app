@@ -791,7 +791,11 @@
       "resetPassword": "Reset Password",
       "Add currency": "Add currency",
       "Save": "Save",
-      "Change": "Change"
+      "Change": "Change",
+      "Logins": "로그인",
+      "Transfers": "이체",
+      "Access changes": "접근 변경",
+      "Refused": "거절됨"
     },
     "catalogs": {
       "% Amount": "양",
@@ -1626,7 +1630,8 @@
       "Mobile App Transfer Limits": "Mobile App Transfer Limits",
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
-      "Linked Clients": "Linked Clients"
+      "Linked Clients": "Linked Clients",
+      "Activity Timeline": "활동 내역"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -4241,7 +4246,11 @@
       "All clients must belong to one office and must not use another mobile app user": "All clients must belong to one office and must not use another mobile app user",
       "Add at least one client": "Add at least one client",
       "No per user limits; product and account rules still apply": "No per user limits; product and account rules still apply",
-      "No linked client": "No linked client"
+      "No linked client": "No linked client",
+      "Refused": "거절됨",
+      "Failed": "실패",
+      "Staff action": "직원 작업",
+      "No activity recorded yet": "기록된 활동이 아직 없습니다"
     },
     "permissions": {
       "actions": {

@@ -69,6 +69,37 @@ export interface SelfServiceUserSummary {
   loggedInLast30Days: number;
 }
 
+/** One entry of a user's activity timeline (GET /selfserviceusers/{id}/events). */
+export interface SelfServiceUserEvent {
+  id: number;
+  eventType: string;
+  /** REGISTRATION, LOGIN, PASSWORD, TRANSFER, BENEFICIARY, LOAN, SAVINGS, SINPE or ACCESS. */
+  category: string;
+  /** SUCCESS, FAILED or REFUSED. */
+  result: string;
+  /** CLIENT (done in the app) or STAFF (done in the back office). */
+  actor: string;
+  staffUsername?: string;
+  description: string;
+  amount?: number;
+  currencyCode?: string;
+  ipAddress?: string;
+  /** JSON object of extra facts (never secrets). */
+  details?: string;
+  createdOn: string;
+}
+
+export interface SelfServiceUserEventPage {
+  totalFilteredRecords: number;
+  pageItems: SelfServiceUserEvent[];
+}
+
+/** Filters for the activity timeline. */
+export interface SelfServiceUserEventFilter {
+  category?: string;
+  result?: string;
+}
+
 /** Status values used by the API (status filter and status.id). */
 export enum SelfServiceUserStatus {
   Pending = 100,

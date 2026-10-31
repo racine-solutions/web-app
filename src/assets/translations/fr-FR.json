@@ -791,7 +791,11 @@
       "resetPassword": "Reset Password",
       "Add currency": "Add currency",
       "Save": "Save",
-      "Change": "Change"
+      "Change": "Change",
+      "Logins": "Connexions",
+      "Transfers": "Virements",
+      "Access changes": "Changements d'accès",
+      "Refused": "Refusés"
     },
     "catalogs": {
       "% Amount": "Montant",
@@ -1628,7 +1632,8 @@
       "Mobile App Transfer Limits": "Mobile App Transfer Limits",
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
-      "Linked Clients": "Linked Clients"
+      "Linked Clients": "Linked Clients",
+      "Activity Timeline": "Historique d'activité"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -4244,7 +4249,11 @@
       "All clients must belong to one office and must not use another mobile app user": "All clients must belong to one office and must not use another mobile app user",
       "Add at least one client": "Add at least one client",
       "No per user limits; product and account rules still apply": "No per user limits; product and account rules still apply",
-      "No linked client": "No linked client"
+      "No linked client": "No linked client",
+      "Refused": "Refusé",
+      "Failed": "Échec",
+      "Staff action": "Action du personnel",
+      "No activity recorded yet": "Aucune activité enregistrée pour l'instant"
     },
     "permissions": {
       "actions": {

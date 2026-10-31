@@ -17,6 +17,8 @@ import { Observable } from 'rxjs';
 import {
   SelfServiceUser,
   SelfServiceUserCommand,
+  SelfServiceUserEventFilter,
+  SelfServiceUserEventPage,
   SelfServiceUserLimit,
   SelfServiceUserPage,
   SelfServiceUserSummary
@@ -69,6 +71,23 @@ export class SelfServiceUsersService {
 
   getUser(userId: number | string): Observable<SelfServiceUser> {
     return this.http.get<SelfServiceUser>(`/selfserviceusers/${userId}`);
+  }
+
+  /** The user's activity timeline, newest first. */
+  getEvents(
+    userId: number,
+    filter: SelfServiceUserEventFilter,
+    offset: number,
+    limit: number
+  ): Observable<SelfServiceUserEventPage> {
+    let params = new HttpParams().set('offset', String(offset)).set('limit', String(limit));
+    if (filter?.category) {
+      params = params.set('category', filter.category);
+    }
+    if (filter?.result) {
+      params = params.set('result', filter.result);
+    }
+    return this.http.get<SelfServiceUserEventPage>(`/selfserviceusers/${userId}/events`, { params });
   }
 
   /** Replaces the user's transfer limits. An empty list removes them. */

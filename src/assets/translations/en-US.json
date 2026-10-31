@@ -760,7 +760,11 @@
       "resetPassword": "Reset Password",
       "Add currency": "Add currency",
       "Save": "Save",
-      "Change": "Change"
+      "Change": "Change",
+      "Logins": "Logins",
+      "Transfers": "Transfers",
+      "Access changes": "Access changes",
+      "Refused": "Refused"
     },
     "catalogs": {
       "Interest payment waiver": "Interest Payment Waiver",
@@ -1594,7 +1598,8 @@
       "Mobile App Transfer Limits": "Mobile App Transfer Limits",
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
-      "Linked Clients": "Linked Clients"
+      "Linked Clients": "Linked Clients",
+      "Activity Timeline": "Activity Timeline"
     },
     "inputs": {
       "accounting": {
@@ -4333,7 +4338,11 @@
       "All clients must belong to one office and must not use another mobile app user": "All clients must belong to one office and must not use another mobile app user",
       "Add at least one client": "Add at least one client",
       "No per user limits; product and account rules still apply": "No per user limits; product and account rules still apply",
-      "No linked client": "No linked client"
+      "No linked client": "No linked client",
+      "Refused": "Refused",
+      "Failed": "Failed",
+      "Staff action": "Staff action",
+      "No activity recorded yet": "No activity recorded yet"
     },
     "Mifos Reporting Plugin for Eclipse Birt": "Mifos Reporting Plugin for Eclipse Birt",
     "licensing": {

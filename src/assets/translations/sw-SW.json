@@ -791,7 +791,11 @@
       "resetPassword": "Reset Password",
       "Add currency": "Add currency",
       "Save": "Save",
-      "Change": "Change"
+      "Change": "Change",
+      "Logins": "Kuingia",
+      "Transfers": "Uhamisho",
+      "Access changes": "Mabadiliko ya ufikiaji",
+      "Refused": "Zilizokataliwa"
     },
     "catalogs": {
       "% Amount": "Kiasi",
@@ -1622,7 +1626,8 @@
       "Mobile App Transfer Limits": "Mobile App Transfer Limits",
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
-      "Linked Clients": "Linked Clients"
+      "Linked Clients": "Linked Clients",
+      "Activity Timeline": "Historia ya shughuli"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -4238,7 +4243,11 @@
       "All clients must belong to one office and must not use another mobile app user": "All clients must belong to one office and must not use another mobile app user",
       "Add at least one client": "Add at least one client",
       "No per user limits; product and account rules still apply": "No per user limits; product and account rules still apply",
-      "No linked client": "No linked client"
+      "No linked client": "No linked client",
+      "Refused": "Imekataliwa",
+      "Failed": "Imeshindwa",
+      "Staff action": "Kitendo cha mfanyakazi",
+      "No activity recorded yet": "Bado hakuna shughuli iliyorekodiwa"
     },
     "permissions": {
       "actions": {

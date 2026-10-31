@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /** Custom Imports */
+import { ActivityTimelineComponent } from '../activity-timeline/activity-timeline.component';
 import { ChangeAccessDialogComponent } from '../change-access-dialog/change-access-dialog.component';
 import { ClientsDialogComponent } from '../clients-dialog/clients-dialog.component';
 import { LimitsDialogComponent } from '../limits-dialog/limits-dialog.component';
@@ -37,7 +38,8 @@ import { SelfServiceUsersService } from '../self-service-users.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    RouterLink
+    RouterLink,
+    ActivityTimelineComponent
   ]
 })
 export class ViewSelfServiceUserComponent {
@@ -54,6 +56,8 @@ export class ViewSelfServiceUserComponent {
   commands: SelfServiceUserCommand[] = [];
   severity = '';
   isClosed = false;
+  /** Bumped on every reload so the activity timeline shows the change just made. */
+  refreshCount = 0;
 
   constructor() {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { user: SelfServiceUser }) => {
@@ -104,6 +108,7 @@ export class ViewSelfServiceUserComponent {
     this.commands = availableCommands(user);
     this.severity = statusSeverity(user);
     this.isClosed = user?.status?.id === SelfServiceUserStatus.Closed;
+    this.refreshCount++;
     this.changeDetector.markForCheck();
   }
 }

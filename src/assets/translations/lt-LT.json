@@ -791,7 +791,11 @@
       "resetPassword": "Reset Password",
       "Add currency": "Add currency",
       "Save": "Save",
-      "Change": "Change"
+      "Change": "Change",
+      "Logins": "Prisijungimai",
+      "Transfers": "Pervedimai",
+      "Access changes": "Prieigos pakeitimai",
+      "Refused": "Atmesti"
     },
     "catalogs": {
       "% Amount": "Suma",
@@ -1624,7 +1628,8 @@
       "Mobile App Transfer Limits": "Mobile App Transfer Limits",
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
-      "Linked Clients": "Linked Clients"
+      "Linked Clients": "Linked Clients",
+      "Activity Timeline": "Veiklos istorija"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -4242,7 +4247,11 @@
       "All clients must belong to one office and must not use another mobile app user": "All clients must belong to one office and must not use another mobile app user",
       "Add at least one client": "Add at least one client",
       "No per user limits; product and account rules still apply": "No per user limits; product and account rules still apply",
-      "No linked client": "No linked client"
+      "No linked client": "No linked client",
+      "Refused": "Atmesta",
+      "Failed": "Nepavyko",
+      "Staff action": "Darbuotojo veiksmas",
+      "No activity recorded yet": "Veiklos dar neužregistruota"
     },
     "permissions": {
       "actions": {

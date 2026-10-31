@@ -1,0 +1,55 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../self-service-users-theme' as theme;
+
+@include theme.host-tokens;
+@include theme.status-pills;
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ch-text-2);
+}
+
+.section-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ch-blue-700);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.access-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 14px 18px;
+  background: var(--ch-surface);
+  border: 1px solid var(--ch-border);
+  border-radius: 6px;
+}
+
+.detail {
+  font-size: 13px;
+  color: var(--ch-text-2);
+}

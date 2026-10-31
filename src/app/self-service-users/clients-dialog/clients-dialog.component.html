@@ -1,0 +1,59 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h1 mat-dialog-title>{{ 'labels.heading.Clients Using This App User' | translate }}</h1>
+<div mat-dialog-content class="dialog-content">
+  <p class="description">
+    {{ 'labels.text.All clients must belong to one office and must not use another mobile app user' | translate }}
+  </p>
+
+  <ul class="selected">
+    @for (client of selected; track client.id) {
+      <li>
+        <span
+          >{{ client.displayName }}
+          @if (client.accountNo) {
+            · {{ client.accountNo }}
+          }
+          @if (client.officeName) {
+            · {{ client.officeName }}
+          }
+        </span>
+        <button mat-button type="button" color="warn" (click)="remove(client)">
+          {{ 'labels.buttons.Remove' | translate }}
+        </button>
+      </li>
+    } @empty {
+      <li class="empty">{{ 'labels.text.Add at least one client' | translate }}</li>
+    }
+  </ul>
+
+  <mat-form-field class="full-width">
+    <mat-label>{{ 'labels.inputs.Add client by name' | translate }}</mat-label>
+    <input matInput [formControl]="search" [matAutocomplete]="clientsAutocomplete" />
+  </mat-form-field>
+  <mat-autocomplete #clientsAutocomplete="matAutocomplete" (optionSelected)="pick($event)">
+    @for (client of options; track client.id) {
+      <mat-option [value]="client"
+        >{{ client.displayName }} · {{ client.accountNo }} · {{ client.officeName }}</mat-option
+      >
+    }
+  </mat-autocomplete>
+
+  <mat-form-field class="full-width">
+    <mat-label>{{ 'labels.inputs.Reason' | translate }}</mat-label>
+    <textarea matInput [formControl]="reason" rows="2" maxlength="500"></textarea>
+  </mat-form-field>
+  <p class="notice">{{ 'labels.text.The client will be told by email and SMS' | translate }}</p>
+</div>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close type="button">{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" [disabled]="!selected.length" (click)="submit()">
+    {{ 'labels.buttons.Save' | translate }}
+  </button>
+</mat-dialog-actions>

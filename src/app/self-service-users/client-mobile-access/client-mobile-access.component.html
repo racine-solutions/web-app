@@ -1,0 +1,37 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (loaded) {
+  <section class="section">
+    <div class="section-head">
+      <span class="section-title">{{ 'labels.heading.Mobile App Access' | translate }}</span>
+      @if (user) {
+        <a class="section-link" [routerLink]="['/selfserviceusers', user.id]">{{
+          'labels.buttons.Manage' | translate
+        }}</a>
+      }
+    </div>
+    <div class="access-card">
+      @if (user) {
+        <span class="status-pill" [ngClass]="severity"
+          ><span class="dot"></span>{{ 'labels.status.' + user.status.value | translate }}</span
+        >
+        @if (user.locked) {
+          <span class="status-pill locked"><span class="dot"></span>{{ 'labels.status.Locked' | translate }}</span>
+        }
+        <span class="detail">{{ user.username }}</span>
+        <span class="detail">
+          {{ 'labels.inputs.Last login' | translate }}:
+          {{ user.lastLoginOn ? (user.lastLoginOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate) }}
+        </span>
+      } @else {
+        <span class="detail">{{ 'labels.text.This client does not use the mobile app' | translate }}</span>
+      }
+    </div>
+  </section>
+}

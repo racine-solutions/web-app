@@ -1,0 +1,55 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h1 mat-dialog-title>{{ 'labels.heading.' + text.title | translate }}</h1>
+<div mat-dialog-content [formGroup]="form" class="dialog-content">
+  <p class="who">
+    {{ data.user.displayName }} · {{ data.user.username }}
+    @if (data.user.clientAccountNo) {
+      · {{ data.user.clientAccountNo }}
+    }
+  </p>
+  <p class="description" [class.warning]="isClose">{{ 'labels.text.' + text.description | translate }}</p>
+
+  @if (isResetPassword) {
+    <mat-radio-group formControlName="method" class="methods">
+      <mat-radio-button value="sendLink">{{
+        'labels.inputs.Send a reset code to the client' | translate
+      }}</mat-radio-button>
+      <mat-radio-button value="forceChange">{{
+        'labels.inputs.Require a new password at next login' | translate
+      }}</mat-radio-button>
+    </mat-radio-group>
+  }
+
+  <mat-form-field class="full-width">
+    <mat-label>{{ 'labels.inputs.Reason' | translate }}</mat-label>
+    <textarea matInput formControlName="reason" rows="3" maxlength="500" [required]="reasonRequired"></textarea>
+    <mat-hint>{{ 'labels.text.Shown in the audit trail and in the message to the client' | translate }}</mat-hint>
+    @if (form.controls.reason.hasError('required')) {
+      <mat-error
+        >{{ 'labels.inputs.Reason' | translate }} {{ 'labels.commons.is' | translate }}
+        <strong>{{ 'labels.commons.required' | translate }}</strong></mat-error
+      >
+    }
+  </mat-form-field>
+
+  @if (isViewOnly) {
+    <mat-checkbox formControlName="revokeSessions">{{
+      'labels.inputs.End open sessions now' | translate
+    }}</mat-checkbox>
+  }
+
+  <p class="notice">{{ 'labels.text.The client will be told by email and SMS' | translate }}</p>
+</div>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close type="button">{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button [color]="isClose ? 'warn' : 'primary'" type="button" (click)="submit()">
+    {{ 'labels.buttons.' + text.submit | translate }}
+  </button>
+</mat-dialog-actions>

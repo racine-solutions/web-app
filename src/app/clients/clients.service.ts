@@ -402,13 +402,6 @@ export class ClientsService {
   }
 
   /**
-   * @param userData User Data.
-   */
-  createSelfServiceUser(userData: any) {
-    return this.http.post(`/users`, userData);
-  }
-
-  /**
    * @param clientId Client ID.
    * @param collateralData Collateral Data
    */

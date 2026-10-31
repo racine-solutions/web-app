@@ -795,7 +795,9 @@
       "Logins": "लगइनहरू",
       "Transfers": "स्थानान्तरणहरू",
       "Access changes": "पहुँच परिवर्तनहरू",
-      "Refused": "अस्वीकृत"
+      "Refused": "अस्वीकृत",
+      "Apply": "लागू गर्नुहोस्",
+      "Reports": "रिपोर्टहरू"
     },
     "catalogs": {
       "% Amount": "रकम",
@@ -1629,7 +1631,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "गतिविधि समयरेखा"
+      "Activity Timeline": "गतिविधि समयरेखा",
+      "Mobile App Reports": "मोबाइल एप रिपोर्टहरू",
+      "Adoption": "प्रयोग",
+      "Sign ups and first logins per month": "महिनाअनुसार दर्ता र पहिलो लगइन",
+      "Sign up funnel": "दर्ता फनेल",
+      "App Transactions": "एप कारोबार",
+      "Refused transfers": "अस्वीकृत स्थानान्तरणहरू"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3235,7 +3243,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "सबै कार्यालयहरू",
+      "Months shown": "देखाइएका महिनाहरू",
+      "Adoption rate": "प्रयोग दर",
+      "active clients": "सक्रिय ग्राहकहरू",
+      "Active app users": "सक्रिय एप प्रयोगकर्ताहरू",
+      "app users": "एप प्रयोगकर्ताहरू",
+      "Sign ups": "दर्ताहरू",
+      "First logins": "पहिलो लगइनहरू",
+      "Active clients": "सक्रिय ग्राहकहरू",
+      "Clients using the app": "एप प्रयोग गर्ने ग्राहकहरू",
+      "Confirmed registration code": "दर्ता कोड पुष्टि गरे",
+      "Logged in": "लगइन गरे",
+      "Made a transfer": "स्थानान्तरण गरे",
+      "Registration codes sent": "पठाइएका दर्ता कोडहरू",
+      "Channel": "माध्यम",
+      "Transfers": "स्थानान्तरणहरू",
+      "App users": "एप प्रयोगकर्ताहरू",
+      "Attempts": "प्रयासहरू"
     },
     "links": {
       "Community": "समुदाय",
@@ -3383,7 +3409,8 @@
       "Remittances": "रेमिट्यान्स",
       "Process Remittance": "रेमिट्यान्स प्रक्रिया",
       "Undo Write-off": "राइट-अफ पूर्ववत गर्नुहोस्",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "मोबाइल एप"
     },
     "placeholders": {
       "Add new server": "नयाँ सर्भर थप्नुहोस्",
@@ -4250,7 +4277,17 @@
       "Refused": "अस्वीकृत",
       "Failed": "असफल",
       "Staff action": "कर्मचारी कार्य",
-      "No activity recorded yet": "अहिलेसम्म कुनै गतिविधि रेकर्ड गरिएको छैन"
+      "No activity recorded yet": "अहिलेसम्म कुनै गतिविधि रेकर्ड गरिएको छैन",
+      "Counted since the activity timeline was introduced": "गतिविधि समयरेखा सुरु भएदेखि गणना गरिएको।",
+      "Between own accounts": "आफ्नै खाताहरू बीच",
+      "Confirmed with a code": "कोडद्वारा पुष्टि गरिएको",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "प्रयोगकर्ताको खाता होइन",
+      "Above the per transfer limit": "प्रति स्थानान्तरण सीमाभन्दा बढी",
+      "Above the daily limit": "दैनिक सीमाभन्दा बढी",
+      "Other": "अन्य",
+      "No transfers in this period": "यस अवधिमा कुनै स्थानान्तरण छैन",
+      "No refused transfers in this period": "यस अवधिमा कुनै अस्वीकृत स्थानान्तरण छैन"
     },
     "permissions": {
       "actions": {

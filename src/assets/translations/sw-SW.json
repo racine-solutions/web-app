@@ -795,7 +795,9 @@
       "Logins": "Kuingia",
       "Transfers": "Uhamisho",
       "Access changes": "Mabadiliko ya ufikiaji",
-      "Refused": "Zilizokataliwa"
+      "Refused": "Zilizokataliwa",
+      "Apply": "Tekeleza",
+      "Reports": "Ripoti"
     },
     "catalogs": {
       "% Amount": "Kiasi",
@@ -1627,7 +1629,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Historia ya shughuli"
+      "Activity Timeline": "Historia ya shughuli",
+      "Mobile App Reports": "Ripoti za programu ya simu",
+      "Adoption": "Matumizi",
+      "Sign ups and first logins per month": "Usajili na kuingia kwa mara ya kwanza kwa mwezi",
+      "Sign up funnel": "Mfereji wa usajili",
+      "App Transactions": "Miamala ya programu",
+      "Refused transfers": "Uhamisho uliokataliwa"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3233,7 +3241,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Ofisi zote",
+      "Months shown": "Miezi inayoonyeshwa",
+      "Adoption rate": "Kiwango cha matumizi",
+      "active clients": "wateja hai",
+      "Active app users": "Watumiaji hai wa programu",
+      "app users": "watumiaji wa programu",
+      "Sign ups": "Usajili",
+      "First logins": "Kuingia kwa mara ya kwanza",
+      "Active clients": "Wateja hai",
+      "Clients using the app": "Wateja wanaotumia programu",
+      "Confirmed registration code": "Walithibitisha msimbo wa usajili",
+      "Logged in": "Waliingia",
+      "Made a transfer": "Walifanya uhamisho",
+      "Registration codes sent": "Misimbo ya usajili iliyotumwa",
+      "Channel": "Njia",
+      "Transfers": "Uhamisho",
+      "App users": "Watumiaji wa programu",
+      "Attempts": "Majaribio"
     },
     "links": {
       "Community": "Jumuiya",
@@ -3380,7 +3406,8 @@
       "Remittances": "Uhawilishaji",
       "Process Remittance": "Chakata uhawilishaji",
       "Undo Write-off": "Futa Kuandika-mbali",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Programu ya simu"
     },
     "placeholders": {
       "Add new server": "Ongeza seva mpya",
@@ -4247,7 +4274,17 @@
       "Refused": "Imekataliwa",
       "Failed": "Imeshindwa",
       "Staff action": "Kitendo cha mfanyakazi",
-      "No activity recorded yet": "Bado hakuna shughuli iliyorekodiwa"
+      "No activity recorded yet": "Bado hakuna shughuli iliyorekodiwa",
+      "Counted since the activity timeline was introduced": "Imehesabiwa tangu historia ya shughuli ilipoanzishwa.",
+      "Between own accounts": "Kati ya akaunti zako",
+      "Confirmed with a code": "Imethibitishwa kwa msimbo",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Si akaunti ya mtumiaji",
+      "Above the per transfer limit": "Juu ya kikomo cha kila uhamisho",
+      "Above the daily limit": "Juu ya kikomo cha siku",
+      "Other": "Nyingine",
+      "No transfers in this period": "Hakuna uhamisho katika kipindi hiki",
+      "No refused transfers in this period": "Hakuna uhamisho uliokataliwa katika kipindi hiki"
     },
     "permissions": {
       "actions": {

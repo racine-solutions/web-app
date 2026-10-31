@@ -795,7 +795,9 @@
       "Logins": "Prisijungimai",
       "Transfers": "Pervedimai",
       "Access changes": "Prieigos pakeitimai",
-      "Refused": "Atmesti"
+      "Refused": "Atmesti",
+      "Apply": "Taikyti",
+      "Reports": "Ataskaitos"
     },
     "catalogs": {
       "% Amount": "Suma",
@@ -1629,7 +1631,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Veiklos istorija"
+      "Activity Timeline": "Veiklos istorija",
+      "Mobile App Reports": "Mobiliosios programėlės ataskaitos",
+      "Adoption": "Naudojimas",
+      "Sign ups and first logins per month": "Registracijos ir pirmieji prisijungimai per mėnesį",
+      "Sign up funnel": "Registracijos piltuvas",
+      "App Transactions": "Programėlės operacijos",
+      "Refused transfers": "Atmesti pervedimai"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3235,7 +3243,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Visi skyriai",
+      "Months shown": "Rodomi mėnesiai",
+      "Adoption rate": "Naudojimo dalis",
+      "active clients": "aktyvūs klientai",
+      "Active app users": "Aktyvūs programėlės naudotojai",
+      "app users": "programėlės naudotojai",
+      "Sign ups": "Registracijos",
+      "First logins": "Pirmieji prisijungimai",
+      "Active clients": "Aktyvūs klientai",
+      "Clients using the app": "Programėlę naudojantys klientai",
+      "Confirmed registration code": "Patvirtino registracijos kodą",
+      "Logged in": "Prisijungė",
+      "Made a transfer": "Atliko pervedimą",
+      "Registration codes sent": "Išsiųsti registracijos kodai",
+      "Channel": "Kanalas",
+      "Transfers": "Pervedimai",
+      "App users": "Programėlės naudotojai",
+      "Attempts": "Bandymai"
     },
     "links": {
       "Community": "bendruomenė",
@@ -3383,7 +3409,8 @@
       "Remittances": "Pervedimai",
       "Process Remittance": "Apdoroti pervedimą",
       "Undo Write-off": "Atšaukti nurašymą",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Mobilioji programėlė"
     },
     "placeholders": {
       "Add new server": "Pridėti naują serverį",
@@ -4251,7 +4278,17 @@
       "Refused": "Atmesta",
       "Failed": "Nepavyko",
       "Staff action": "Darbuotojo veiksmas",
-      "No activity recorded yet": "Veiklos dar neužregistruota"
+      "No activity recorded yet": "Veiklos dar neužregistruota",
+      "Counted since the activity timeline was introduced": "Skaičiuojama nuo veiklos istorijos įdiegimo.",
+      "Between own accounts": "Tarp savų sąskaitų",
+      "Confirmed with a code": "Patvirtinta kodu",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Ne naudotojo sąskaita",
+      "Above the per transfer limit": "Viršija vieno pervedimo limitą",
+      "Above the daily limit": "Viršija dienos limitą",
+      "Other": "Kita",
+      "No transfers in this period": "Šiuo laikotarpiu pervedimų nėra",
+      "No refused transfers in this period": "Šiuo laikotarpiu atmestų pervedimų nėra"
     },
     "permissions": {
       "actions": {

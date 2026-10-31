@@ -194,6 +194,14 @@
   <button mat-menu-item [routerLink]="['/reports', 'Accounting']" tabindex="0" *mifosxHasPermission="'READ_REPORT'">
     {{ 'labels.menus.Accounting' | translate }}
   </button>
+  <button
+    mat-menu-item
+    [routerLink]="['/selfserviceusers', 'reports']"
+    tabindex="0"
+    *mifosxHasPermission="'READ_SELFSERVICEREPORT'"
+  >
+    {{ 'labels.menus.Mobile App' | translate }}
+  </button>
 </mat-menu>
 
 <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">

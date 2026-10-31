@@ -14,9 +14,19 @@
         {{ 'labels.text.Clients who use the mobile app in your office and the offices under it' | translate }}
       </p>
     </div>
-    <button mat-raised-button type="button" (click)="exportCsv()" [disabled]="!totalRecords">
-      <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Export CSV' | translate }}
-    </button>
+    <div class="head-actions">
+      <button
+        mat-raised-button
+        type="button"
+        [routerLink]="['/selfserviceusers', 'reports']"
+        *mifosxHasPermission="readReportPermission"
+      >
+        {{ 'labels.buttons.Reports' | translate }}
+      </button>
+      <button mat-raised-button type="button" (click)="exportCsv()" [disabled]="!totalRecords">
+        <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Export CSV' | translate }}
+      </button>
+    </div>
   </div>
 
   @if (summary) {

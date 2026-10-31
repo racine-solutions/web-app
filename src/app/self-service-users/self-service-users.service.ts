@@ -15,6 +15,9 @@ import { Observable } from 'rxjs';
 
 /** Custom Models */
 import {
+  SelfServiceAdoptionReport,
+  SelfServiceFunnelReport,
+  SelfServiceTransactionsReport,
   SelfServiceUser,
   SelfServiceUserCommand,
   SelfServiceUserEventFilter,
@@ -88,6 +91,51 @@ export class SelfServiceUsersService {
       params = params.set('result', filter.result);
     }
     return this.http.get<SelfServiceUserEventPage>(`/selfserviceusers/${userId}/events`, { params });
+  }
+
+  /** Offices the staff member can see (their own and the ones under it). */
+  getOffices(): Observable<{ id: number; name: string; hierarchy: string }[]> {
+    return this.http.get<{ id: number; name: string; hierarchy: string }[]>('/offices');
+  }
+
+  getAdoptionReport(officeId: number | null, months: number): Observable<SelfServiceAdoptionReport> {
+    return this.http.get<SelfServiceAdoptionReport>('/selfservicereports/adoption', {
+      params: this.reportParams(officeId, { months: String(months) })
+    });
+  }
+
+  getFunnelReport(officeId: number | null, fromDate: string, toDate: string): Observable<SelfServiceFunnelReport> {
+    return this.http.get<SelfServiceFunnelReport>('/selfservicereports/funnel', {
+      params: this.reportParams(officeId, { fromDate, toDate })
+    });
+  }
+
+  getTransactionsReport(
+    officeId: number | null,
+    fromDate: string,
+    toDate: string
+  ): Observable<SelfServiceTransactionsReport> {
+    return this.http.get<SelfServiceTransactionsReport>('/selfservicereports/transactions', {
+      params: this.reportParams(officeId, { fromDate, toDate })
+    });
+  }
+
+  private reportParams(officeId: number | null, values: Record<string, string>): HttpParams {
+    let params = new HttpParams();
+    if (officeId) {
+      params = params.set('officeId', String(officeId));
+    }
+    Object.entries(values).forEach(
+      ([
+        key,
+        value
+      ]) => {
+        if (value) {
+          params = params.set(key, value);
+        }
+      }
+    );
+    return params;
   }
 
   /** Replaces the user's transfer limits. An empty list removes them. */

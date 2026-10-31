@@ -796,7 +796,9 @@
       "Logins": "Přihlášení",
       "Transfers": "Převody",
       "Access changes": "Změny přístupu",
-      "Refused": "Zamítnuté"
+      "Refused": "Zamítnuté",
+      "Apply": "Použít",
+      "Reports": "Přehledy"
     },
     "catalogs": {
       "% Amount": "% Amount",
@@ -1630,7 +1632,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Časová osa aktivit"
+      "Activity Timeline": "Časová osa aktivit",
+      "Mobile App Reports": "Přehledy mobilní aplikace",
+      "Adoption": "Využívání",
+      "Sign ups and first logins per month": "Registrace a první přihlášení po měsících",
+      "Sign up funnel": "Registrační trychtýř",
+      "App Transactions": "Transakce v aplikaci",
+      "Refused transfers": "Zamítnuté převody"
     },
     "inputs": {
       "Annual interest rate": "Roční úroková sazba",
@@ -3236,7 +3244,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Všechny pobočky",
+      "Months shown": "Zobrazené měsíce",
+      "Adoption rate": "Míra využívání",
+      "active clients": "aktivních klientů",
+      "Active app users": "Aktivní uživatelé aplikace",
+      "app users": "uživatelů aplikace",
+      "Sign ups": "Registrace",
+      "First logins": "První přihlášení",
+      "Active clients": "Aktivní klienti",
+      "Clients using the app": "Klienti používající aplikaci",
+      "Confirmed registration code": "Potvrdili registrační kód",
+      "Logged in": "Přihlásili se",
+      "Made a transfer": "Provedli převod",
+      "Registration codes sent": "Odeslané registrační kódy",
+      "Channel": "Kanál",
+      "Transfers": "Převody",
+      "App users": "Uživatelé aplikace",
+      "Attempts": "Pokusy"
     },
     "links": {
       "Community": "Společenství",
@@ -3384,7 +3410,8 @@
       "Remittances": "Remitence",
       "Process Remittance": "Zpracovat remitenci",
       "Undo Write-off": "Zrušit odpis",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Mobilní aplikace"
     },
     "placeholders": {
       "Add new server": "Přidat nový server",
@@ -4251,7 +4278,17 @@
       "Refused": "Zamítnuto",
       "Failed": "Neúspěšné",
       "Staff action": "Akce pracovníka",
-      "No activity recorded yet": "Zatím nebyla zaznamenána žádná aktivita"
+      "No activity recorded yet": "Zatím nebyla zaznamenána žádná aktivita",
+      "Counted since the activity timeline was introduced": "Počítáno od zavedení časové osy aktivit.",
+      "Between own accounts": "Mezi vlastními účty",
+      "Confirmed with a code": "Potvrzeno kódem",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Nejde o účet uživatele",
+      "Above the per transfer limit": "Nad limitem na převod",
+      "Above the daily limit": "Nad denním limitem",
+      "Other": "Jiné",
+      "No transfers in this period": "V tomto období nejsou žádné převody",
+      "No refused transfers in this period": "V tomto období nejsou žádné zamítnuté převody"
     },
     "permissions": {
       "actions": {

@@ -9,7 +9,7 @@
 /** Angular Imports */
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
@@ -39,6 +39,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ChangeAccessDialogComponent } from './change-access-dialog/change-access-dialog.component';
 import {
   COMMAND_PERMISSIONS,
+  READ_REPORT_PERMISSION,
   SelfServiceUser,
   SelfServiceUserCommand,
   SelfServiceUserStatus,
@@ -61,6 +62,7 @@ const EXPORT_LIMIT = 500;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
+    RouterLink,
     FaIconComponent,
     MatTable,
     MatColumnDef,
@@ -96,6 +98,7 @@ export class SelfServiceUsersComponent implements OnInit {
     { value: SelfServiceUserStatus.Closed, label: 'Closed' }
   ];
   readonly commandPermissions = COMMAND_PERMISSIONS;
+  readonly readReportPermission = READ_REPORT_PERMISSION;
   readonly statusSeverity = statusSeverity;
   readonly availableCommands = availableCommands;
 

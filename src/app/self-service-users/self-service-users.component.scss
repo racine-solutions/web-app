@@ -27,6 +27,12 @@
   gap: 12px;
 }
 
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .page-title {
   margin: 0;
   font-size: 22px;

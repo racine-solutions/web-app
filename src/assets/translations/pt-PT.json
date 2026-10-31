@@ -795,7 +795,9 @@
       "Logins": "Inícios de sessão",
       "Transfers": "Transferências",
       "Access changes": "Alterações de acesso",
-      "Refused": "Recusadas"
+      "Refused": "Recusadas",
+      "Apply": "Aplicar",
+      "Reports": "Relatórios"
     },
     "catalogs": {
       "% Amount": "Quantia",
@@ -1629,7 +1631,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Histórico de atividade"
+      "Activity Timeline": "Histórico de atividade",
+      "Mobile App Reports": "Relatórios da aplicação móvel",
+      "Adoption": "Adoção",
+      "Sign ups and first logins per month": "Registos e primeiros acessos por mês",
+      "Sign up funnel": "Funil de registo",
+      "App Transactions": "Transações na aplicação",
+      "Refused transfers": "Transferências recusadas"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3235,7 +3243,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Todos os balcões",
+      "Months shown": "Meses apresentados",
+      "Adoption rate": "Taxa de adoção",
+      "active clients": "clientes ativos",
+      "Active app users": "Utilizadores ativos da aplicação",
+      "app users": "utilizadores da aplicação",
+      "Sign ups": "Registos",
+      "First logins": "Primeiros acessos",
+      "Active clients": "Clientes ativos",
+      "Clients using the app": "Clientes que usam a aplicação",
+      "Confirmed registration code": "Confirmaram o código de registo",
+      "Logged in": "Iniciaram sessão",
+      "Made a transfer": "Fizeram uma transferência",
+      "Registration codes sent": "Códigos de registo enviados",
+      "Channel": "Canal",
+      "Transfers": "Transferências",
+      "App users": "Utilizadores da aplicação",
+      "Attempts": "Tentativas"
     },
     "links": {
       "Community": "Comunidade",
@@ -3383,7 +3409,8 @@
       "Remittances": "Remessas",
       "Process Remittance": "Processar remessa",
       "Undo Write-off": "Desfazer abatimento",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Aplicação móvel"
     },
     "placeholders": {
       "Add new server": "Adicionar novo servidor",
@@ -4250,7 +4277,17 @@
       "Refused": "Recusada",
       "Failed": "Falhou",
       "Staff action": "Ação de funcionário",
-      "No activity recorded yet": "Ainda não há atividade registada"
+      "No activity recorded yet": "Ainda não há atividade registada",
+      "Counted since the activity timeline was introduced": "Contado desde a introdução do histórico de atividade.",
+      "Between own accounts": "Entre contas próprias",
+      "Confirmed with a code": "Confirmada com um código",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Não é uma conta do utilizador",
+      "Above the per transfer limit": "Acima do limite por transferência",
+      "Above the daily limit": "Acima do limite diário",
+      "Other": "Outro",
+      "No transfers in this period": "Sem transferências neste período",
+      "No refused transfers in this period": "Sem transferências recusadas neste período"
     },
     "permissions": {
       "actions": {

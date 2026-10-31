@@ -795,7 +795,9 @@
       "Logins": "로그인",
       "Transfers": "이체",
       "Access changes": "접근 변경",
-      "Refused": "거절됨"
+      "Refused": "거절됨",
+      "Apply": "적용",
+      "Reports": "보고서"
     },
     "catalogs": {
       "% Amount": "양",
@@ -1631,7 +1633,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "활동 내역"
+      "Activity Timeline": "활동 내역",
+      "Mobile App Reports": "모바일 앱 보고서",
+      "Adoption": "도입",
+      "Sign ups and first logins per month": "월별 가입 및 첫 로그인",
+      "Sign up funnel": "가입 퍼널",
+      "App Transactions": "앱 거래",
+      "Refused transfers": "거절된 이체"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3236,7 +3244,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "모든 지점",
+      "Months shown": "표시 개월 수",
+      "Adoption rate": "도입률",
+      "active clients": "활성 고객",
+      "Active app users": "활성 앱 사용자",
+      "app users": "앱 사용자",
+      "Sign ups": "가입",
+      "First logins": "첫 로그인",
+      "Active clients": "활성 고객",
+      "Clients using the app": "앱 사용 고객",
+      "Confirmed registration code": "등록 코드 확인",
+      "Logged in": "로그인함",
+      "Made a transfer": "이체함",
+      "Registration codes sent": "발송된 등록 코드",
+      "Channel": "채널",
+      "Transfers": "이체",
+      "App users": "앱 사용자",
+      "Attempts": "시도"
     },
     "links": {
       "Community": "지역 사회",
@@ -3383,7 +3409,8 @@
       "Remittances": "송금",
       "Process Remittance": "송금 처리",
       "Undo Write-off": "상각 취소",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "모바일 앱"
     },
     "placeholders": {
       "Add new server": "새 서버 추가",
@@ -4250,7 +4277,17 @@
       "Refused": "거절됨",
       "Failed": "실패",
       "Staff action": "직원 작업",
-      "No activity recorded yet": "기록된 활동이 아직 없습니다"
+      "No activity recorded yet": "기록된 활동이 아직 없습니다",
+      "Counted since the activity timeline was introduced": "활동 내역 도입 이후부터 집계됩니다.",
+      "Between own accounts": "본인 계좌 간",
+      "Confirmed with a code": "코드로 확인됨",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "사용자의 계좌가 아님",
+      "Above the per transfer limit": "1회 이체 한도 초과",
+      "Above the daily limit": "일일 한도 초과",
+      "Other": "기타",
+      "No transfers in this period": "이 기간에 이체가 없습니다",
+      "No refused transfers in this period": "이 기간에 거절된 이체가 없습니다"
     },
     "permissions": {
       "actions": {

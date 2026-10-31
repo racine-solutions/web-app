@@ -795,7 +795,9 @@
       "Logins": "Pieteikšanās",
       "Transfers": "Pārskaitījumi",
       "Access changes": "Piekļuves izmaiņas",
-      "Refused": "Noraidītie"
+      "Refused": "Noraidītie",
+      "Apply": "Lietot",
+      "Reports": "Pārskati"
     },
     "catalogs": {
       "% Amount": "Summa",
@@ -1630,7 +1632,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Darbību vēsture"
+      "Activity Timeline": "Darbību vēsture",
+      "Mobile App Reports": "Mobilās lietotnes pārskati",
+      "Adoption": "Lietošana",
+      "Sign ups and first logins per month": "Reģistrācijas un pirmās pieteikšanās mēnesī",
+      "Sign up funnel": "Reģistrācijas piltuve",
+      "App Transactions": "Lietotnes darījumi",
+      "Refused transfers": "Noraidītie pārskaitījumi"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3236,7 +3244,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Visas filiāles",
+      "Months shown": "Rādītie mēneši",
+      "Adoption rate": "Lietošanas īpatsvars",
+      "active clients": "aktīvie klienti",
+      "Active app users": "Aktīvie lietotnes lietotāji",
+      "app users": "lietotnes lietotāji",
+      "Sign ups": "Reģistrācijas",
+      "First logins": "Pirmās pieteikšanās",
+      "Active clients": "Aktīvie klienti",
+      "Clients using the app": "Klienti, kas lieto lietotni",
+      "Confirmed registration code": "Apstiprināja reģistrācijas kodu",
+      "Logged in": "Pieteicās",
+      "Made a transfer": "Veica pārskaitījumu",
+      "Registration codes sent": "Nosūtītie reģistrācijas kodi",
+      "Channel": "Kanāls",
+      "Transfers": "Pārskaitījumi",
+      "App users": "Lietotnes lietotāji",
+      "Attempts": "Mēģinājumi"
     },
     "links": {
       "Community": "kopiena",
@@ -3383,7 +3409,8 @@
       "Remittances": "Pārvedumi",
       "Process Remittance": "Apstrādāt pārvedumu",
       "Undo Write-off": "Atcelt norakstīšanu",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Mobilā lietotne"
     },
     "placeholders": {
       "Add new server": "Pievienot jaunu serveri",
@@ -4250,7 +4277,17 @@
       "Refused": "Noraidīts",
       "Failed": "Neizdevās",
       "Staff action": "Darbinieka darbība",
-      "No activity recorded yet": "Darbības vēl nav reģistrētas"
+      "No activity recorded yet": "Darbības vēl nav reģistrētas",
+      "Counted since the activity timeline was introduced": "Skaitīts kopš darbību vēstures ieviešanas.",
+      "Between own accounts": "Starp saviem kontiem",
+      "Confirmed with a code": "Apstiprināts ar kodu",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Nav lietotāja konts",
+      "Above the per transfer limit": "Pārsniedz viena pārskaitījuma limitu",
+      "Above the daily limit": "Pārsniedz dienas limitu",
+      "Other": "Cits",
+      "No transfers in this period": "Šajā periodā nav pārskaitījumu",
+      "No refused transfers in this period": "Šajā periodā nav noraidītu pārskaitījumu"
     },
     "permissions": {
       "actions": {

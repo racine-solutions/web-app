@@ -1,0 +1,229 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h2 class="page-title">{{ 'labels.heading.Mobile App Reports' | translate }}</h2>
+      <p class="page-subtitle">
+        {{ 'labels.text.Clients who use the mobile app in your office and the offices under it' | translate }}
+      </p>
+    </div>
+  </div>
+
+  <form class="data-card filters" [formGroup]="form" (ngSubmit)="load()">
+    <mat-form-field>
+      <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
+      <mat-select formControlName="officeId">
+        <mat-option [value]="null">{{ 'labels.inputs.All offices' | translate }}</mat-option>
+        @for (office of offices; track office.id) {
+          <mat-option [value]="office.id">{{ office.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'labels.inputs.From Date' | translate }}</mat-label>
+      <input matInput type="date" formControlName="fromDate" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'labels.inputs.To Date' | translate }}</mat-label>
+      <input matInput type="date" formControlName="toDate" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'labels.inputs.Months shown' | translate }}</mat-label>
+      <mat-select formControlName="months">
+        @for (months of monthOptions; track months) {
+          <mat-option [value]="months">{{ months }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+      {{ 'labels.buttons.Apply' | translate }}
+    </button>
+  </form>
+
+  @if (adoption) {
+    <section class="data-card">
+      <div class="card-head">
+        <h3 class="section-title">{{ 'labels.heading.Adoption' | translate }}</h3>
+        <button mat-button type="button" color="primary" (click)="exportAdoptionCsv()">
+          {{ 'labels.buttons.Export CSV' | translate }}
+        </button>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi">
+          <span class="kpi-label">{{ 'labels.inputs.Adoption rate' | translate }}</span>
+          <span class="kpi-value">{{ adoption.totals.adoptionRate | number: '1.0-1' }}%</span>
+          <span class="kpi-note"
+            >{{ adoption.totals.clientsUsingApp | number }} / {{ adoption.totals.activeClients | number }}
+            {{ 'labels.inputs.active clients' | translate }}</span
+          >
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">{{ 'labels.inputs.Active app users' | translate }}</span>
+          <span class="kpi-value">{{ adoption.totals.activeAppUsers | number }}</span>
+          <span class="kpi-note"
+            >{{ adoption.totals.appUsers | number }} {{ 'labels.inputs.app users' | translate }}</span
+          >
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">{{ 'labels.inputs.Logged in last 30 days' | translate }}</span>
+          <span class="kpi-value">{{ adoption.totals.loggedInLast30Days | number }}</span>
+        </div>
+      </div>
+
+      <h4 class="sub-title">{{ 'labels.heading.Sign ups and first logins per month' | translate }}</h4>
+      <div class="legend">
+        <span class="key"><span class="swatch series-1"></span>{{ 'labels.inputs.Sign ups' | translate }}</span>
+        <span class="key"><span class="swatch series-2"></span>{{ 'labels.inputs.First logins' | translate }}</span>
+      </div>
+      <div
+        class="month-chart"
+        role="img"
+        [attr.aria-label]="'labels.heading.Sign ups and first logins per month' | translate"
+      >
+        @for (month of adoption.months; track month.month) {
+          <div class="month" [title]="month.month + ': ' + month.signUps + ' / ' + month.firstLogins">
+            <div class="bars">
+              <span class="bar series-1" [style.height]="barHeight(month.signUps)"></span>
+              <span class="bar series-2" [style.height]="barHeight(month.firstLogins)"></span>
+            </div>
+            <span class="month-label">{{ month.month + '-01' | date: 'MMM yy' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.Office' | translate }}</th>
+              <th class="num">{{ 'labels.inputs.Active clients' | translate }}</th>
+              <th class="num">{{ 'labels.inputs.Clients using the app' | translate }}</th>
+              <th class="num">{{ 'labels.inputs.Adoption rate' | translate }}</th>
+              <th class="num">{{ 'labels.inputs.Active app users' | translate }}</th>
+              <th class="num">{{ 'labels.inputs.Logged in last 30 days' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (office of adoption.offices; track office.officeId) {
+              <tr>
+                <td>{{ office.officeName }}</td>
+                <td class="num">{{ office.activeClients | number }}</td>
+                <td class="num">{{ office.clientsUsingApp | number }}</td>
+                <td class="num">{{ office.adoptionRate | number: '1.0-1' }}%</td>
+                <td class="num">{{ office.activeAppUsers | number }}</td>
+                <td class="num">{{ office.loggedInLast30Days | number }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  @if (funnel) {
+    <section class="data-card">
+      <h3 class="section-title">
+        {{ 'labels.heading.Sign up funnel' | translate }} · {{ funnel.fromDate | date: 'dd MMM yyyy' }} –
+        {{ funnel.toDate | date: 'dd MMM yyyy' }}
+      </h3>
+      <ol class="funnel">
+        @for (step of funnelSteps; track step.label) {
+          <li>
+            <span class="step-label">{{ 'labels.inputs.' + step.label | translate }}</span>
+            <span class="track"><span class="fill" [style.width.%]="step.share"></span></span>
+            <span class="step-value">{{ step.count | number }} · {{ step.share | number: '1.0-1' }}%</span>
+          </li>
+        }
+      </ol>
+      <p class="note">
+        {{ 'labels.inputs.Registration codes sent' | translate }}: {{ funnel.registrationCodesSent | number }}.
+        {{ 'labels.text.Counted since the activity timeline was introduced' | translate }}
+      </p>
+    </section>
+  }
+
+  @if (transactions) {
+    <section class="data-card">
+      <div class="card-head">
+        <h3 class="section-title">
+          {{ 'labels.heading.App Transactions' | translate }} · {{ transactions.fromDate | date: 'dd MMM yyyy' }} –
+          {{ transactions.toDate | date: 'dd MMM yyyy' }}
+        </h3>
+        <button
+          mat-button
+          type="button"
+          color="primary"
+          [disabled]="!transactions.days.length"
+          (click)="exportTransactionsCsv()"
+        >
+          {{ 'labels.buttons.Export CSV' | translate }}
+        </button>
+      </div>
+      @if (transactions.totals.length) {
+        <div class="table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>{{ 'labels.inputs.Channel' | translate }}</th>
+                <th>{{ 'labels.inputs.Currency' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.Transfers' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.Amount' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.App users' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (total of transactions.totals; track total.channel + total.currencyCode) {
+                <tr>
+                  <td>{{ 'labels.text.' + (channelLabels[total.channel] || total.channel) | translate }}</td>
+                  <td>{{ total.currencyCode }}</td>
+                  <td class="num">{{ total.transfers | number }}</td>
+                  <td class="num">{{ total.amount | number: '1.0-2' }}</td>
+                  <td class="num">{{ total.users | number }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty">{{ 'labels.text.No transfers in this period' | translate }}</p>
+      }
+
+      <h4 class="sub-title">{{ 'labels.heading.Refused transfers' | translate }}</h4>
+      @if (transactions.refusals.length) {
+        <div class="table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>{{ 'labels.inputs.Reason' | translate }}</th>
+                <th>{{ 'labels.inputs.Currency' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.Attempts' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.Amount' | translate }}</th>
+                <th class="num">{{ 'labels.inputs.App users' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (refusal of transactions.refusals; track refusal.reason + refusal.currencyCode) {
+                <tr>
+                  <td>{{ 'labels.text.' + refusalLabels[refusal.reason] | translate }}</td>
+                  <td>{{ refusal.currencyCode || '-' }}</td>
+                  <td class="num">{{ refusal.attempts | number }}</td>
+                  <td class="num">{{ refusal.amount | number: '1.0-2' }}</td>
+                  <td class="num">{{ refusal.users | number }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty">{{ 'labels.text.No refused transfers in this period' | translate }}</p>
+      }
+    </section>
+  }
+</div>

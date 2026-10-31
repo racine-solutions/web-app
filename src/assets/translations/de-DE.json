@@ -797,7 +797,9 @@
       "Logins": "Anmeldungen",
       "Transfers": "Überweisungen",
       "Access changes": "Zugriffsänderungen",
-      "Refused": "Abgelehnt"
+      "Refused": "Abgelehnt",
+      "Apply": "Anwenden",
+      "Reports": "Berichte"
     },
     "catalogs": {
       "% Amount": "Menge",
@@ -1632,7 +1634,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Aktivitätsverlauf"
+      "Activity Timeline": "Aktivitätsverlauf",
+      "Mobile App Reports": "Berichte zur Mobile App",
+      "Adoption": "Nutzung",
+      "Sign ups and first logins per month": "Registrierungen und erste Anmeldungen pro Monat",
+      "Sign up funnel": "Registrierungstrichter",
+      "App Transactions": "App-Transaktionen",
+      "Refused transfers": "Abgelehnte Überweisungen"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3238,7 +3246,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Alle Filialen",
+      "Months shown": "Angezeigte Monate",
+      "Adoption rate": "Nutzungsquote",
+      "active clients": "aktive Kunden",
+      "Active app users": "Aktive App-Nutzer",
+      "app users": "App-Nutzer",
+      "Sign ups": "Registrierungen",
+      "First logins": "Erste Anmeldungen",
+      "Active clients": "Aktive Kunden",
+      "Clients using the app": "Kunden mit App",
+      "Confirmed registration code": "Registrierungscode bestätigt",
+      "Logged in": "Angemeldet",
+      "Made a transfer": "Überweisung getätigt",
+      "Registration codes sent": "Gesendete Registrierungscodes",
+      "Channel": "Kanal",
+      "Transfers": "Überweisungen",
+      "App users": "App-Nutzer",
+      "Attempts": "Versuche"
     },
     "links": {
       "Community": "Gemeinschaft",
@@ -3386,7 +3412,8 @@
       "Remittances": "Überweisungen",
       "Process Remittance": "Überweisung bearbeiten",
       "Undo Write-off": "Abschreibung rückgängig machen",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Mobile App"
     },
     "placeholders": {
       "Add new server": "Neuen Server hinzufügen",
@@ -4252,7 +4279,17 @@
       "Refused": "Abgelehnt",
       "Failed": "Fehlgeschlagen",
       "Staff action": "Mitarbeiteraktion",
-      "No activity recorded yet": "Noch keine Aktivität erfasst"
+      "No activity recorded yet": "Noch keine Aktivität erfasst",
+      "Counted since the activity timeline was introduced": "Gezählt seit Einführung des Aktivitätsverlaufs.",
+      "Between own accounts": "Zwischen eigenen Konten",
+      "Confirmed with a code": "Mit Code bestätigt",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Kein Konto des Nutzers",
+      "Above the per transfer limit": "Über dem Limit pro Überweisung",
+      "Above the daily limit": "Über dem Tageslimit",
+      "Other": "Sonstige",
+      "No transfers in this period": "Keine Überweisungen in diesem Zeitraum",
+      "No refused transfers in this period": "Keine abgelehnten Überweisungen in diesem Zeitraum"
     },
     "permissions": {
       "actions": {

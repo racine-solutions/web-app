@@ -100,6 +100,53 @@ export interface SelfServiceUserEventFilter {
   result?: string;
 }
 
+/** GET /selfservicereports/adoption. Adoption rate = share of active clients using the app, in percent. */
+export interface SelfServiceAdoptionReport {
+  totals: {
+    activeClients: number;
+    clientsUsingApp: number;
+    appUsers: number;
+    activeAppUsers: number;
+    loggedInLast30Days: number;
+    adoptionRate: number;
+  };
+  offices: {
+    officeId: number;
+    officeName: string;
+    activeClients: number;
+    clientsUsingApp: number;
+    appUsers: number;
+    activeAppUsers: number;
+    loggedInLast30Days: number;
+    adoptionRate: number;
+  }[];
+  /** month is yyyy-MM (UTC), oldest first. */
+  months: { month: string; signUps: number; firstLogins: number }[];
+}
+
+/** GET /selfservicereports/funnel: of the people who signed up in the period, how far each got. */
+export interface SelfServiceFunnelReport {
+  fromDate: string;
+  toDate: string;
+  registrationCodesSent: number;
+  signedUp: number;
+  confirmed: number;
+  loggedIn: number;
+  transacted: number;
+}
+
+/** GET /selfservicereports/transactions. */
+export interface SelfServiceTransactionsReport {
+  fromDate: string;
+  toDate: string;
+  totals: { channel: string; currencyCode: string; transfers: number; amount: number; users: number }[];
+  days: { day: string; currencyCode: string; transfers: number; amount: number }[];
+  /** reason: OWNERSHIP, PER_TRANSFER_LIMIT, DAILY_LIMIT or OTHER. */
+  refusals: { reason: string; currencyCode?: string; attempts: number; amount: number; users: number }[];
+}
+
+export const READ_REPORT_PERMISSION = 'READ_SELFSERVICEREPORT';
+
 /** Status values used by the API (status filter and status.id). */
 export enum SelfServiceUserStatus {
   Pending = 100,

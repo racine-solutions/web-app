@@ -15,6 +15,7 @@ import { Route } from '../core/route/route.service';
 
 /** Custom Imports */
 import { SelfServiceUsersComponent } from './self-service-users.component';
+import { SelfServiceReportsComponent } from './self-service-reports/self-service-reports.component';
 import { ViewSelfServiceUserComponent } from './view-self-service-user/view-self-service-user.component';
 import { SelfServiceUserResolver } from './self-service-user.resolver';
 
@@ -27,6 +28,11 @@ const routes: Routes = [
         {
           path: '',
           component: SelfServiceUsersComponent
+        },
+        {
+          path: 'reports',
+          component: SelfServiceReportsComponent,
+          data: { title: 'Mobile App Reports', breadcrumb: 'Reports' }
         },
         {
           path: ':id',

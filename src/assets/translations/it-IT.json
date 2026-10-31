@@ -795,7 +795,9 @@
       "Logins": "Accessi",
       "Transfers": "Bonifici",
       "Access changes": "Modifiche di accesso",
-      "Refused": "Rifiutati"
+      "Refused": "Rifiutati",
+      "Apply": "Applica",
+      "Reports": "Report"
     },
     "catalogs": {
       "% Amount": "Quantità",
@@ -1630,7 +1632,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Cronologia attività"
+      "Activity Timeline": "Cronologia attività",
+      "Mobile App Reports": "Report dell'app mobile",
+      "Adoption": "Adozione",
+      "Sign ups and first logins per month": "Iscrizioni e primi accessi al mese",
+      "Sign up funnel": "Funnel di iscrizione",
+      "App Transactions": "Transazioni nell'app",
+      "Refused transfers": "Bonifici rifiutati"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3236,7 +3244,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "Tutte le filiali",
+      "Months shown": "Mesi mostrati",
+      "Adoption rate": "Tasso di adozione",
+      "active clients": "clienti attivi",
+      "Active app users": "Utenti attivi dell'app",
+      "app users": "utenti dell'app",
+      "Sign ups": "Iscrizioni",
+      "First logins": "Primi accessi",
+      "Active clients": "Clienti attivi",
+      "Clients using the app": "Clienti che usano l'app",
+      "Confirmed registration code": "Codice di registrazione confermato",
+      "Logged in": "Hanno effettuato l'accesso",
+      "Made a transfer": "Hanno fatto un bonifico",
+      "Registration codes sent": "Codici di registrazione inviati",
+      "Channel": "Canale",
+      "Transfers": "Bonifici",
+      "App users": "Utenti dell'app",
+      "Attempts": "Tentativi"
     },
     "links": {
       "Community": "Comunità",
@@ -3383,7 +3409,8 @@
       "Remittances": "Rimesse",
       "Process Remittance": "Elabora rimessa",
       "Undo Write-off": "Annulla storno",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "App mobile"
     },
     "placeholders": {
       "Add new server": "Aggiungi nuovo server",
@@ -4251,7 +4278,17 @@
       "Refused": "Rifiutato",
       "Failed": "Non riuscito",
       "Staff action": "Azione del personale",
-      "No activity recorded yet": "Nessuna attività registrata finora"
+      "No activity recorded yet": "Nessuna attività registrata finora",
+      "Counted since the activity timeline was introduced": "Conteggiato dall'introduzione della cronologia attività.",
+      "Between own accounts": "Tra conti propri",
+      "Confirmed with a code": "Confermato con un codice",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Non è un conto dell'utente",
+      "Above the per transfer limit": "Oltre il limite per bonifico",
+      "Above the daily limit": "Oltre il limite giornaliero",
+      "Other": "Altro",
+      "No transfers in this period": "Nessun bonifico in questo periodo",
+      "No refused transfers in this period": "Nessun bonifico rifiutato in questo periodo"
     },
     "permissions": {
       "actions": {

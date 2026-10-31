@@ -764,7 +764,9 @@
       "Logins": "Logins",
       "Transfers": "Transfers",
       "Access changes": "Access changes",
-      "Refused": "Refused"
+      "Refused": "Refused",
+      "Apply": "Apply",
+      "Reports": "Reports"
     },
     "catalogs": {
       "Interest payment waiver": "Interest Payment Waiver",
@@ -1599,7 +1601,13 @@
       "Clients Using This App User": "Clients Using This App User",
       "Transfer Limits": "Transfer Limits",
       "Linked Clients": "Linked Clients",
-      "Activity Timeline": "Activity Timeline"
+      "Activity Timeline": "Activity Timeline",
+      "Mobile App Reports": "Mobile App Reports",
+      "Adoption": "Adoption",
+      "Sign ups and first logins per month": "Sign-ups and first logins per month",
+      "Sign up funnel": "Sign-up funnel",
+      "App Transactions": "App Transactions",
+      "Refused transfers": "Refused transfers"
     },
     "inputs": {
       "accounting": {
@@ -3209,7 +3217,25 @@
       "Per transfer limit": "Per transfer limit",
       "Daily limit": "Daily limit",
       "Used today": "Used today",
-      "Add client by name": "Add client by name"
+      "Add client by name": "Add client by name",
+      "All offices": "All offices",
+      "Months shown": "Months shown",
+      "Adoption rate": "Adoption rate",
+      "active clients": "active clients",
+      "Active app users": "Active app users",
+      "app users": "app users",
+      "Sign ups": "Sign-ups",
+      "First logins": "First logins",
+      "Active clients": "Active clients",
+      "Clients using the app": "Clients using the app",
+      "Confirmed registration code": "Confirmed registration code",
+      "Logged in": "Logged in",
+      "Made a transfer": "Made a transfer",
+      "Registration codes sent": "Registration codes sent",
+      "Channel": "Channel",
+      "Transfers": "Transfers",
+      "App users": "App users",
+      "Attempts": "Attempts"
     },
     "links": {
       "Community": "Community",
@@ -3362,7 +3388,8 @@
       "Tasks": "Tasks",
       "Undo Payment Rate": "Undo Payment Rate",
       "Reporting Dashboard": "Reporting Dashboard",
-      "Self Service Users": "Self Service Users"
+      "Self Service Users": "Self Service Users",
+      "Mobile App": "Mobile App"
     },
     "placeholders": {
       "Add new server": "Add new server",
@@ -4342,7 +4369,17 @@
       "Refused": "Refused",
       "Failed": "Failed",
       "Staff action": "Staff action",
-      "No activity recorded yet": "No activity recorded yet"
+      "No activity recorded yet": "No activity recorded yet",
+      "Counted since the activity timeline was introduced": "Counted since the activity timeline was introduced.",
+      "Between own accounts": "Between own accounts",
+      "Confirmed with a code": "Confirmed with a code",
+      "SINPE Movil": "SINPE Móvil",
+      "Not one of the user s accounts": "Not one of the user's accounts",
+      "Above the per transfer limit": "Above the per-transfer limit",
+      "Above the daily limit": "Above the daily limit",
+      "Other": "Other",
+      "No transfers in this period": "No transfers in this period",
+      "No refused transfers in this period": "No refused transfers in this period"
     },
     "Mifos Reporting Plugin for Eclipse Birt": "Mifos Reporting Plugin for Eclipse Birt",
     "licensing": {

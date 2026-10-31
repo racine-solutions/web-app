@@ -25,7 +25,8 @@ import {
   MatHeaderRowDef,
   MatRow,
   MatRowDef,
-  MatTable
+  MatTable,
+  MatTableDataSource
 } from '@angular/material/table';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -107,7 +108,8 @@ export class SelfServiceUsersComponent implements OnInit {
     'lastLoginOn',
     'actions'
   ];
-  users: SelfServiceUser[] = [];
+  /** Rows of the current page; MatTableDataSource pushes every new page to the table. */
+  dataSource = new MatTableDataSource<SelfServiceUser>([]);
   summary: SelfServiceUserSummary | null = null;
   totalRecords = 0;
   loading = false;
@@ -250,7 +252,7 @@ export class SelfServiceUsersComponent implements OnInit {
       .getUsers({ ...this.filters(), offset: this.pageIndex * this.pageSize, limit: this.pageSize })
       .subscribe({
         next: (page) => {
-          this.users = page.pageItems || [];
+          this.dataSource.data = page.pageItems || [];
           this.totalRecords = page.totalFilteredRecords || 0;
           this.loading = false;
           this.changeDetector.markForCheck();

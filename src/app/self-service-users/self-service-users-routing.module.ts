@@ -31,7 +31,13 @@ const routes: Routes = [
         {
           path: ':id',
           component: ViewSelfServiceUserComponent,
-          data: { title: 'View Self Service User', routeParamBreadcrumb: 'id' },
+          data: {
+            title: 'View Self Service User',
+            routeResolveBreadcrumb: [
+              'user',
+              'displayName'
+            ]
+          },
           resolve: { user: SelfServiceUserResolver }
         }
       ]

@@ -55,6 +55,10 @@
   width: 100%;
 }
 
+.add-currency {
+  align-self: flex-start;
+}
+
 @media (width <= 640px) {
   .dialog-content {
     min-width: 0;

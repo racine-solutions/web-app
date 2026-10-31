@@ -81,8 +81,9 @@ export class LimitsDialogComponent implements OnInit {
     (this.data.user.limits || []).forEach((limit) => this.addRow(limit));
     this.organizationService.getCurrencies().subscribe((data: any) => {
       this.currencies = data?.selectedCurrencyOptions || [];
-      if (!this.limits.length && this.currencies.length) {
-        this.addRow({ currencyCode: this.currencies[0].code });
+      // Start with one empty row; staff choose the currency themselves
+      if (!this.limits.length) {
+        this.addRow();
       }
       this.changeDetector.markForCheck();
     });

@@ -49,7 +49,7 @@
   @if (!limits.length) {
     <p class="description">{{ 'labels.text.No limits set; saving removes all limits for this user' | translate }}</p>
   }
-  <button mat-button type="button" color="primary" (click)="addRow()">
+  <button mat-button type="button" color="primary" class="add-currency" (click)="addRow()">
     {{ 'labels.buttons.Add currency' | translate }}
   </button>
 

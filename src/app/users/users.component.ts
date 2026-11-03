@@ -86,8 +86,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
     'firstname',
     'lastname',
     'email',
-    'officeName',
-    'isSelfServiceUser'
+    'officeName'
   ];
   /** Data source for users table. */
   dataSource: MatTableDataSource<any>;

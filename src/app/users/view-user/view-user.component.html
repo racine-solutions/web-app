@@ -57,19 +57,6 @@
             }
           </div>
         </div>
-
-        <div class="content-row">
-          <div class="label">{{ 'labels.buttons.Is Self Service' | translate }}</div>
-          <div class="value">
-            <span class="self-service-container">
-              <span
-                [ngClass]="userData.isSelfServiceUser ? 'self-service-true' : 'self-service-false'"
-                class="self-service-indicator"
-              ></span>
-              {{ userData.isSelfServiceUser ? ('labels.buttons.Yes' | translate) : ('labels.buttons.No' | translate) }}
-            </span>
-          </div>
-        </div>
       </div>
 
       <div class="layout-row layout-align-center gap-2percent column-on-mobile back-button-container">

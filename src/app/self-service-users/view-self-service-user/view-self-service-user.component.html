@@ -1,0 +1,184 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page">
+  <section class="profile-card">
+    <div class="profile-head">
+      <div class="avatar" aria-hidden="true">{{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }}</div>
+      <div class="identity">
+        <h2 class="name">{{ user.displayName }}</h2>
+        <p class="sub">
+          {{ user.username }} · {{ 'labels.inputs.App user' | translate }} #{{ user.id }} · {{ user.officeName }}
+        </p>
+        <div class="pills">
+          <span class="status-pill" [ngClass]="severity"
+            ><span class="dot"></span>{{ 'labels.status.' + user.status.value | translate }}</span
+          >
+          @if (user.locked) {
+            <span class="status-pill locked"><span class="dot"></span>{{ 'labels.status.Locked' | translate }}</span>
+          }
+          @if (user.passwordResetRequired) {
+            <span class="status-pill pending"
+              ><span class="dot"></span>{{ 'labels.status.New password required' | translate }}</span
+            >
+          }
+        </div>
+      </div>
+    </div>
+    @if (commands.length) {
+      <div class="actions">
+        @for (command of commands; track command) {
+          <button
+            mat-raised-button
+            type="button"
+            [color]="
+              command === 'close' ? 'warn' : command === 'unlock' || command === 'reactivate' ? 'primary' : undefined
+            "
+            (click)="runCommand(command)"
+            *mifosxHasPermission="commandPermissions[command]"
+          >
+            {{ 'labels.buttons.' + command | translate }}
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <div class="grid">
+    <section class="data-card">
+      <h3 class="section-title">{{ 'labels.heading.Account' | translate }}</h3>
+      <dl class="kv">
+        <dt>{{ 'labels.inputs.Linked client' | translate }}</dt>
+        <dd>
+          @if (user.clientId) {
+            <a [routerLink]="['/clients', user.clientId, 'general']"
+              >{{ user.clientDisplayName }} · {{ user.clientAccountNo }}</a
+            >
+          } @else {
+            -
+          }
+        </dd>
+        <dt>{{ 'labels.inputs.Email' | translate }}</dt>
+        <dd>{{ user.email || '-' }}</dd>
+        <dt>{{ 'labels.inputs.Mobile number' | translate }}</dt>
+        <dd>{{ user.mobileNo || '-' }}</dd>
+        <dt>{{ 'labels.inputs.Office' | translate }}</dt>
+        <dd>{{ user.officeName }}</dd>
+        <dt>{{ 'labels.inputs.Signed up' | translate }}</dt>
+        <dd>{{ user.createdOn ? (user.createdOn | date: 'dd MMM yyyy HH:mm') : '-' }}</dd>
+      </dl>
+    </section>
+
+    <section class="data-card">
+      <h3 class="section-title">{{ 'labels.heading.Mobile App Activity' | translate }}</h3>
+      <dl class="kv">
+        <dt>{{ 'labels.inputs.Last login' | translate }}</dt>
+        <dd>
+          {{ user.lastLoginOn ? (user.lastLoginOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate) }}
+        </dd>
+        <dt>{{ 'labels.inputs.Open sessions' | translate }}</dt>
+        <dd>{{ user.openSessions ?? 0 }}</dd>
+        @if (user.lastSessionStartedOn) {
+          <dt>{{ 'labels.inputs.Latest session started' | translate }}</dt>
+          <dd>{{ user.lastSessionStartedOn | date: 'dd MMM yyyy HH:mm' }}</dd>
+        }
+      </dl>
+    </section>
+
+    <section class="data-card">
+      <div class="card-head">
+        <h3 class="section-title">{{ 'labels.heading.Transfer Limits' | translate }}</h3>
+        @if (!isClosed) {
+          <button
+            mat-button
+            type="button"
+            color="primary"
+            (click)="editLimits()"
+            *mifosxHasPermission="updateLimitsPermission"
+          >
+            {{ 'labels.buttons.Edit' | translate }}
+          </button>
+        }
+      </div>
+      @if (user.limits?.length) {
+        <table class="limits">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.Currency' | translate }}</th>
+              <th>{{ 'labels.inputs.Per transfer limit' | translate }}</th>
+              <th>{{ 'labels.inputs.Daily limit' | translate }}</th>
+              <th>{{ 'labels.inputs.Used today' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (limit of user.limits; track limit.currencyCode) {
+              <tr>
+                <td>{{ limit.currencyCode }}</td>
+                <td>{{ limit.perTransferLimit ? (limit.perTransferLimit | number: '1.0-2') : '-' }}</td>
+                <td>{{ limit.dailyLimit ? (limit.dailyLimit | number: '1.0-2') : '-' }}</td>
+                <td>{{ limit.usedToday | number: '1.0-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="empty">{{ 'labels.text.No per user limits; product and account rules still apply' | translate }}</p>
+      }
+    </section>
+
+    <section class="data-card">
+      <div class="card-head">
+        <h3 class="section-title">{{ 'labels.heading.Linked Clients' | translate }}</h3>
+        @if (!isClosed) {
+          <button
+            mat-button
+            type="button"
+            color="primary"
+            (click)="editClients()"
+            *mifosxHasPermission="updateClientsPermission"
+          >
+            {{ 'labels.buttons.Change' | translate }}
+          </button>
+        }
+      </div>
+      <ul class="clients">
+        @for (client of user.clients; track client.id) {
+          <li>
+            <a [routerLink]="['/clients', client.id, 'general']">{{ client.displayName }} · {{ client.accountNo }}</a>
+            <span class="muted">{{ client.officeName }}</span>
+          </li>
+        } @empty {
+          <li class="empty">{{ 'labels.text.No linked client' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="data-card">
+      <h3 class="section-title">{{ 'labels.heading.Last Access Change' | translate }}</h3>
+      @if (user.statusChangedOn) {
+        <dl class="kv">
+          <dt>{{ 'labels.inputs.Changed on' | translate }}</dt>
+          <dd>{{ user.statusChangedOn | date: 'dd MMM yyyy HH:mm' }}</dd>
+          <dt>{{ 'labels.inputs.Changed by' | translate }}</dt>
+          <dd>{{ user.statusChangedBy || '-' }}</dd>
+          <dt>{{ 'labels.inputs.Reason' | translate }}</dt>
+          <dd>{{ user.statusReason || '-' }}</dd>
+        </dl>
+      } @else {
+        <p class="empty">{{ 'labels.text.Staff have not changed this user s access' | translate }}</p>
+      }
+    </section>
+  </div>
+
+  <section class="data-card">
+    <mifosx-self-service-activity-timeline
+      [userId]="user.id"
+      [refresh]="refreshCount"
+    ></mifosx-self-service-activity-timeline>
+  </section>
+</div>

@@ -1,0 +1,190 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../self-service-users-theme' as theme;
+
+@include theme.host-tokens;
+@include theme.status-pills;
+
+.page {
+  padding: 20px 24px;
+  background: var(--ch-surface-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-card,
+.data-card {
+  background: var(--ch-surface);
+  border: 1px solid var(--ch-border);
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+
+.profile-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ch-blue-50);
+  color: var(--ch-blue-700);
+  font-size: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.identity {
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ch-text-1);
+}
+
+.sub {
+  margin: 2px 0 8px;
+  color: var(--ch-text-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .data-card {
+    flex: 1 1 300px;
+    min-width: 0;
+  }
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ch-text-2);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) auto;
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 13px;
+
+  dt {
+    color: var(--ch-text-2);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ch-text-1);
+    overflow-wrap: anywhere;
+  }
+
+  a {
+    color: var(--ch-blue-700);
+  }
+}
+
+.empty {
+  margin: 0;
+  color: var(--ch-text-2);
+  font-size: 13px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+
+  .section-title {
+    margin-bottom: 8px;
+  }
+}
+
+.limits {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--ch-border);
+  }
+
+  th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ch-text-2);
+  }
+}
+
+.clients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  a {
+    color: var(--ch-blue-700);
+  }
+
+  .muted {
+    color: var(--ch-text-2);
+  }
+}

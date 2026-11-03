@@ -1,0 +1,104 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/* Shared look for the self-service users screens: Racine redesign tokens (light and dark) and status pills. */
+
+@mixin host-tokens {
+  :host {
+    --ch-blue-700: #1565c0;
+    --ch-blue-50: #e3f2fd;
+    --ch-surface: #fff;
+    --ch-surface-alt: #f4f7fb;
+    --ch-surface-h: #ebf2fa;
+    --ch-border: #dde5f0;
+    --ch-text-1: #0d1b2a;
+    --ch-text-2: #4a6785;
+    --ch-text-3: #8fa5bc;
+    --ch-paid: #2e7d32;
+    --ch-paid-bg: #e8f5e9;
+    --ch-partial: #e65100;
+    --ch-partial-bg: #fff3e0;
+    --ch-alert: #c62828;
+    --ch-alert-bg: #ffebee;
+
+    display: block;
+  }
+
+  :host-context(.dark-theme) {
+    --ch-blue-700: #5b9bd5;
+    --ch-blue-50: #0a2040;
+    --ch-surface: #1a2535;
+    --ch-surface-alt: #101d2d;
+    --ch-surface-h: #132032;
+    --ch-border: #1e3050;
+    --ch-text-1: #e2ebf6;
+    --ch-text-2: #8baecf;
+    --ch-text-3: #6a8fad;
+    --ch-paid: #66bb6a;
+    --ch-paid-bg: #172b1a;
+    --ch-partial: #ffa726;
+    --ch-partial-bg: #281c0b;
+    --ch-alert: #ef9a9a;
+    --ch-alert-bg: #2b1212;
+  }
+}
+
+@mixin status-pills {
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-size: 10.5px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    width: fit-content;
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentcolor;
+    }
+
+    &.active {
+      color: var(--ch-paid);
+      border-color: var(--ch-paid);
+      background: var(--ch-paid-bg);
+    }
+
+    &.viewonly {
+      color: var(--ch-blue-700);
+      border-color: var(--ch-blue-700);
+      background: var(--ch-blue-50);
+    }
+
+    &.suspended {
+      color: var(--ch-partial);
+      border-color: var(--ch-partial);
+      background: var(--ch-partial-bg);
+    }
+
+    &.locked {
+      color: var(--ch-alert);
+      border-color: var(--ch-alert);
+      background: var(--ch-alert-bg);
+    }
+
+    &.closed,
+    &.pending {
+      color: var(--ch-text-3);
+      border-color: var(--ch-text-3);
+      background: var(--ch-surface-h);
+    }
+  }
+}

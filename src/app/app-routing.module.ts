@@ -97,6 +97,10 @@ const routes: Routes = [
     loadChildren: () => import('./users/users.module').then((m) => m.UsersModule)
   },
   {
+    path: 'selfserviceusers',
+    loadChildren: () => import('./self-service-users/self-service-users.module').then((m) => m.SelfServiceUsersModule)
+  },
+  {
     path: 'callback',
     component: CallbackComponent
   },

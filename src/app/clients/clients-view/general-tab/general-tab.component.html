@@ -34,6 +34,13 @@
     </div>
   </section>
 
+  <!-- ════ MOBILE APP ACCESS ══════════════════════════════════ -->
+  <mifosx-client-mobile-access
+    *mifosxHasPermission="'READ_SELFSERVICEUSER'"
+    class="section"
+    [clientId]="clientid"
+  ></mifosx-client-mobile-access>
+
   <!-- ════ UPCOMING CHARGES ═══════════════════════════════════ -->
   <section class="section">
     <div class="section-head">

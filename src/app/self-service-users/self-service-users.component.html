@@ -1,0 +1,180 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h2 class="page-title">{{ 'labels.heading.Self Service Users' | translate }}</h2>
+      <p class="page-subtitle">
+        {{ 'labels.text.Clients who use the mobile app in your office and the offices under it' | translate }}
+      </p>
+    </div>
+    <div class="head-actions">
+      <button
+        mat-raised-button
+        type="button"
+        [routerLink]="['/selfserviceusers', 'reports']"
+        *mifosxHasPermission="readReportPermission"
+      >
+        {{ 'labels.buttons.Reports' | translate }}
+      </button>
+      <button mat-raised-button type="button" (click)="exportCsv()" [disabled]="!totalRecords">
+        <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Export CSV' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (summary) {
+    <div class="kpi-grid">
+      <button type="button" class="kpi-card" (click)="showStatus(null)">
+        <span class="kpi-label">{{ 'labels.inputs.Signed up' | translate }}</span>
+        <span class="kpi-value">{{ summary.total - summary.pending - summary.closed | number }}</span>
+        <span class="kpi-note">{{ summary.closed | number }} {{ 'labels.inputs.closed' | translate }}</span>
+      </button>
+      <button type="button" class="kpi-card" (click)="showStatus(null)">
+        <span class="kpi-label">{{ 'labels.inputs.Logged in last 30 days' | translate }}</span>
+        <span class="kpi-value">{{ summary.loggedInLast30Days | number }}</span>
+      </button>
+      <button type="button" class="kpi-card" (click)="showStatus(400)">
+        <span class="kpi-label">{{ 'labels.status.View only' | translate }}</span>
+        <span class="kpi-value">{{ summary.viewOnly | number }}</span>
+      </button>
+      <button type="button" class="kpi-card" (click)="showStatus(500)">
+        <span class="kpi-label">{{ 'labels.status.Suspended' | translate }}</span>
+        <span class="kpi-value">{{ summary.suspended | number }}</span>
+      </button>
+      <button type="button" class="kpi-card kpi-alert" (click)="showStatus(null, true)">
+        <span class="kpi-label">{{ 'labels.status.Locked' | translate }}</span>
+        <span class="kpi-value">{{ summary.locked | number }}</span>
+      </button>
+      <button type="button" class="kpi-card" (click)="showStatus(100)">
+        <span class="kpi-label">{{ 'labels.inputs.Waiting for code confirmation' | translate }}</span>
+        <span class="kpi-value">{{ summary.pending | number }}</span>
+      </button>
+    </div>
+  }
+
+  <div class="data-card">
+    <div class="filters">
+      <mat-form-field class="search">
+        <mat-label>{{ 'labels.inputs.Search name, username, email, phone or account' | translate }}</mat-label>
+        <input matInput #searchInput (keyup)="onSearch(searchInput.value)" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'labels.inputs.Status' | translate }}</mat-label>
+        <mat-select [value]="status" (selectionChange)="onStatusChange($event.value)">
+          <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+          @for (option of statuses; track option.value) {
+            <mat-option [value]="option.value">{{ 'labels.status.' + option.label | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox [checked]="lockedOnly" (change)="onLockedChange($event.checked)">
+        {{ 'labels.inputs.Locked only' | translate }}
+      </mat-checkbox>
+    </div>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSort($event)" class="data-table">
+        <ng-container matColumnDef="displayName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.App user' | translate }}</th>
+          <td mat-cell *matCellDef="let user">
+            <div class="who">
+              <span class="who-name">{{ user.displayName }}</span>
+              <span class="who-sub"
+                >{{ user.username }}
+                @if (user.mobileNo) {
+                  · {{ user.mobileNo }}
+                }
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="client">
+          <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Client' | translate }}</th>
+          <td mat-cell *matCellDef="let user">{{ user.clientAccountNo || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="officeName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Office' | translate }}</th>
+          <td mat-cell *matCellDef="let user">{{ user.officeName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Status' | translate }}</th>
+          <td mat-cell *matCellDef="let user">
+            <div class="pills">
+              <span class="status-pill" [ngClass]="statusSeverity(user)"
+                ><span class="dot"></span>{{ 'labels.status.' + user.status.value | translate }}</span
+              >
+              @if (user.locked) {
+                <span class="status-pill locked"
+                  ><span class="dot"></span>{{ 'labels.status.Locked' | translate }}</span
+                >
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdOn">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Signed up' | translate }}</th>
+          <td mat-cell *matCellDef="let user">{{ user.createdOn ? (user.createdOn | date: 'dd MMM yyyy') : '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastLoginOn">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Last login' | translate }}</th>
+          <td mat-cell *matCellDef="let user">
+            {{
+              user.lastLoginOn ? (user.lastLoginOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate)
+            }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let user" (click)="$event.stopPropagation()">
+            @if (availableCommands(user).length) {
+              <button mat-icon-button type="button" [matMenuTriggerFor]="rowMenu" aria-label="Actions">
+                <fa-icon icon="bars"></fa-icon>
+              </button>
+              <mat-menu #rowMenu="matMenu">
+                @for (command of availableCommands(user); track command) {
+                  <button
+                    mat-menu-item
+                    type="button"
+                    (click)="runCommand(user, command)"
+                    *mifosxHasPermission="commandPermissions[command]"
+                  >
+                    {{ 'labels.buttons.' + command | translate }}
+                  </button>
+                }
+              </mat-menu>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="select-row" (click)="openUser(row)"></tr>
+      </table>
+
+      @if (!loading && !dataSource.data.length) {
+        <p class="empty">{{ 'labels.text.No mobile app users match these filters' | translate }}</p>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalRecords"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[25, 50, 100]"
+      (page)="onPage($event)"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+</div>

@@ -1,0 +1,153 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@use '../self-service-users-theme' as theme;
+
+@include theme.host-tokens;
+@include theme.status-pills;
+
+:host {
+  display: block;
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ch-text-2);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  border: 1px solid var(--ch-border);
+  background: var(--ch-surface);
+  color: var(--ch-text-2);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 12px;
+  cursor: pointer;
+
+  &.selected {
+    background: var(--ch-blue-50);
+    border-color: var(--ch-blue-700);
+    color: var(--ch-blue-700);
+    font-weight: 600;
+  }
+}
+
+.timeline {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+
+  li {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    padding: 0 0 14px;
+
+    // Connector between markers
+    &:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 14px;
+      bottom: 0;
+      width: 2px;
+      background: var(--ch-border);
+    }
+  }
+}
+
+.marker {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--ch-paid);
+
+  &.viewonly {
+    background: var(--ch-blue-700);
+  }
+
+  &.suspended {
+    background: var(--ch-alert);
+  }
+}
+
+.entry {
+  min-width: 0;
+  font-size: 13px;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: var(--ch-text-1);
+}
+
+.description {
+  overflow-wrap: anywhere;
+}
+
+.amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  margin-top: 2px;
+  color: var(--ch-text-2);
+  font-size: 12px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) auto;
+  gap: 2px 12px;
+  margin: 6px 0 0;
+  font-size: 12px;
+
+  dt {
+    color: var(--ch-text-3);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ch-text-2);
+    overflow-wrap: anywhere;
+  }
+}
+
+.empty {
+  margin: 0;
+  color: var(--ch-text-2);
+  font-size: 13px;
+}

@@ -82,7 +82,7 @@
         [matMenuTriggerFor]="adminMenu"
         #adminMenuTrigger="matMenuTrigger"
         tabindex="0"
-        *mifosxHasPermission="['READ_USER', 'READ_ROLE']"
+        *mifosxHasPermission="['READ_USER', 'READ_ROLE', 'READ_SELFSERVICEUSER']"
       >
         <fa-icon class="mr-05" icon="shield-alt" size="lg"></fa-icon>
         {{ 'labels.menus.Admin' | translate }}
@@ -167,7 +167,7 @@
       mat-menu-item
       [matMenuTriggerFor]="adminMenu"
       tabindex="0"
-      *mifosxHasPermission="['READ_USER', 'READ_ROLE']"
+      *mifosxHasPermission="['READ_USER', 'READ_ROLE', 'READ_SELFSERVICEUSER']"
     >
       {{ 'labels.menus.Admin' | translate }}
     </button>
@@ -194,11 +194,22 @@
   <button mat-menu-item [routerLink]="['/reports', 'Accounting']" tabindex="0" *mifosxHasPermission="'READ_REPORT'">
     {{ 'labels.menus.Accounting' | translate }}
   </button>
+  <button
+    mat-menu-item
+    [routerLink]="['/selfserviceusers', 'reports']"
+    tabindex="0"
+    *mifosxHasPermission="'READ_SELFSERVICEREPORT'"
+  >
+    {{ 'labels.menus.Mobile App' | translate }}
+  </button>
 </mat-menu>
 
 <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
   <button mat-menu-item [routerLink]="['/appusers']" tabindex="0" *mifosxHasPermission="'READ_USER'">
     {{ 'labels.menus.Users' | translate }}
+  </button>
+  <button mat-menu-item [routerLink]="['/selfserviceusers']" tabindex="0" *mifosxHasPermission="'READ_SELFSERVICEUSER'">
+    {{ 'labels.menus.Self Service Users' | translate }}
   </button>
   <button mat-menu-item [routerLink]="['/organization']" tabindex="0" *mifosxHasPermission="'READ_OFFICE'">
     {{ 'labels.menus.Organization' | translate }}

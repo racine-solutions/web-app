@@ -1,0 +1,67 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h1 mat-dialog-title>{{ 'labels.heading.Mobile App Transfer Limits' | translate }}</h1>
+<div mat-dialog-content [formGroup]="form" class="dialog-content">
+  <p class="description">
+    {{ 'labels.text.Limits apply to every transfer the client makes in the mobile app' | translate }}
+  </p>
+
+  <div formArrayName="limits" class="rows">
+    @for (row of limits.controls; track row; let i = $index) {
+      <div class="row" [formGroupName]="i">
+        <mat-form-field class="currency">
+          <mat-label>{{ 'labels.inputs.Currency' | translate }}</mat-label>
+          <mat-select formControlName="currencyCode" required>
+            @for (currency of currencies; track currency.code) {
+              <mat-option [value]="currency.code">{{ currency.code }} · {{ currency.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'labels.inputs.Per transfer limit' | translate }}</mat-label>
+          <input matInput type="number" min="0" formControlName="perTransferLimit" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'labels.inputs.Daily limit' | translate }}</mat-label>
+          <input matInput type="number" min="0" formControlName="dailyLimit" />
+        </mat-form-field>
+        <button mat-button type="button" color="warn" (click)="removeRow(i)">
+          {{ 'labels.buttons.Remove' | translate }}
+        </button>
+        @if (row.touched && row.hasError('noLimit')) {
+          <p class="row-error">{{ 'labels.text.Give a per transfer limit, a daily limit, or both' | translate }}</p>
+        }
+        @if (row.touched && row.hasError('dailyBelowPerTransfer')) {
+          <p class="row-error">
+            {{ 'labels.text.The daily limit cannot be lower than the per transfer limit' | translate }}
+          </p>
+        }
+      </div>
+    }
+  </div>
+
+  @if (!limits.length) {
+    <p class="description">{{ 'labels.text.No limits set; saving removes all limits for this user' | translate }}</p>
+  }
+  <button mat-button type="button" color="primary" class="add-currency" (click)="addRow()">
+    {{ 'labels.buttons.Add currency' | translate }}
+  </button>
+
+  <mat-form-field class="full-width">
+    <mat-label>{{ 'labels.inputs.Reason' | translate }}</mat-label>
+    <textarea matInput formControlName="reason" rows="2" maxlength="500"></textarea>
+  </mat-form-field>
+  <p class="notice">{{ 'labels.text.The client will be told by email and SMS' | translate }}</p>
+</div>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close type="button">{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="submit()">
+    {{ 'labels.buttons.Save' | translate }}
+  </button>
+</mat-dialog-actions>

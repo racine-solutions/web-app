@@ -1,0 +1,73 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="card-head">
+  <h3 class="section-title">{{ 'labels.heading.Activity Timeline' | translate }}</h3>
+  <div class="filters" role="group">
+    @for (option of filters; track option.label) {
+      <button
+        type="button"
+        class="chip"
+        [class.selected]="option === selected"
+        [attr.aria-pressed]="option === selected"
+        (click)="select(option)"
+      >
+        {{ 'labels.buttons.' + option.label | translate }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (events.length) {
+  <ol class="timeline">
+    @for (event of events; track event.id) {
+      <li>
+        <span class="marker" [ngClass]="severity(event)" aria-hidden="true"></span>
+        <div class="entry">
+          <div class="line">
+            <span class="description">{{ event.description }}</span>
+            @if (event.amount !== null && event.amount !== undefined) {
+              <span class="amount">{{ event.amount | number: '1.0-2' }} {{ event.currencyCode }}</span>
+            }
+            @if (event.result === 'REFUSED') {
+              <span class="status-pill suspended"
+                ><span class="dot"></span>{{ 'labels.text.Refused' | translate }}</span
+              >
+            } @else if (event.result === 'FAILED') {
+              <span class="status-pill suspended"><span class="dot"></span>{{ 'labels.text.Failed' | translate }}</span>
+            }
+          </div>
+          <div class="meta">
+            <time [attr.datetime]="event.createdOn">{{ event.createdOn | date: 'dd MMM yyyy HH:mm:ss' }}</time>
+            @if (event.actor === 'STAFF') {
+              <span>· {{ 'labels.text.Staff action' | translate }}: {{ event.staffUsername || '-' }}</span>
+            }
+            @if (event.ipAddress) {
+              <span>· {{ event.ipAddress }}</span>
+            }
+          </div>
+          @if (detailsOf(event).length) {
+            <dl class="details">
+              @for (item of detailsOf(event); track item.key) {
+                <dt>{{ item.key }}</dt>
+                <dd>{{ item.value }}</dd>
+              }
+            </dl>
+          }
+        </div>
+      </li>
+    }
+  </ol>
+  @if (events.length < total) {
+    <button mat-button type="button" color="primary" [disabled]="loading" (click)="loadMore()">
+      {{ 'labels.buttons.Show more' | translate }} ({{ total - events.length }})
+    </button>
+  }
+} @else if (!loading) {
+  <p class="empty">{{ 'labels.text.No activity recorded yet' | translate }}</p>
+}

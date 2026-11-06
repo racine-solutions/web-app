@@ -54,6 +54,12 @@ import { SmsAccountResolver } from './premium-feature/sms/sms-account.resolver';
 import { SmsMessagesComponent } from './premium-feature/sms/sms-messages.component';
 import { PremiumFeatureSmsComponent } from './premium-feature/sms/premium-feature-sms.component';
 import { SmsWalletTransactionsComponent } from './premium-feature/sms/sms-wallet-transactions.component';
+import { CampaignListComponent } from './premium-feature/campaigns/campaign-list/campaign-list.component';
+import { TemplateListComponent } from './premium-feature/campaigns/template-list/template-list.component';
+import { TemplateFormComponent } from './premium-feature/campaigns/template-form/template-form.component';
+import { CampaignFormComponent } from './premium-feature/campaigns/campaign-form/campaign-form.component';
+import { CampaignViewComponent } from './premium-feature/campaigns/campaign-view/campaign-view.component';
+import { CampaignRunComponent } from './premium-feature/campaigns/campaign-run/campaign-run.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -663,6 +669,52 @@ const routes: Routes = [
                   path: 'wallet-transactions',
                   data: { title: 'Wallet Transactions', breadcrumb: 'Wallet Transactions' },
                   component: SmsWalletTransactionsComponent
+                }
+              ]
+            },
+            {
+              path: 'campaigns',
+              data: { title: 'Campaigns', breadcrumb: 'Campaigns' },
+              children: [
+                { path: '', component: CampaignListComponent },
+                {
+                  path: 'templates',
+                  data: { title: 'Templates', breadcrumb: 'Templates' },
+                  children: [
+                    { path: '', component: TemplateListComponent },
+                    {
+                      path: 'create',
+                      data: { title: 'New template', breadcrumb: 'New' },
+                      component: TemplateFormComponent
+                    },
+                    {
+                      path: ':templateId/edit',
+                      data: { title: 'Edit template', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                      component: TemplateFormComponent
+                    }
+                  ]
+                },
+                {
+                  path: 'create',
+                  data: { title: 'New campaign', breadcrumb: 'New' },
+                  component: CampaignFormComponent
+                },
+                {
+                  path: ':id',
+                  data: { title: 'Campaign', breadcrumb: 'Campaign', routeParamBreadcrumb: false },
+                  children: [
+                    { path: '', component: CampaignViewComponent },
+                    {
+                      path: 'edit',
+                      data: { title: 'Edit campaign', breadcrumb: 'Edit' },
+                      component: CampaignFormComponent
+                    },
+                    {
+                      path: 'runs/:runId',
+                      data: { title: 'Delivery report', breadcrumb: 'Delivery report', routeParamBreadcrumb: false },
+                      component: CampaignRunComponent
+                    }
+                  ]
                 }
               ]
             }

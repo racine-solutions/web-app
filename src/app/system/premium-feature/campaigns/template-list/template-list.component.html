@@ -1,0 +1,90 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <div class="page-actions">
+    <mat-checkbox [(ngModel)]="showArchived" (change)="reload()">Show archived</mat-checkbox>
+    <span class="spacer"></span>
+    <a mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_COMMTEMPLATE'"
+      ><mat-icon>add</mat-icon> New template</a
+    >
+  </div>
+
+  <mat-card>
+    @if (loading && !templates.length) {
+      <p class="muted">Loading templates…</p>
+    } @else if (!total) {
+      <div class="empty">
+        <mat-icon>description</mat-icon>
+        <p>No communication templates yet.</p>
+        <p class="muted">A template holds the message, with placeholders such as the client's name or loan balance.</p>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="full">
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Tag</th>
+              <th>Purpose</th>
+              <th class="num">Longest SMS</th>
+              <th class="num">Used by</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (template of templates; track template.id) {
+              <tr [routerLink]="[template.id, 'edit']" tabindex="0">
+                <td>
+                  <strong>{{ template.name }}</strong>
+                  @if (template.archived) {
+                    <span class="chip grey">Archived</span>
+                  }
+                  <div class="muted preview">{{ template.text }}</div>
+                </td>
+                <td>
+                  <span class="chip">{{ template.tag }}</span>
+                </td>
+                <td>{{ template.purpose === 'MARKETING' ? 'Sales & marketing' : 'General' }}</td>
+                <td class="num">
+                  <span [class.over]="template.longestLength > template.limit"
+                    >{{ template.longestLength }} / {{ template.limit }}</span
+                  >
+                </td>
+                <td class="num">
+                  {{ template.campaignsUsingIt }} campaign{{ template.campaignsUsingIt === 1 ? '' : 's' }}
+                </td>
+                <td class="num">
+                  @if (!template.archived) {
+                    <button
+                      mat-button
+                      type="button"
+                      (click)="archive(template, $event)"
+                      *mifosxHasPermission="'DELETE_COMMTEMPLATE'"
+                    >
+                      Archive
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        showFirstLastButtons
+        (page)="page($event)"
+        aria-label="Pages of templates"
+      ></mat-paginator>
+    }
+  </mat-card>
+</div>

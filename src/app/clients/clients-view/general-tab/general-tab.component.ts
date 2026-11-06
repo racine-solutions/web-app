@@ -36,6 +36,7 @@ import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { CurrencyPipe } from '@angular/common';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { ClientMarketingConsentComponent } from 'app/system/premium-feature/campaigns/client-marketing-consent/client-marketing-consent.component';
 import { ClientMobileAccessComponent } from 'app/self-service-users/client-mobile-access/client-mobile-access.component';
 import { ReportsService } from 'app/reports/reports.service';
 import { SettingsService } from 'app/settings/settings.service';
@@ -54,6 +55,7 @@ import { LoanProductService } from 'app/products/loan-products/services/loan-pro
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
     ClientMobileAccessComponent,
+    ClientMarketingConsentComponent,
     MatTable,
     MatColumnDef,
     MatHeaderCellDef,

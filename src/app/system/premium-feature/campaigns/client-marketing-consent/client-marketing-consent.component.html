@@ -1,0 +1,56 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (consent; as c) {
+  <section class="section">
+    <div class="section-head">
+      <span class="section-title">Communication preferences</span>
+      @if (!editing) {
+        <button
+          mat-button
+          type="button"
+          class="section-link"
+          (click)="edit()"
+          *mifosxHasPermission="'UPDATE_CLIENTMARKETINGCONSENT'"
+        >
+          Change
+        </button>
+      }
+    </div>
+    <div class="consent-card">
+      @if (!editing) {
+        <span>Receives marketing messages</span>
+        <span class="chip" [ngClass]="c.receivesMarketing ? 'green' : 'red'">{{
+          c.receivesMarketing ? 'Yes' : 'No'
+        }}</span>
+        @if (c.changedOn) {
+          <span class="muted"
+            >Changed {{ c.changedOn | date: 'dd MMM yyyy' }} by {{ c.changedBy
+            }}{{ c.note ? ' · ' + c.note : '' }}</span
+          >
+        }
+        @if (!c.receivesMarketing) {
+          <span class="muted">Still gets general notices and account SMS.</span>
+        }
+      } @else {
+        <mat-radio-group [(ngModel)]="receives" aria-label="Receives marketing messages">
+          <mat-radio-button [value]="true">Receives marketing messages</mat-radio-button>
+          <mat-radio-button [value]="false">Does not want marketing messages</mat-radio-button>
+        </mat-radio-group>
+        <mat-form-field class="note">
+          <mat-label>Note</mat-label>
+          <input matInput [(ngModel)]="note" maxlength="500" placeholder="e.g. Asked at the Ntinda counter" />
+        </mat-form-field>
+        <div class="actions">
+          <button mat-button type="button" (click)="editing = false">Cancel</button>
+          <button mat-raised-button color="primary" type="button" [disabled]="saving" (click)="save()">Save</button>
+        </div>
+      }
+    </div>
+  </section>
+}

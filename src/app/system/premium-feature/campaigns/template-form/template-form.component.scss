@@ -1,0 +1,109 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+
+  > div,
+  > mat-card {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+
+  > div:first-child,
+  > mat-card:first-child {
+    flex-grow: 1.5;
+  }
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+
+  > mat-form-field {
+    flex: 1 1 180px;
+  }
+}
+
+.channel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 16px;
+}
+
+.placeholders {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+
+  .group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    > .muted {
+      width: 80px;
+    }
+  }
+
+  button.chip {
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+
+    &:focus-visible {
+      outline: 2px solid #2b6fe3;
+      outline-offset: 1px;
+    }
+  }
+}
+
+.body {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preview-card h3 {
+  margin-top: 0;
+}
+
+.preview-as {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+
+  .client-search {
+    width: 100%;
+  }
+
+  .clear {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: inherit;
+  }
+}
+
+.spacer {
+  flex: 1;
+}

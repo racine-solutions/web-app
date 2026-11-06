@@ -1,0 +1,136 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <form [formGroup]="form" (ngSubmit)="save()" class="layout">
+    <mat-card class="editor-card">
+      <div class="fields">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Repayment reminder" />
+          @if (form.controls.name.hasError('required')) {
+            <mat-error>Give the template a name.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Tag</mat-label>
+          <input matInput formControlName="tag" [matAutocomplete]="tagList" />
+          <mat-autocomplete #tagList="matAutocomplete">
+            @for (tag of tags; track tag) {
+              <mat-option [value]="tag">{{ tag }}</mat-option>
+            }
+          </mat-autocomplete>
+          <mat-hint>Pick one or type a new tag</mat-hint>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Purpose</mat-label>
+          <mat-select formControlName="purpose">
+            <mat-option value="GENERAL">General communication</mat-option>
+            <mat-option value="MARKETING">Sales &amp; marketing</mat-option>
+          </mat-select>
+          <mat-hint>{{
+            form.controls.purpose.value === 'MARKETING'
+              ? 'Skips clients who asked not to get marketing'
+              : 'Reaches every client you choose'
+          }}</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="channel">
+        <span class="muted">Channel</span>
+        <mat-button-toggle-group formControlName="channel" aria-label="Channel">
+          <mat-button-toggle value="SMS">SMS</mat-button-toggle>
+          <mat-button-toggle value="EMAIL" disabled>Email (coming soon)</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <div class="message">
+        <div class="placeholders" aria-label="Insert placeholder">
+          @for (group of groups; track group.name) {
+            <div class="group">
+              <span class="muted">{{ group.name }}</span>
+              @for (placeholder of group.items; track placeholder.key) {
+                <button
+                  type="button"
+                  class="chip"
+                  (click)="insert(placeholder, body)"
+                  [title]="'Up to ' + placeholder.maxLength + ' characters, e.g. ' + placeholder.example"
+                >
+                  {{ placeholder.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <mat-form-field class="body">
+          <mat-label>Message</mat-label>
+          <textarea
+            #body
+            matInput
+            formControlName="text"
+            rows="5"
+            placeholder="Hi {{ '{{' }}client.name{{ '}}' }}, …"
+          ></textarea>
+        </mat-form-field>
+        <div class="counter">
+          <span
+            >As shown: <b>{{ typedLength }}</b> · Longest case: <b>{{ longestLength }}</b> / {{ limit }}</span
+          >
+          @if (fits) {
+            <span class="ok">{{ limit === 70 ? 'Fits one Unicode SMS' : 'Fits one SMS' }}</span>
+          } @else {
+            <span class="over">{{ longestLength - limit }} characters over: shorten to save</span>
+          }
+        </div>
+        <p class="muted">
+          "Longest case" fills every placeholder with the longest value it can take, such as a 20-letter name or UGX
+          9,999,999,999. Accented letters such as "ó" make the SMS Unicode, which holds 70 characters.
+        </p>
+      </div>
+
+      <div class="actions">
+        <a mat-button [routerLink]="['/system', 'premium-feature', 'campaigns', 'templates']">Cancel</a>
+        <button mat-raised-button color="primary" type="submit" [disabled]="saving || !fits">
+          {{ templateId ? 'Save changes' : 'Save template' }}
+        </button>
+      </div>
+    </mat-card>
+
+    <mat-card class="preview-card">
+      <h3>Preview</h3>
+      <div class="phone">
+        <div class="sender">SMS</div>
+        <div class="bubble">{{ preview?.message || 'Your message appears here.' }}</div>
+      </div>
+      <div class="preview-as">
+        @if (previewClient) {
+          <span class="chip blue"
+            >{{ previewClient.name }}
+            <button type="button" class="clear" (click)="clearClient()" aria-label="Use example values">×</button></span
+          >
+        } @else {
+          <span class="muted">Showing example values.</span>
+        }
+        <mat-form-field class="client-search">
+          <mat-label>Preview as client</mat-label>
+          <input
+            matInput
+            [formControl]="clientSearch"
+            [matAutocomplete]="clientList"
+            placeholder="Name or account number"
+          />
+          <mat-autocomplete #clientList="matAutocomplete" (optionSelected)="pickClient($event.option.value)">
+            @for (client of clients; track client.entityId) {
+              <mat-option [value]="client">{{ client.entityName }} · {{ client.entityAccountNo }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </mat-card>
+  </form>
+</div>

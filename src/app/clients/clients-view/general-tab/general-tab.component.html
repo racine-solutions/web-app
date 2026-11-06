@@ -41,6 +41,13 @@
     [clientId]="clientid"
   ></mifosx-client-mobile-access>
 
+  <!-- ════ COMMUNICATION PREFERENCES ══════════════════════════ -->
+  <mifosx-client-marketing-consent
+    *mifosxHasPermission="'READ_CLIENTMARKETINGCONSENT'"
+    class="section"
+    [clientId]="clientid"
+  ></mifosx-client-marketing-consent>
+
   <!-- ════ UPCOMING CHARGES ═══════════════════════════════════ -->
   <section class="section">
     <div class="section-head">

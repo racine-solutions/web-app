@@ -9,11 +9,13 @@
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
 import { RunJobWithParamPayloadType } from './manage-jobs/scheduler-jobs/custom-parameters-popover/custom-parameters-popover.component';
 import { SmsAccount } from './premium-feature/sms/sms-account.model';
+import { SmsCreditStatusService } from 'app/shared/sms-credit-banner/sms-credit-status.service';
 import { SmsMessagesPage } from './premium-feature/sms/sms-message.model';
 import { SmsWalletTransactionsPage } from './premium-feature/sms/sms-wallet-transaction.model';
 
@@ -25,6 +27,7 @@ import { SmsWalletTransactionsPage } from './premium-feature/sms/sms-wallet-tran
 })
 export class SystemService {
   private http = inject(HttpClient);
+  private smsCreditStatusService = inject(SmsCreditStatusService);
 
   public static CONFIG_ASSET_EXTERNALIZATION = 'asset-externalization-of-non-active-loans';
 
@@ -459,7 +462,10 @@ export class SystemService {
    * @returns {Observable<any>}
    */
   updateConfiguration(configurationId: string, configuration: any): Observable<any> {
-    return this.http.put(`/configurations/${configurationId}`, configuration);
+    // Switching SMS or its credit alerts on or off changes the SMS banner
+    return this.http
+      .put(`/configurations/${configurationId}`, configuration)
+      .pipe(tap(() => this.smsCreditStatusService.requestRefresh()));
   }
 
   /**
@@ -728,7 +734,9 @@ export class SystemService {
   }
 
   putSmsEventConfiguration(payload: any): Observable<any> {
-    return this.http.put('/sms/smsevents/configuration', payload);
+    return this.http
+      .put('/sms/smsevents/configuration', payload)
+      .pipe(tap(() => this.smsCreditStatusService.requestRefresh()));
   }
 
   /**

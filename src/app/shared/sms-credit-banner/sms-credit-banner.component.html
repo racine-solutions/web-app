@@ -1,0 +1,63 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (status && visible) {
+  <div class="sms-credit-banner" [class.critical]="critical" role="alert" aria-live="polite">
+    <mat-icon class="sms-credit-banner-icon">{{ smsOff ? 'sms_failed' : critical ? 'error' : 'warning' }}</mat-icon>
+    @if (smsOff) {
+      <div class="sms-credit-banner-text">
+        <strong>{{ 'labels.text.SMS off title ' + status.offReason | translate }}</strong>
+        <span>{{ 'labels.text.SMS off detail ' + status.offReason | translate }}</span>
+      </div>
+      @if (offAction) {
+        <a
+          class="sms-credit-banner-action"
+          mat-button
+          [routerLink]="offAction.route"
+          *mifosxHasPermission="offAction.permission"
+        >
+          {{ offAction.label | translate }}
+        </a>
+      }
+    } @else {
+      <div class="sms-credit-banner-text">
+        <strong>
+          {{
+            (status.smsBalance === 0
+              ? 'labels.text.SMS credit used up'
+              : critical
+                ? 'labels.text.SMS credit almost used up'
+                : 'labels.text.SMS credit running low'
+            ) | translate
+          }}
+        </strong>
+        <span>
+          {{ 'labels.text.SMS credit left' | translate: { count: (status.smsBalance | number) } }}
+          @if (status.balanceAmount !== null && status.balanceAmount !== undefined) {
+            ({{ 'labels.text.SMS credit worth' | translate: { amount: (status.balanceAmount | number: '1.2-2') } }})
+          }
+          · {{ 'labels.text.SMS credit used' | translate: { percent: status.percentUsed } }}
+          @if (alertLevel !== undefined) {
+            {{ 'labels.text.SMS credit alert level' | translate: { percent: alertLevel } }}
+          }
+          @if (status.smsBalance === 0) {
+            · {{ 'labels.text.SMS credit no messages sent' | translate }}
+          }
+        </span>
+      </div>
+      <a
+        class="sms-credit-banner-action"
+        mat-button
+        [routerLink]="['/system', 'premium-feature', 'sms']"
+        *mifosxHasPermission="'CREDIT_SMS_NOTIFICATION_ACCOUNT'"
+      >
+        {{ 'labels.text.Top up SMS credit' | translate }}
+      </a>
+    }
+  </div>
+}

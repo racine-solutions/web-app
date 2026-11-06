@@ -37,7 +37,9 @@ const campaign: Campaign = {
   lastModifiedById: 5,
   submittedBy: 'Nankya Sarah',
   submittedOn: '2026-11-06T10:05:00Z',
-  history: []
+  history: [],
+  runsDone: 0,
+  upcomingRuns: []
 };
 
 describe('CampaignViewComponent', () => {

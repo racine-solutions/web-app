@@ -144,8 +144,22 @@
               All active clients of {{ c.officeName }}
             }
           </span>
-          <span>When</span
-          ><span>{{ c.scheduleType === 'NOW' ? 'As soon as approved' : 'Once, ' + c.scheduledAt }}</span>
+          <span>When</span><span>{{ scheduleText(c) }}</span> <span>Sending hours</span><span>{{ quietText(c) }}</span>
+          @if (c.scheduleType === 'REPEAT') {
+            <span>Runs so far</span
+            ><span>{{ c.runsDone }}{{ c.repeatStop === 'AFTER_RUNS' ? ' of ' + c.repeatMaxRuns : '' }}</span>
+          }
+          @if (c.nextRunAt && (c.status === 'SCHEDULED' || c.status === 'PAUSED')) {
+            <span>Next run</span><span>{{ c.nextRunAt }}</span>
+          }
+          @if (c.upcomingRuns?.length && c.scheduleType === 'REPEAT') {
+            <span>Coming up</span
+            ><span>
+              @for (time of c.upcomingRuns; track time) {
+                <div>{{ time }}</div>
+              }
+            </span>
+          }
           <span>Created</span><span>{{ c.createdBy }} · {{ c.createdOn | date: 'dd MMM yyyy HH:mm' }}</span>
           @if (c.approvedBy) {
             <span>Approved</span><span>{{ c.approvedBy }} · {{ c.approvedOn | date: 'dd MMM yyyy HH:mm' }}</span>

@@ -23,6 +23,7 @@ import {
   reasonLabel
 } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
+import { describe, quietText } from '../schedule';
 
 /** One campaign: approval, actions, runs and history. */
 @Component({
@@ -47,6 +48,8 @@ export class CampaignViewComponent implements OnInit {
   readonly statusTone = STATUS_TONE;
   readonly historyLabels = HISTORY_LABELS;
   readonly reasonLabel = reasonLabel;
+  readonly scheduleText = describe;
+  readonly quietText = quietText;
 
   campaign: Campaign | null = null;
   runs: CampaignRun[] = [];

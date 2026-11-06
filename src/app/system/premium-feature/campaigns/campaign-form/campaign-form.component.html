@@ -58,6 +58,19 @@
     <mat-step label="Audience">
       <div class="step two-col audience">
         <div class="filters">
+          <div class="saved row">
+            <mat-form-field class="value">
+              <mat-label>Start from a saved audience</mat-label>
+              <mat-select [(ngModel)]="savedAudienceId" (selectionChange)="loadSavedAudience()">
+                @for (saved of savedAudiences; track saved.id) {
+                  <mat-option [value]="saved.id">{{ saved.name }}</mat-option>
+                }
+              </mat-select>
+              @if (!savedAudiences.length) {
+                <mat-hint>None saved yet</mat-hint>
+              }
+            </mat-form-field>
+          </div>
           <p class="muted">
             Clients must match every condition. With no conditions, every active client of your offices is included.
           </p>
@@ -205,6 +218,23 @@
           <div class="row">
             <button mat-stroked-button type="button" (click)="addFilter()"><mat-icon>add</mat-icon> Add filter</button>
           </div>
+          <div class="row save-audience" *mifosxHasPermission="'CREATE_COMMAUDIENCE'">
+            <mat-form-field class="value">
+              <mat-label>Save these filters as</mat-label>
+              <input matInput [(ngModel)]="audienceName" maxlength="100" placeholder="e.g. Women 18–35 with savings" />
+            </mat-form-field>
+            <button
+              mat-stroked-button
+              type="button"
+              [disabled]="savingAudience || !filters.length"
+              (click)="saveAudience()"
+            >
+              <mat-icon>bookmark_add</mat-icon> Save audience
+            </button>
+            @if (audienceMessage) {
+              <span class="muted">{{ audienceMessage }}</span>
+            }
+          </div>
           <div class="quick">
             <span class="muted">Quick picks:</span>
             @for (pick of quickPicks; track pick.label) {
@@ -266,26 +296,88 @@
           <mat-radio-group [(ngModel)]="scheduleType" class="when">
             <mat-radio-button value="NOW">Send as soon as it is approved</mat-radio-button>
             <mat-radio-button value="ONCE">Send once at a set time</mat-radio-button>
+            <mat-radio-button value="REPEAT">Repeat on an interval</mat-radio-button>
           </mat-radio-group>
-          @if (scheduleType === 'ONCE') {
+          @if (scheduleType !== 'NOW') {
             <div class="row">
               <mat-form-field>
-                <mat-label>Date</mat-label>
+                <mat-label>{{ scheduleType === 'REPEAT' ? 'First send on' : 'Date' }}</mat-label>
                 <input matInput type="date" [(ngModel)]="sendDate" />
               </mat-form-field>
               <mat-form-field>
-                <mat-label>Time</mat-label>
+                <mat-label>At</mat-label>
                 <input matInput type="time" [(ngModel)]="sendTime" />
               </mat-form-field>
             </div>
-            @if (!scheduleValid) {
-              <p class="over">Choose a date and time in the future.</p>
-            }
           }
-          <p class="muted">Repeating campaigns and quiet hours come in the next release.</p>
+          @if (scheduleType === 'REPEAT') {
+            <div class="row">
+              <mat-form-field class="short">
+                <mat-label>Every</mat-label>
+                <input matInput type="number" min="1" max="365" [(ngModel)]="repeatEvery" />
+              </mat-form-field>
+              <mat-form-field class="short">
+                <mat-label>Unit</mat-label>
+                <mat-select [(ngModel)]="repeatUnit">
+                  <mat-option value="DAYS">days</mat-option>
+                  <mat-option value="WEEKS">weeks</mat-option>
+                  <mat-option value="MONTHS">months</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Stop</mat-label>
+                <mat-select [(ngModel)]="repeatStop">
+                  <mat-option value="NEVER">When I stop it</mat-option>
+                  <mat-option value="ON_DATE">On a date</mat-option>
+                  <mat-option value="AFTER_RUNS">After a number of runs</mat-option>
+                </mat-select>
+              </mat-form-field>
+              @if (repeatStop === 'ON_DATE') {
+                <mat-form-field>
+                  <mat-label>Last date</mat-label>
+                  <input matInput type="date" [(ngModel)]="repeatUntil" />
+                </mat-form-field>
+              }
+              @if (repeatStop === 'AFTER_RUNS') {
+                <mat-form-field class="short">
+                  <mat-label>Runs</mat-label>
+                  <input matInput type="number" min="1" max="1000" [(ngModel)]="repeatMaxRuns" />
+                </mat-form-field>
+              }
+            </div>
+          }
+          <div class="row quiet">
+            <mat-checkbox [(ngModel)]="quietHours">Only send between</mat-checkbox>
+            <mat-form-field class="short">
+              <mat-label>From</mat-label>
+              <input matInput type="time" [(ngModel)]="quietFrom" [disabled]="!quietHours" />
+            </mat-form-field>
+            <mat-form-field class="short">
+              <mat-label>To</mat-label>
+              <input matInput type="time" [(ngModel)]="quietTo" [disabled]="!quietHours" />
+            </mat-form-field>
+          </div>
+          <p class="muted">
+            Outside these hours sending waits and continues when they start again. The default comes from the
+            campaign-quiet-hours configuration.
+          </p>
+          @if (scheduleProblem) {
+            <p class="over">{{ scheduleProblem }}</p>
+          } @else if (upcomingRuns.length) {
+            <div class="upcoming">
+              <span class="muted">{{ scheduleType === 'REPEAT' ? 'Next runs' : 'Sends' }}:</span>
+              @for (time of upcomingRuns; track $index) {
+                <span class="chip">{{ time | date: 'd MMM yyyy HH:mm' }}</span>
+              }
+              @if (scheduleType === 'REPEAT' && repeatStop === 'NEVER') {
+                <span class="muted">… until you stop it</span>
+              }
+            </div>
+            <p class="muted">Who gets it is worked out again at every run, so new clients who match are included.</p>
+          }
         </div>
         <mat-card>
-          <h3>Cost</h3>
+          <h3>{{ scheduleType === 'REPEAT' ? 'Cost per run' : 'Cost' }}</h3>
           <div class="kv">
             <span>SMS to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
             @if (smsCost !== null) {
@@ -299,6 +391,12 @@
               <span>SMS Wallet balance</span><span>{{ smsBalance | number }} SMS</span>
             }
           </div>
+          @if (scheduleType === 'REPEAT' && runsCovered !== null) {
+            <p class="muted">
+              The wallet covers {{ runsCovered | number }} run{{ runsCovered === 1 ? '' : 's' }} at today's audience
+              size.
+            </p>
+          }
           @if (smsBalance !== null && count && count.recipients > smsBalance) {
             <div class="banner">
               <mat-icon>warning</mat-icon>Not enough SMS credit. The campaign waits after approval until the wallet is
@@ -330,7 +428,8 @@
             }
           </span>
           <span>Recipients</span><span>{{ count?.recipients ?? 0 | number }}</span> <span>When</span
-          ><span>{{ scheduleType === 'NOW' ? 'As soon as approved' : 'Once, ' + scheduledAt }}</span>
+          ><span>{{ scheduleText }}</span> <span>Sending hours</span
+          ><span>{{ quietHours ? 'Only ' + quietFrom + '–' + quietTo : 'Any time' }}</span>
         </div>
         @if (preview) {
           <div class="phone">

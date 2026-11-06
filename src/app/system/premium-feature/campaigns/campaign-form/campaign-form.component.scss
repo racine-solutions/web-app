@@ -142,3 +142,23 @@
     color: inherit;
   }
 }
+
+.short {
+  width: 120px;
+}
+
+.quiet {
+  margin-top: 4px;
+}
+
+.upcoming {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.save-audience {
+  margin-top: 8px;
+}

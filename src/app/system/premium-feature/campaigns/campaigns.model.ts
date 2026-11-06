@@ -133,7 +133,7 @@ export interface Campaign {
   tag: string;
   messageText: string;
   audience: string;
-  scheduleType: 'NOW' | 'ONCE';
+  scheduleType: 'NOW' | 'ONCE' | 'REPEAT';
   scheduledAt?: string;
   nextRunAt?: string;
   status: CampaignStatus;
@@ -154,6 +154,37 @@ export interface Campaign {
   rejectionReason?: string;
   lastRun?: CampaignRun;
   history: CampaignHistory[];
+  repeatEvery?: number;
+  repeatUnit?: 'DAYS' | 'WEEKS' | 'MONTHS';
+  repeatStop?: 'NEVER' | 'ON_DATE' | 'AFTER_RUNS';
+  repeatUntil?: string;
+  repeatMaxRuns?: number;
+  quietFrom?: string;
+  quietTo?: string;
+  runsDone: number;
+  upcomingRuns: string[];
+}
+
+export interface SavedAudience {
+  id: number;
+  name: string;
+  audience: string;
+  officeName: string;
+  createdBy: string;
+  updatedOn: string;
+}
+
+export interface ClientCampaignMessage {
+  id: number;
+  campaignId: number;
+  campaignName: string;
+  runNumber: number;
+  channel: string;
+  address: string;
+  message: string;
+  status: DeliveryStatus;
+  reason?: string;
+  sentOn: string;
 }
 
 export interface Delivery {

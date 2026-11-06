@@ -14,6 +14,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 import { Campaign, CampaignStatus, STATUS_LABELS, STATUS_TONE } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
+import { describe } from '../schedule';
 
 /** All campaigns, newest first, filtered by status. */
 @Component({
@@ -81,7 +82,7 @@ export class CampaignListComponent implements OnInit {
   }
 
   schedule(campaign: Campaign): string {
-    return campaign.scheduleType === 'ONCE' ? `Once, ${campaign.scheduledAt}` : 'As soon as approved';
+    return describe(campaign);
   }
 
   private load() {

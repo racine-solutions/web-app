@@ -1,0 +1,73 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <mat-card>
+    @if (loading && !audiences.length) {
+      <p class="muted">Loading audiences…</p>
+    } @else if (!total) {
+      <div class="empty">
+        <mat-icon>groups</mat-icon>
+        <p>No saved audiences yet.</p>
+        <p class="muted">In a campaign's Audience step, set the filters and use "Save audience" to reuse them later.</p>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="full">
+          <thead>
+            <tr>
+              <th>Audience</th>
+              <th>Filters</th>
+              <th>Office</th>
+              <th>Saved by</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (audience of audiences; track audience.id) {
+              <tr>
+                <td>
+                  <strong>{{ audience.name }}</strong>
+                  <div class="muted">Updated {{ audience.updatedOn | date: 'dd MMM yyyy' }}</div>
+                </td>
+                <td>{{ filters(audience) }}</td>
+                <td>{{ audience.officeName }}</td>
+                <td>{{ audience.createdBy }}</td>
+                <td class="num">
+                  @if (confirming === audience.id) {
+                    <span class="muted">Delete it? Campaigns keep their own copy.</span>
+                    <button mat-button type="button" (click)="confirming = null">Keep</button>
+                    <button mat-raised-button color="warn" type="button" (click)="delete(audience)">Delete</button>
+                  } @else {
+                    <button
+                      mat-button
+                      type="button"
+                      (click)="confirming = audience.id"
+                      *mifosxHasPermission="'DELETE_COMMAUDIENCE'"
+                    >
+                      Delete
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        showFirstLastButtons
+        (page)="page($event)"
+        aria-label="Pages of saved audiences"
+      ></mat-paginator>
+    }
+  </mat-card>
+</div>

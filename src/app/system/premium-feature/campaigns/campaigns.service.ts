@@ -22,6 +22,8 @@ import {
   MarketingConsent,
   MessageCheck,
   Paged,
+  SavedAudience,
+  ClientCampaignMessage,
   Placeholder
 } from './campaigns.model';
 
@@ -85,6 +87,33 @@ export class CampaignsService {
       params = params.set('status', status);
     }
     return this.http.get<Paged<Campaign>>('/comm/campaigns', { params });
+  }
+
+  /** Defaults for a new campaign, such as the institution's quiet hours. */
+  getCampaignDefaults(): Observable<{ quietFrom?: string; quietTo?: string }> {
+    return this.http.get<{ quietFrom?: string; quietTo?: string }>('/comm/campaigns/template');
+  }
+
+  getSavedAudiences(offset = 0, limit = 25): Observable<Paged<SavedAudience>> {
+    return this.http.get<Paged<SavedAudience>>('/comm/audiences/saved', {
+      params: new HttpParams().set('offset', offset).set('limit', limit)
+    });
+  }
+
+  saveAudience(name: string, audience: AudienceFilter[], id?: number): Observable<any> {
+    return id
+      ? this.http.put(`/comm/audiences/saved/${id}`, { name, audience })
+      : this.http.post('/comm/audiences/saved', { name, audience });
+  }
+
+  deleteSavedAudience(id: number): Observable<any> {
+    return this.http.delete(`/comm/audiences/saved/${id}`);
+  }
+
+  getClientMessages(clientId: number, offset = 0, limit = 10): Observable<Paged<ClientCampaignMessage>> {
+    return this.http.get<Paged<ClientCampaignMessage>>(`/comm/clients/${clientId}/messages`, {
+      params: new HttpParams().set('offset', offset).set('limit', limit)
+    });
   }
 
   getCampaign(id: number): Observable<Campaign> {

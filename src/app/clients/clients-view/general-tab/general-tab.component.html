@@ -48,6 +48,12 @@
     [clientId]="clientid"
   ></mifosx-client-marketing-consent>
 
+  <mifosx-client-campaign-messages
+    *mifosxHasPermission="'READ_COMMCAMPAIGN'"
+    class="section"
+    [clientId]="clientid"
+  ></mifosx-client-campaign-messages>
+
   <!-- ════ UPCOMING CHARGES ═══════════════════════════════════ -->
   <section class="section">
     <div class="section-head">

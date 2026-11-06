@@ -9,6 +9,9 @@
 <div class="container">
   <div class="page-actions">
     <a mat-stroked-button [routerLink]="['templates']"><mat-icon>description</mat-icon> Templates</a>
+    <a mat-stroked-button [routerLink]="['audiences']" *mifosxHasPermission="'READ_COMMAUDIENCE'"
+      ><mat-icon>groups</mat-icon> Saved audiences</a
+    >
     <a mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_COMMCAMPAIGN'"
       ><mat-icon>add</mat-icon> New campaign</a
     >
@@ -58,7 +61,12 @@
                     <span class="chip grey">Marketing</span>
                   }
                 </td>
-                <td>{{ schedule(campaign) }}</td>
+                <td>
+                  {{ schedule(campaign) }}
+                  @if (campaign.nextRunAt && (campaign.status === 'SCHEDULED' || campaign.status === 'PAUSED')) {
+                    <div class="muted">Next: {{ campaign.nextRunAt }}</div>
+                  }
+                </td>
                 <td>
                   <span class="chip" [ngClass]="statusTone[campaign.status]">{{ statusLabels[campaign.status] }}</span>
                 </td>

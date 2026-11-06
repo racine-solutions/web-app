@@ -15,6 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatStep, MatStepper, MatStepperNext, MatStepperPrevious } from '@angular/material/stepper';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { Subject, debounceTime, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -28,10 +29,12 @@ import {
   AudienceOptions,
   CommTemplate,
   MessageCheck,
+  SavedAudience,
   reasonLabel
 } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
 import { FIELD_SPECS, FieldSpec, QUICK_PICKS, optionsFor } from './audience-fields';
+import { RepeatStop, RepeatUnit, Schedule, ScheduleType, describe, upcoming } from '../schedule';
 import {
   AudienceClientsDialogComponent,
   AudienceClientsDialogData
@@ -60,6 +63,7 @@ interface FilterRow extends AudienceFilter {
     MatStepperPrevious,
     MatRadioGroup,
     MatRadioButton,
+    MatCheckbox,
     MatAutocomplete,
     MatAutocompleteTrigger
   ]
@@ -87,9 +91,23 @@ export class CampaignFormComponent implements OnInit {
   templates: CommTemplate[] = [];
   options: AudienceOptions | null = null;
   filters: FilterRow[] = [];
-  scheduleType: 'NOW' | 'ONCE' = 'NOW';
+  scheduleType: ScheduleType = 'NOW';
   sendDate = '';
   sendTime = '09:00';
+  repeatEvery = 1;
+  repeatUnit: RepeatUnit = 'MONTHS';
+  repeatStop: RepeatStop = 'NEVER';
+  repeatUntil = '';
+  repeatMaxRuns = 6;
+  quietHours = false;
+  quietFrom = '08:00';
+  quietTo = '20:00';
+
+  savedAudiences: SavedAudience[] = [];
+  savedAudienceId: number | null = null;
+  audienceName = '';
+  savingAudience = false;
+  audienceMessage = '';
 
   preview: MessageCheck | null = null;
   count: AudienceCount | null = null;
@@ -152,6 +170,15 @@ export class CampaignFormComponent implements OnInit {
         this.clientMatches = (results || []).slice(0, 10);
         this.changeDetector.markForCheck();
       });
+    this.loadSavedAudiences();
+    if (!this.campaignId) {
+      this.service.getCampaignDefaults().subscribe((defaults) => {
+        this.quietHours = !!defaults.quietFrom;
+        this.quietFrom = defaults.quietFrom || this.quietFrom;
+        this.quietTo = defaults.quietTo || this.quietTo;
+        this.changeDetector.markForCheck();
+      });
+    }
     if (this.campaignId) {
       this.service.getCampaign(this.campaignId).subscribe((campaign) => {
         this.name.setValue(campaign.name);
@@ -162,6 +189,14 @@ export class CampaignFormComponent implements OnInit {
           values: filter.values || []
         }));
         this.scheduleType = campaign.scheduleType;
+        this.repeatEvery = campaign.repeatEvery || 1;
+        this.repeatUnit = campaign.repeatUnit || 'MONTHS';
+        this.repeatStop = campaign.repeatStop || 'NEVER';
+        this.repeatUntil = campaign.repeatUntil || '';
+        this.repeatMaxRuns = campaign.repeatMaxRuns || 6;
+        this.quietHours = !!campaign.quietFrom;
+        this.quietFrom = campaign.quietFrom || this.quietFrom;
+        this.quietTo = campaign.quietTo || this.quietTo;
         if (campaign.scheduledAt) {
           [
             this.sendDate,
@@ -293,15 +328,109 @@ export class CampaignFormComponent implements OnInit {
   }
 
   get scheduledAt(): string | null {
-    return this.scheduleType === 'ONCE' && this.sendDate && this.sendTime ? `${this.sendDate} ${this.sendTime}` : null;
+    return this.scheduleType !== 'NOW' && this.sendDate && this.sendTime ? `${this.sendDate} ${this.sendTime}` : null;
+  }
+
+  get schedule(): Schedule {
+    return {
+      ...this.schedule,
+      repeatEvery: this.scheduleType === 'REPEAT' ? this.repeatEvery : null,
+      repeatUnit: this.scheduleType === 'REPEAT' ? this.repeatUnit : null,
+      repeatStop: this.scheduleType === 'REPEAT' ? this.repeatStop : null,
+      repeatUntil: this.scheduleType === 'REPEAT' && this.repeatStop === 'ON_DATE' ? this.repeatUntil : null,
+      repeatMaxRuns: this.scheduleType === 'REPEAT' && this.repeatStop === 'AFTER_RUNS' ? this.repeatMaxRuns : null,
+      quietFrom: this.quietHours ? this.quietFrom : null,
+      quietTo: this.quietHours ? this.quietTo : null
+    };
+  }
+
+  /** What's wrong with the schedule, or '' when it is fine. */
+  get scheduleProblem(): string {
+    if (this.quietHours && (!this.quietFrom || !this.quietTo || this.quietFrom >= this.quietTo)) {
+      return 'Quiet hours need a start before the end, e.g. 08:00 to 20:00.';
+    }
+    if (this.scheduleType === 'NOW') {
+      return '';
+    }
+    const at = this.scheduledAt;
+    if (!at || new Date(at.replace(' ', 'T')) <= new Date()) {
+      return 'Choose a first send date and time in the future.';
+    }
+    if (this.scheduleType === 'REPEAT') {
+      if (!(this.repeatEvery >= 1 && this.repeatEvery <= 365)) {
+        return 'Repeat every 1 to 365 days, weeks or months.';
+      }
+      if (this.repeatStop === 'ON_DATE' && (!this.repeatUntil || this.repeatUntil < this.sendDate)) {
+        return 'Choose a last date on or after the first send.';
+      }
+      if (this.repeatStop === 'AFTER_RUNS' && !(this.repeatMaxRuns >= 1 && this.repeatMaxRuns <= 1000)) {
+        return 'Stop after 1 to 1000 runs.';
+      }
+    }
+    return '';
   }
 
   get scheduleValid(): boolean {
-    if (this.scheduleType === 'NOW') {
-      return true;
+    return !this.scheduleProblem;
+  }
+
+  get upcomingRuns(): Date[] {
+    return this.scheduleValid ? upcoming(this.schedule, 6) : [];
+  }
+
+  get scheduleText(): string {
+    return describe(this.schedule);
+  }
+
+  /** Runs the wallet covers, at today's audience size. */
+  get runsCovered(): number | null {
+    if (this.smsBalance === null || !this.count?.recipients) {
+      return null;
     }
-    const at = this.scheduledAt;
-    return !!at && new Date(at.replace(' ', 'T')) > new Date();
+    return Math.floor(this.smsBalance / this.count.recipients);
+  }
+
+  loadSavedAudience() {
+    const saved = this.savedAudiences.find((audience) => audience.id === this.savedAudienceId);
+    if (!saved) {
+      return;
+    }
+    this.filters = (JSON.parse(saved.audience || '[]') as AudienceFilter[]).map((filter) => ({
+      ...filter,
+      operator: filter.operator || 'IN',
+      values: filter.values || []
+    }));
+    this.audienceName = saved.name;
+    this.audienceMessage = `Loaded "${saved.name}".`;
+    this.recount();
+  }
+
+  saveAudience() {
+    const name = this.audienceName.trim();
+    if (!name || !this.cleanFilters().length) {
+      this.audienceMessage = 'Give the audience a name and at least one filter.';
+      return;
+    }
+    const existing = this.savedAudiences.find((audience) => audience.name.toLowerCase() === name.toLowerCase());
+    this.savingAudience = true;
+    this.service.saveAudience(name, this.cleanFilters(), existing?.id).subscribe({
+      next: () => {
+        this.audienceMessage = existing ? `Updated "${name}".` : `Saved as "${name}".`;
+        this.savingAudience = false;
+        this.loadSavedAudiences();
+      },
+      error: () => {
+        this.savingAudience = false;
+        this.changeDetector.markForCheck();
+      }
+    });
+  }
+
+  private loadSavedAudiences() {
+    this.service.getSavedAudiences(0, 500).subscribe((page) => {
+      this.savedAudiences = page.pageItems;
+      this.changeDetector.markForCheck();
+    });
   }
 
   audienceSummary(row: FilterRow): string {

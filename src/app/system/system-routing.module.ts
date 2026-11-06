@@ -60,6 +60,7 @@ import { TemplateFormComponent } from './premium-feature/campaigns/template-form
 import { CampaignFormComponent } from './premium-feature/campaigns/campaign-form/campaign-form.component';
 import { CampaignViewComponent } from './premium-feature/campaigns/campaign-view/campaign-view.component';
 import { CampaignRunComponent } from './premium-feature/campaigns/campaign-run/campaign-run.component';
+import { SavedAudiencesComponent } from './premium-feature/campaigns/saved-audiences/saved-audiences.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -693,6 +694,11 @@ const routes: Routes = [
                       component: TemplateFormComponent
                     }
                   ]
+                },
+                {
+                  path: 'audiences',
+                  data: { title: 'Saved audiences', breadcrumb: 'Saved audiences' },
+                  component: SavedAudiencesComponent
                 },
                 {
                   path: 'create',

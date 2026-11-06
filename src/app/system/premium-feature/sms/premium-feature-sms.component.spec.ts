@@ -50,6 +50,26 @@ describe('PremiumFeatureSmsComponent', () => {
     expect(component.accountStatusLabel).toBe('Active');
   });
 
+  it('should work out the percentage of SMS credit used', () => {
+    component.smsAccount = { ...mockSmsAccount, smsTotalCredit: 4042, smsTotalBalance: 3994 };
+    expect(component.smsUsed).toBe(48);
+    expect(component.percentageUsed).toBeCloseTo(1.19, 2);
+  });
+
+  it('should show no percentage before any SMS credit is bought', () => {
+    component.smsAccount = { ...mockSmsAccount, smsTotalCredit: 0, smsTotalBalance: 0 };
+    expect(component.percentageUsed).toBeNull();
+  });
+
+  it('should render the percentage used card', () => {
+    component.smsAccount = { ...mockSmsAccount, smsTotalCredit: 4042, smsTotalBalance: 3994 };
+    fixture.detectChanges();
+    const textContent = fixture.nativeElement.textContent;
+    expect(textContent).toContain('Percentage Used');
+    expect(textContent).toContain('1.2%');
+    expect(textContent).toContain('48 of 4,042 SMS used');
+  });
+
   it('should render the sms account card and event configuration menu', () => {
     const textContent = fixture.nativeElement.textContent;
 

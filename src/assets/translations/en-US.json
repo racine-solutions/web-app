@@ -4217,6 +4217,7 @@
       "LoanAccountCreationEvent": "Loan Account Creation Event",
       "LoanAccountDisbursementEvent": "Loan Account Disbursement Event",
       "LoanAccountRepaymentEvent": "Loan Account Repayment Event",
+      "LoanAccountClearanceEvent": "Loan Account Clearance Event",
       "SavingsAccountDepositEvent": "Savings Account Deposit Event",
       "SavingsAccountWithdrawEvent": "Savings Account Withdraw Event",
       "LoanAccountRejectedEvent": "Loan Account Rejected Event",

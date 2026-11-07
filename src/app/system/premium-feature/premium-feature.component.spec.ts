@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faWallet } from '@fortawesome/free-solid-svg-icons';
 
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import { PremiumFeatureComponent } from './premium-feature.component';
 
 describe('PremiumFeatureComponent', () => {
@@ -12,7 +13,10 @@ describe('PremiumFeatureComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PremiumFeatureComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        { provide: AuthenticationService, useValue: { getCredentials: () => ({ permissions: ['ALL_FUNCTIONS'] }) } }
+      ]
     }).compileComponents();
 
     const library = TestBed.inject(FaIconLibrary);
@@ -25,5 +29,11 @@ describe('PremiumFeatureComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('offers Campaigns next to SMS', () => {
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('SMS');
+    expect(text).toContain('Campaigns');
   });
 });

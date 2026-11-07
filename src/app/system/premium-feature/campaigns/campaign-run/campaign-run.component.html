@@ -1,0 +1,206 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  @if (run; as r) {
+    <div class="page-actions">
+      <span class="muted grow"
+        >Run {{ r.runNumber }} · started {{ r.startedOn | date: 'dd MMM yyyy HH:mm'
+        }}{{ r.finishedOn ? ' · finished ' + (r.finishedOn | date: 'HH:mm') : ' · still sending' }}</span
+      >
+      <button mat-stroked-button type="button" (click)="exportCsv()"><mat-icon>download</mat-icon> Export CSV</button>
+      @if (r.retryable) {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          [disabled]="busy"
+          (click)="retry(false)"
+          *mifosxHasPermission="'RETRY_COMMCAMPAIGN'"
+        >
+          <mat-icon>replay</mat-icon> Retry {{ r.retryable | number }} failed
+        </button>
+      }
+    </div>
+    @if (message) {
+      <div class="banner blue"><mat-icon>info</mat-icon>{{ message }}</div>
+    }
+
+    <div class="tiles">
+      <div class="tile green">
+        <div class="label">
+          {{ isEmail ? 'Sent (accepted by the email service)' : 'Sent (accepted by the SMS gateway)' }}
+        </div>
+        <div class="value">{{ r.sent | number }}</div>
+      </div>
+      @if (isEmail) {
+        <div class="tile green">
+          <div class="label">Delivered to the inbox</div>
+          <div class="value">{{ r.delivered | number }}</div>
+        </div>
+        @if (r.spam) {
+          <div class="tile amber">
+            <div class="label">Marked as spam</div>
+            <div class="value">{{ r.spam | number }}</div>
+          </div>
+        }
+      }
+      <div class="tile red">
+        <div class="label">Failed</div>
+        <div class="value">{{ r.failed | number }}</div>
+      </div>
+      <div class="tile">
+        <div class="label">Skipped</div>
+        <div class="value">{{ r.skipped | number }}</div>
+      </div>
+      <div class="tile blue">
+        <div class="label">Waiting to send</div>
+        <div class="value">{{ r.queued | number }}</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <mat-card class="list">
+        <div class="filters">
+          @for (
+            option of [
+              { value: '', label: 'All' },
+              { value: 'FAILED', label: 'Failed' },
+              { value: 'SKIPPED', label: 'Skipped' },
+              { value: 'SENT', label: 'Sent' },
+              { value: 'QUEUED', label: 'Waiting' }
+            ];
+            track option.value
+          ) {
+            <button type="button" class="chip" [class.blue]="status === option.value" (click)="setStatus(option.value)">
+              {{ option.label }}
+            </button>
+          }
+          <mat-form-field class="reason">
+            <mat-label>Reason</mat-label>
+            <mat-select [(ngModel)]="reason" (selectionChange)="setStatus(status)">
+              <mat-option value="">Any reason</mat-option>
+              @for (option of reasons; track option) {
+                <mat-option [value]="option">{{ reasonLabel(option) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if (selected.size) {
+            <button
+              mat-stroked-button
+              type="button"
+              [disabled]="busy"
+              (click)="retry(true)"
+              *mifosxHasPermission="'RETRY_COMMCAMPAIGN'"
+            >
+              Retry {{ selected.size }} selected
+            </button>
+          }
+        </div>
+        <div class="table-scroll">
+          <table class="full">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Client</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Reason</th>
+                @if (isEmail) {
+                  <th>Email result</th>
+                }
+                <th class="num">Tries</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of deliveries; track d.id) {
+                <tr>
+                  <td>
+                    @if (d.retryable) {
+                      <mat-checkbox
+                        [checked]="selected.has(d.id)"
+                        (change)="toggle(d)"
+                        [aria-label]="'Select ' + d.clientName"
+                      ></mat-checkbox>
+                    }
+                  </td>
+                  <td>
+                    @if (d.clientId) {
+                      <a [routerLink]="['/clients', d.clientId, 'general']">{{ d.clientName }}</a>
+                      <div class="muted">{{ d.accountNo }}</div>
+                    } @else {
+                      {{ d.clientName }}
+                      <div class="muted">{{ d.recipientType === 'USER' ? 'System user' : 'Staff' }}</div>
+                    }
+                  </td>
+                  <td>{{ d.address || '—' }}</td>
+                  <td>
+                    <span
+                      class="chip"
+                      [ngClass]="{
+                        green: d.status === 'SENT',
+                        red: d.status === 'FAILED',
+                        grey: d.status === 'SKIPPED',
+                        amber: d.status === 'QUEUED'
+                      }"
+                      >{{ d.status === 'QUEUED' ? 'Waiting' : (d.status | titlecase) }}</span
+                    >
+                  </td>
+                  <td>{{ reasonLabel(d.reason) }}</td>
+                  @if (isEmail) {
+                    <td [title]="d.providerEventOn ? (d.providerEventOn | date: 'dd MMM yyyy HH:mm') : ''">
+                      {{ eventLabels[d.providerEvent || ''] || (d.status === 'SENT' ? 'Waiting for news' : '—') }}
+                    </td>
+                  }
+                  <td class="num">{{ d.attempts }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td [attr.colspan]="isEmail ? 7 : 6" class="muted">No messages here.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          [length]="total"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[25, 50, 100]"
+          (page)="page($event)"
+        ></mat-paginator>
+      </mat-card>
+
+      <mat-card class="why">
+        <h3>Why messages failed or were skipped</h3>
+        @for (bar of reasonBars; track bar.reason) {
+          <div class="bar">
+            <span>{{ reasonLabel(bar.reason) }}</span>
+            <span class="track"><s [style.width.%]="bar.width" [class.skip]="bar.skipped"></s></span>
+            <em>{{ bar.count | number }}</em>
+          </div>
+        } @empty {
+          <p class="muted">Every message was sent.</p>
+        }
+        @if (isEmail) {
+          <p class="muted">
+            Delivered, bounced and spam reports arrive from the email service a few minutes after sending.
+          </p>
+        }
+        @if (r.retryable) {
+          <p class="muted">
+            {{ r.retryable | number }} can be retried. A retry uses the client's current
+            {{ isEmail ? 'email address' : 'phone number' }}, so fix any wrong ones on the client record first.
+          </p>
+        }
+      </mat-card>
+    </div>
+  } @else {
+    <p class="muted">Loading report…</p>
+  }
+</div>

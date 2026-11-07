@@ -1,0 +1,112 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.step {
+  padding: 8px 0;
+}
+
+.wide {
+  width: 100%;
+  max-width: 560px;
+  display: block;
+}
+
+.two-col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+
+  > div,
+  > mat-card {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+
+  > div:first-child,
+  > mat-card:first-child {
+    flex-grow: 1.4;
+  }
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.when {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.over {
+  color: #b42318;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.review {
+  align-self: start;
+
+  span:nth-child(even) {
+    text-align: left;
+  }
+}
+
+.client-picker {
+  flex: 1;
+  min-width: 260px;
+
+  .value {
+    width: 100%;
+  }
+
+  .picked {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: -8px 0 8px;
+  }
+
+  .remove {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: inherit;
+  }
+}
+
+.short {
+  width: 120px;
+}
+
+.quiet {
+  margin-top: 4px;
+}
+
+.upcoming {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.save-audience {
+  margin-top: 8px;
+}

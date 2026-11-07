@@ -1,0 +1,239 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  @if (campaign; as c) {
+    <div class="head">
+      <div>
+        <span class="chip" [ngClass]="statusTone[c.status]">{{ statusLabels[c.status] }}</span>
+        <span class="muted"
+          >{{ c.channel }} · {{ c.tag }}{{ c.purpose === 'MARKETING' ? ' · Sales & marketing' : '' }}</span
+        >
+      </div>
+      <div class="page-actions">
+        @if (editable) {
+          <a mat-stroked-button [routerLink]="['edit']" *mifosxHasPermission="'UPDATE_COMMCAMPAIGN'"
+            ><mat-icon>edit</mat-icon> Edit</a
+          >
+        }
+        @if (c.status === 'DRAFT' || c.status === 'REJECTED') {
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="busy"
+            (click)="act('submit')"
+            *mifosxHasPermission="'SUBMIT_COMMCAMPAIGN'"
+          >
+            Submit for approval
+          </button>
+        }
+        @if (c.status === 'SCHEDULED' || c.status === 'SENDING') {
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="busy"
+            (click)="act('pause')"
+            *mifosxHasPermission="'PAUSE_COMMCAMPAIGN'"
+          >
+            <mat-icon>pause</mat-icon> Pause
+          </button>
+        }
+        @if (c.status === 'PAUSED') {
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="busy"
+            (click)="act('resume')"
+            *mifosxHasPermission="'RESUME_COMMCAMPAIGN'"
+          >
+            <mat-icon>play_arrow</mat-icon> Resume
+          </button>
+        }
+        @if (['PENDING_APPROVAL', 'SCHEDULED', 'SENDING', 'PAUSED'].includes(c.status)) {
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            [disabled]="busy"
+            (click)="act('stop')"
+            *mifosxHasPermission="'STOP_COMMCAMPAIGN'"
+          >
+            <mat-icon>stop</mat-icon> Stop
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (c.status === 'PENDING_APPROVAL') {
+      <div class="banner">
+        <mat-icon>hourglass_top</mat-icon>
+        <div class="grow">
+          Pending approval · submitted by {{ c.submittedBy }} on {{ c.submittedOn | date: 'dd MMM yyyy HH:mm' }}.
+        </div>
+        <div class="approval-actions">
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="busy"
+            (click)="rejecting = !rejecting"
+            *mifosxHasPermission="'REJECT_COMMCAMPAIGN'"
+          >
+            Reject…
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="busy"
+            (click)="act('approve')"
+            *mifosxHasPermission="'APPROVE_COMMCAMPAIGN'"
+          >
+            Approve
+          </button>
+        </div>
+      </div>
+      @if (rejecting) {
+        <mat-card class="reject">
+          <mat-form-field class="wide">
+            <mat-label>Why are you rejecting it?</mat-label>
+            <textarea
+              matInput
+              rows="2"
+              [formControl]="reason"
+              placeholder="e.g. Please add the branch phone number"
+            ></textarea>
+            @if (reason.hasError('required')) {
+              <mat-error>Give a reason; the creator sees it.</mat-error>
+            }
+          </mat-form-field>
+          <div class="page-actions">
+            <button mat-button type="button" (click)="rejecting = false">Cancel</button>
+            <button mat-raised-button color="warn" type="button" [disabled]="busy" (click)="reject()">
+              Reject campaign
+            </button>
+          </div>
+        </mat-card>
+      }
+    }
+    @if (c.status === 'REJECTED' && c.rejectionReason) {
+      <div class="banner red">
+        <mat-icon>block</mat-icon>
+        Rejected by {{ c.rejectedBy }}: "{{ c.rejectionReason }}". Edit it and submit again.
+      </div>
+    }
+    @if (c.lastError) {
+      <div class="banner"><mat-icon>warning</mat-icon>{{ c.lastError }}</div>
+    }
+
+    <div class="grid">
+      <mat-card>
+        <h3>What will be sent</h3>
+        <div class="kv">
+          <span>Template</span><span>{{ c.templateName }}</span> <span>Audience</span
+          ><span>
+            @for (filter of filters; track $index) {
+              <div>{{ describe(filter) }}</div>
+            } @empty {
+              All active clients of {{ c.officeName }}
+            }
+          </span>
+          <span>When</span><span>{{ scheduleText(c) }}</span> <span>Sending hours</span><span>{{ quietText(c) }}</span>
+          @if (c.scheduleType === 'REPEAT') {
+            <span>Runs so far</span
+            ><span>{{ c.runsDone }}{{ c.repeatStop === 'AFTER_RUNS' ? ' of ' + c.repeatMaxRuns : '' }}</span>
+          }
+          @if (c.nextRunAt && (c.status === 'SCHEDULED' || c.status === 'PAUSED')) {
+            <span>Next run</span><span>{{ c.nextRunAt }}</span>
+          }
+          @if (c.upcomingRuns?.length && c.scheduleType === 'REPEAT') {
+            <span>Coming up</span
+            ><span>
+              @for (time of c.upcomingRuns; track time) {
+                <div>{{ time }}</div>
+              }
+            </span>
+          }
+          <span>Created</span><span>{{ c.createdBy }} · {{ c.createdOn | date: 'dd MMM yyyy HH:mm' }}</span>
+          @if (c.approvedBy) {
+            <span>Approved</span><span>{{ c.approvedBy }} · {{ c.approvedOn | date: 'dd MMM yyyy HH:mm' }}</span>
+          }
+        </div>
+      </mat-card>
+      <mat-card>
+        <h3>{{ c.channel === 'EMAIL' ? 'Email' : 'Message' }}</h3>
+        @if (c.channel === 'EMAIL') {
+          <div class="email-preview">
+            <div class="email-subject">
+              <span class="muted">Subject</span><b>{{ preview?.subject || c.emailSubject }}</b>
+            </div>
+            <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+          </div>
+          <p class="muted center">Example values</p>
+        } @else {
+          <div class="phone">
+            <div class="sender">SMS</div>
+            <div class="bubble">{{ preview?.message || c.messageText }}</div>
+          </div>
+          @if (preview) {
+            <p class="muted center">Example values · longest {{ preview.longestLength }} / {{ preview.limit }}</p>
+          }
+        }
+      </mat-card>
+    </div>
+
+    <mat-card>
+      <h3>Runs</h3>
+      @for (run of runs; track run.id) {
+        <a class="run" [routerLink]="['runs', run.id]">
+          <span
+            ><b>Run {{ run.runNumber }}</b> · {{ run.startedOn | date: 'dd MMM yyyy HH:mm' }}</span
+          >
+          <span class="counts">
+            <span class="chip green">{{ run.sent | number }} sent</span>
+            @if (run.queued) {
+              <span class="chip amber">{{ run.queued | number }} waiting</span>
+            }
+            @if (run.failed) {
+              <span class="chip red">{{ run.failed | number }} failed</span>
+            }
+            @if (run.skipped) {
+              <span class="chip grey">{{ run.skipped | number }} skipped</span>
+            }
+          </span>
+          <mat-icon>chevron_right</mat-icon>
+        </a>
+      } @empty {
+        <p class="muted">Not sent yet.</p>
+      }
+    </mat-card>
+
+    <mat-card>
+      <h3>History</h3>
+      <table class="full history">
+        <tbody>
+          @for (entry of c.history; track entry.id) {
+            <tr>
+              <td class="when">{{ entry.createdOn | date: 'dd MMM yyyy HH:mm' }}</td>
+              <td>{{ entry.user }}</td>
+              <td>
+                {{ historyLabels[entry.action] || entry.action }}
+                @if (entry.note) {
+                  <span class="muted">· {{ entry.note }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card>
+  } @else {
+    <p class="muted">Loading campaign…</p>
+  }
+</div>

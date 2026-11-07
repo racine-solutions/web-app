@@ -594,9 +594,10 @@ export class LoansService {
     return this.http.put(`/${productType}/${loanId}`, loanData);
   }
 
+  /** Fills the template in for the loan: a POST merges, while a GET would only return the template itself. */
   getTemplateData(templateId: any, loanId: any): Observable<any> {
     const httpParams = new HttpParams().set('loanId', loanId);
-    return this.http.get(`/templates/${templateId}`, { params: httpParams, responseType: 'text' });
+    return this.http.post(`/templates/${templateId}`, {}, { params: httpParams, responseType: 'text' });
   }
 
   /**

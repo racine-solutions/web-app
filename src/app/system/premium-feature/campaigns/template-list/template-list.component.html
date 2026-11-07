@@ -32,7 +32,7 @@
               <th>Template</th>
               <th>Tag</th>
               <th>Purpose</th>
-              <th class="num">Longest SMS</th>
+              <th class="num">Channel · longest</th>
               <th class="num">Used by</th>
               <th></th>
             </tr>
@@ -45,16 +45,22 @@
                   @if (template.archived) {
                     <span class="chip grey">Archived</span>
                   }
-                  <div class="muted preview">{{ template.text }}</div>
+                  <div class="muted preview">
+                    {{ template.channel === 'EMAIL' ? 'Subject: ' + template.emailSubject : template.text }}
+                  </div>
                 </td>
                 <td>
                   <span class="chip">{{ template.tag }}</span>
                 </td>
                 <td>{{ template.purpose === 'MARKETING' ? 'Sales & marketing' : 'General' }}</td>
                 <td class="num">
-                  <span [class.over]="template.longestLength > template.limit"
-                    >{{ template.longestLength }} / {{ template.limit }}</span
-                  >
+                  @if (template.channel === 'EMAIL') {
+                    <span class="chip blue">Email</span>
+                  } @else {
+                    <span [class.over]="template.longestLength > template.limit"
+                      >SMS · {{ template.longestLength }} / {{ template.limit }}</span
+                    >
+                  }
                 </td>
                 <td class="num">
                   {{ template.campaignsUsingIt }} campaign{{ template.campaignsUsingIt === 1 ? '' : 's' }}

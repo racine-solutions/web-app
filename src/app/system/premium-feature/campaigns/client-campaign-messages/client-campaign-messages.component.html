@@ -34,11 +34,24 @@
                     <a [routerLink]="['/system', 'premium-feature', 'campaigns', m.campaignId]">{{ m.campaignName }}</a>
                     <div class="muted">Run {{ m.runNumber }}</div>
                   </td>
-                  <td class="text">{{ m.message || '—' }}</td>
+                  <td class="text">
+                    @if (m.channel === 'EMAIL') {
+                      <span class="chip blue">Email</span> {{ m.subject || '—' }}
+                      <div class="muted">{{ m.address }}</div>
+                    } @else {
+                      {{ m.message || '—' }}
+                    }
+                  </td>
                   <td>
                     @switch (m.status) {
                       @case ('SENT') {
-                        <span class="chip green">Sent</span>
+                        <span class="chip green">{{
+                          m.providerEvent === 'DELIVERED'
+                            ? 'Delivered'
+                            : m.providerEvent === 'SPAM'
+                              ? 'Sent · marked as spam'
+                              : 'Sent'
+                        }}</span>
                       }
                       @case ('QUEUED') {
                         <span class="chip amber">Waiting</span>

@@ -14,7 +14,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
-import { CampaignRun, Delivery, REASON_LABELS, reasonLabel } from '../campaigns.model';
+import { CampaignRun, Delivery, EMAIL_EVENT_LABELS, REASON_LABELS, reasonLabel } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
 
 /** Delivery report for one run: who got the message, who didn't and why, with retry. */
@@ -41,6 +41,10 @@ export class CampaignRunComponent implements OnInit {
 
   readonly reasonLabel = reasonLabel;
   readonly reasons = Object.keys(REASON_LABELS);
+  readonly eventLabels = EMAIL_EVENT_LABELS;
+
+  /** SMS or EMAIL, from the campaign. */
+  channel = 'SMS';
 
   run: CampaignRun | null = null;
   deliveries: Delivery[] = [];
@@ -62,7 +66,15 @@ export class CampaignRunComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.service.getCampaign(this.campaignId).subscribe((campaign) => {
+      this.channel = campaign.channel;
+      this.changeDetector.markForCheck();
+    });
     this.loadRun();
+  }
+
+  get isEmail(): boolean {
+    return this.channel === 'EMAIL';
   }
 
   get reasonBars(): { reason: string; count: number; width: number; skipped: boolean }[] {
@@ -90,6 +102,8 @@ export class CampaignRunComponent implements OnInit {
             'NO_PHONE',
             'INVALID_PHONE',
             'PHONE_SHARED',
+            'NO_EMAIL',
+            'EMAIL_SHARED',
             'OPTED_OUT',
             'STOPPED'
           ].includes(reason)
@@ -146,11 +160,13 @@ export class CampaignRunComponent implements OnInit {
           [
             'Client',
             'Account',
-            'Phone',
+            this.isEmail ? 'Email' : 'Phone',
             'Status',
             'Reason',
+            ...(this.isEmail ? ['Email result'] : []),
             'Attempts',
             'Last attempt',
+            ...(this.isEmail ? ['Subject'] : []),
             'Message'
           ],
           ...page.pageItems.map((d) => [
@@ -159,8 +175,10 @@ export class CampaignRunComponent implements OnInit {
             d.address,
             d.status,
             reasonLabel(d.reason),
+            ...(this.isEmail ? [EMAIL_EVENT_LABELS[d.providerEvent || ''] || ''] : []),
             d.attempts,
             d.lastAttemptOn || '',
+            ...(this.isEmail ? [d.subject || ''] : []),
             d.message || ''
           ])
         ];

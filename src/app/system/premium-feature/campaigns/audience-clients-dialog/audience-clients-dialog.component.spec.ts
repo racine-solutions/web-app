@@ -61,26 +61,41 @@ describe('AudienceClientsDialogComponent', () => {
   });
 
   it('loads one page at a time from the server', () => {
-    expect(audienceClients).toHaveBeenLastCalledWith([], 'GENERAL', { show: 'ALL', search: '', offset: 0, limit: 25 });
+    expect(audienceClients).toHaveBeenLastCalledWith(
+      [],
+      'GENERAL',
+      { show: 'ALL', search: '', offset: 0, limit: 25 },
+      'SMS'
+    );
     expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(25);
     fixture.componentInstance.page({ pageIndex: 2, pageSize: 50, length: 520 });
-    expect(audienceClients).toHaveBeenLastCalledWith([], 'GENERAL', {
-      show: 'ALL',
-      search: '',
-      offset: 100,
-      limit: 50
-    });
+    expect(audienceClients).toHaveBeenLastCalledWith(
+      [],
+      'GENERAL',
+      {
+        show: 'ALL',
+        search: '',
+        offset: 100,
+        limit: 50
+      },
+      'SMS'
+    );
   });
 
   it('switches to skipped clients and says why', () => {
     fixture.componentInstance.setTab('SKIPPED');
     fixture.detectChanges();
-    expect(audienceClients).toHaveBeenLastCalledWith([], 'GENERAL', {
-      show: 'SKIPPED',
-      search: '',
-      offset: 0,
-      limit: 25
-    });
+    expect(audienceClients).toHaveBeenLastCalledWith(
+      [],
+      'GENERAL',
+      {
+        show: 'SKIPPED',
+        search: '',
+        offset: 0,
+        limit: 25
+      },
+      'SMS'
+    );
     expect(fixture.nativeElement.textContent).toContain('Skipped · No phone number');
   });
 });

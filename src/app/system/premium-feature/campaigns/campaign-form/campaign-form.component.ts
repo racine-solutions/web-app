@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatStep, MatStepper, MatStepperNext, MatStepperPrevious } from '@angular/material/stepper';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject, debounceTime, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -33,6 +34,7 @@ import {
   reasonLabel
 } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
+import { emailDays, emailDocument } from '../email-preview';
 import { FIELD_SPECS, FieldSpec, QUICK_PICKS, optionsFor } from './audience-fields';
 import { RepeatStop, RepeatUnit, Schedule, ScheduleType, describe, upcoming } from '../schedule';
 import {
@@ -75,6 +77,7 @@ export class CampaignFormComponent implements OnInit {
   private router = inject(Router);
   private changeDetector = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private sanitizer = inject(DomSanitizer);
   private dialog = inject(MatDialog);
   private searchService = inject(SearchService);
 
@@ -110,6 +113,11 @@ export class CampaignFormComponent implements OnInit {
   audienceMessage = '';
 
   preview: MessageCheck | null = null;
+  /** Email templates: the preview page for a sandboxed frame. */
+  previewHtml: SafeHtml | null = null;
+  emailEnabled = true;
+  emailDailyLimit: number | null = null;
+  emailsLeftToday: number | null = null;
   count: AudienceCount | null = null;
   counting = false;
   smsCost: number | null = null;
@@ -126,7 +134,7 @@ export class CampaignFormComponent implements OnInit {
   ngOnInit() {
     this.campaignId = Number(this.route.snapshot.paramMap.get('id')) || undefined;
     this.service.getTemplates(false, 0, 500).subscribe((page) => {
-      this.templates = page.pageItems.filter((template) => template.channel === 'SMS');
+      this.templates = page.pageItems;
       this.changeDetector.markForCheck();
     });
     this.service.getAudienceOptions().subscribe((options) => {
@@ -147,7 +155,9 @@ export class CampaignFormComponent implements OnInit {
         switchMap(() => {
           this.counting = true;
           this.changeDetector.markForCheck();
-          return this.service.countAudience(this.cleanFilters(), this.purpose).pipe(catchError(() => of(null)));
+          return this.service
+            .countAudience(this.cleanFilters(), this.purpose, this.channel)
+            .pipe(catchError(() => of(null)));
         }),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -171,14 +181,17 @@ export class CampaignFormComponent implements OnInit {
         this.changeDetector.markForCheck();
       });
     this.loadSavedAudiences();
-    if (!this.campaignId) {
-      this.service.getCampaignDefaults().subscribe((defaults) => {
+    this.service.getCampaignDefaults().subscribe((defaults) => {
+      if (!this.campaignId) {
         this.quietHours = !!defaults.quietFrom;
         this.quietFrom = defaults.quietFrom || this.quietFrom;
         this.quietTo = defaults.quietTo || this.quietTo;
-        this.changeDetector.markForCheck();
-      });
-    }
+      }
+      this.emailEnabled = defaults.emailEnabled !== false;
+      this.emailDailyLimit = defaults.emailDailyLimit ?? null;
+      this.emailsLeftToday = defaults.emailsLeftToday ?? null;
+      this.changeDetector.markForCheck();
+    });
     if (this.campaignId) {
       this.service.getCampaign(this.campaignId).subscribe((campaign) => {
         this.name.setValue(campaign.name);
@@ -219,15 +232,30 @@ export class CampaignFormComponent implements OnInit {
     return this.template?.purpose || 'GENERAL';
   }
 
+  get channel(): 'SMS' | 'EMAIL' {
+    return this.template?.channel || 'SMS';
+  }
+
+  get isEmail(): boolean {
+    return this.channel === 'EMAIL';
+  }
+
   templateChanged() {
     this.preview = null;
+    this.previewHtml = null;
     if (this.templateId) {
       this.service.preview({ templateId: this.templateId }).subscribe((preview) => {
         this.preview = preview;
+        this.previewHtml = this.isEmail ? this.sanitizer.bypassSecurityTrustHtml(emailDocument(preview.message)) : null;
         this.changeDetector.markForCheck();
       });
     }
     this.recount();
+  }
+
+  /** Days one run takes under the daily email limit. */
+  get emailRunDays(): number {
+    return emailDays(this.count?.recipients ?? 0, this.emailDailyLimit, this.emailsLeftToday);
   }
 
   spec(field: string): FieldSpec {
@@ -310,7 +338,12 @@ export class CampaignFormComponent implements OnInit {
     this.dialog.open(AudienceClientsDialogComponent, {
       width: '960px',
       maxWidth: '95vw',
-      data: { audience: this.cleanFilters(), purpose: this.purpose, count: this.count } as AudienceClientsDialogData
+      data: {
+        audience: this.cleanFilters(),
+        purpose: this.purpose,
+        channel: this.channel,
+        count: this.count
+      } as AudienceClientsDialogData
     });
   }
 

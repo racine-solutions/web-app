@@ -26,7 +26,11 @@
     </div>
     <mat-form-field class="search" subscriptSizing="dynamic">
       <mat-label>Search</mat-label>
-      <input matInput [formControl]="search" placeholder="Name, account or phone" />
+      <input
+        matInput
+        [formControl]="search"
+        [placeholder]="isEmail ? 'Name, account or email' : 'Name, account or phone'"
+      />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </div>
@@ -41,8 +45,8 @@
           <th>Client</th>
           <th>Account</th>
           <th>Office</th>
-          <th>Phone</th>
-          <th>Gets the SMS?</th>
+          <th>{{ isEmail ? 'Email' : 'Phone' }}</th>
+          <th>{{ isEmail ? 'Gets the email?' : 'Gets the SMS?' }}</th>
         </tr>
       </thead>
       <tbody>
@@ -55,7 +59,7 @@
             </td>
             <td class="mono">{{ client.accountNo }}</td>
             <td>{{ client.officeName }}</td>
-            <td class="mono">{{ client.mobileNo || '—' }}</td>
+            <td class="mono">{{ (isEmail ? client.emailAddress : client.mobileNo) || '—' }}</td>
             <td>
               @if (client.skipReason) {
                 <span class="chip amber">Skipped · {{ reasonLabel(client.skipReason) }}</span>
@@ -68,7 +72,11 @@
           @if (!loading) {
             <tr>
               <td colspan="5" class="muted empty">
-                {{ search.value ? 'No matching client has that name, account or phone.' : 'No clients here.' }}
+                {{
+                  search.value
+                    ? 'No matching client has that name, account or ' + (isEmail ? 'email.' : 'phone.')
+                    : 'No clients here.'
+                }}
               </td>
             </tr>
           }

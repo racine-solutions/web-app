@@ -33,9 +33,23 @@
 
     <div class="tiles">
       <div class="tile green">
-        <div class="label">Sent (accepted by the SMS gateway)</div>
+        <div class="label">
+          {{ isEmail ? 'Sent (accepted by the email service)' : 'Sent (accepted by the SMS gateway)' }}
+        </div>
         <div class="value">{{ r.sent | number }}</div>
       </div>
+      @if (isEmail) {
+        <div class="tile green">
+          <div class="label">Delivered to the inbox</div>
+          <div class="value">{{ r.delivered | number }}</div>
+        </div>
+        @if (r.spam) {
+          <div class="tile amber">
+            <div class="label">Marked as spam</div>
+            <div class="value">{{ r.spam | number }}</div>
+          </div>
+        }
+      }
       <div class="tile red">
         <div class="label">Failed</div>
         <div class="value">{{ r.failed | number }}</div>
@@ -97,6 +111,9 @@
                 <th>To</th>
                 <th>Status</th>
                 <th>Reason</th>
+                @if (isEmail) {
+                  <th>Email result</th>
+                }
                 <th class="num">Tries</th>
               </tr>
             </thead>
@@ -130,11 +147,16 @@
                     >
                   </td>
                   <td>{{ reasonLabel(d.reason) }}</td>
+                  @if (isEmail) {
+                    <td [title]="d.providerEventOn ? (d.providerEventOn | date: 'dd MMM yyyy HH:mm') : ''">
+                      {{ eventLabels[d.providerEvent || ''] || (d.status === 'SENT' ? 'Waiting for news' : '—') }}
+                    </td>
+                  }
                   <td class="num">{{ d.attempts }}</td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="6" class="muted">No messages here.</td>
+                  <td [attr.colspan]="isEmail ? 7 : 6" class="muted">No messages here.</td>
                 </tr>
               }
             </tbody>
@@ -160,10 +182,15 @@
         } @empty {
           <p class="muted">Every message was sent.</p>
         }
+        @if (isEmail) {
+          <p class="muted">
+            Delivered, bounced and spam reports arrive from the email service a few minutes after sending.
+          </p>
+        }
         @if (r.retryable) {
           <p class="muted">
-            {{ r.retryable | number }} can be retried. A retry uses the client's current phone number, so fix any wrong
-            numbers on the client record first.
+            {{ r.retryable | number }} can be retried. A retry uses the client's current
+            {{ isEmail ? 'email address' : 'phone number' }}, so fix any wrong ones on the client record first.
           </p>
         }
       </mat-card>

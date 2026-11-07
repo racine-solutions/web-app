@@ -45,8 +45,11 @@
         <span class="muted">Channel</span>
         <mat-button-toggle-group formControlName="channel" aria-label="Channel">
           <mat-button-toggle value="SMS">SMS</mat-button-toggle>
-          <mat-button-toggle value="EMAIL" disabled>Email (coming soon)</mat-button-toggle>
+          <mat-button-toggle value="EMAIL" [disabled]="!emailEnabled && !isEmail">Email</mat-button-toggle>
         </mat-button-toggle-group>
+        @if (!emailEnabled) {
+          <span class="muted">Email isn't set up on the server yet. Ask your administrator.</span>
+        }
       </div>
 
       <div class="message">
@@ -58,7 +61,7 @@
                 <button
                   type="button"
                   class="chip"
-                  (click)="insert(placeholder, body)"
+                  (click)="insert(placeholder, body, subject)"
                   [title]="'Up to ' + placeholder.maxLength + ' characters, e.g. ' + placeholder.example"
                 >
                   {{ placeholder.label }}
@@ -67,30 +70,68 @@
             </div>
           }
         </div>
+        <mat-form-field class="body" [class.hidden]="!isEmail">
+          <mat-label>Subject</mat-label>
+          <input
+            #subject
+            matInput
+            formControlName="emailSubject"
+            (focus)="focusOn('subject')"
+            placeholder="e.g. Your loan statement, {{ '{{' }}client.name{{ '}}' }}"
+          />
+          @if (form.controls.emailSubject.hasError('required')) {
+            <mat-error>Give the email a subject.</mat-error>
+          }
+          @if (form.controls.emailSubject.hasError('maxlength')) {
+            <mat-error>Keep the subject to 200 characters.</mat-error>
+          }
+        </mat-form-field>
+        @if (isEmail) {
+          <div class="format" aria-label="Format the email">
+            <button type="button" class="chip" (click)="wrap('<b>', '</b>', body)" title="Bold"><b>B</b></button>
+            <button type="button" class="chip" (click)="wrap('<i>', '</i>', body)" title="Italic"><i>I</i></button>
+            <button type="button" class="chip" (click)="wrap('<h2>', '</h2>', body)" title="Heading">Heading</button>
+            <button type="button" class="chip" (click)="wrap('<p>', '</p>', body)" title="Paragraph">Paragraph</button>
+            <button
+              type="button"
+              class="chip"
+              (click)="wrap('<a href=&quot;https://&quot;>', '</a>', body)"
+              title="Link"
+            >
+              Link
+            </button>
+          </div>
+        }
         <mat-form-field class="body">
-          <mat-label>Message</mat-label>
+          <mat-label>{{ isEmail ? 'Email (text or HTML)' : 'Message' }}</mat-label>
           <textarea
             #body
             matInput
             formControlName="text"
-            rows="5"
+            (focus)="focusOn('text')"
+            [rows]="isEmail ? 14 : 5"
             placeholder="Hi {{ '{{' }}client.name{{ '}}' }}, …"
           ></textarea>
-        </mat-form-field>
-        <div class="counter">
-          <span
-            >As shown: <b>{{ typedLength }}</b> · Longest case: <b>{{ longestLength }}</b> / {{ limit }}</span
-          >
-          @if (fits) {
-            <span class="ok">{{ limit === 70 ? 'Fits one Unicode SMS' : 'Fits one SMS' }}</span>
-          } @else {
-            <span class="over">{{ longestLength - limit }} characters over: shorten to save</span>
+          @if (isEmail) {
+            <mat-hint>Plain text keeps its line breaks. Paste HTML for a designed email.</mat-hint>
           }
-        </div>
-        <p class="muted">
-          "Longest case" fills every placeholder with the longest value it can take, such as a 20-letter name or UGX
-          9,999,999,999. Accented letters such as "ó" make the SMS Unicode, which holds 70 characters.
-        </p>
+        </mat-form-field>
+        @if (!isEmail) {
+          <div class="counter">
+            <span
+              >As shown: <b>{{ typedLength }}</b> · Longest case: <b>{{ longestLength }}</b> / {{ limit }}</span
+            >
+            @if (fits) {
+              <span class="ok">{{ limit === 70 ? 'Fits one Unicode SMS' : 'Fits one SMS' }}</span>
+            } @else {
+              <span class="over">{{ longestLength - limit }} characters over: shorten to save</span>
+            }
+          </div>
+          <p class="muted">
+            "Longest case" fills every placeholder with the longest value it can take, such as a 20-letter name or UGX
+            9,999,999,999. Accented letters such as "ó" make the SMS Unicode, which holds 70 characters.
+          </p>
+        }
       </div>
 
       <div class="actions">
@@ -103,10 +144,20 @@
 
     <mat-card class="preview-card">
       <h3>Preview</h3>
-      <div class="phone">
-        <div class="sender">SMS</div>
-        <div class="bubble">{{ preview?.message || 'Your message appears here.' }}</div>
-      </div>
+      @if (isEmail) {
+        <div class="email-preview">
+          <div class="email-subject">
+            <span class="muted">Subject</span>
+            <b>{{ preview?.subject || 'Your subject appears here.' }}</b>
+          </div>
+          <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+        </div>
+      } @else {
+        <div class="phone">
+          <div class="sender">SMS</div>
+          <div class="bubble">{{ preview?.message || 'Your message appears here.' }}</div>
+        </div>
+      }
       <div class="preview-as">
         @if (previewClient) {
           <span class="chip blue"

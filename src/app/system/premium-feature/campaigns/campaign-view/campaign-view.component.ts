@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -23,6 +24,7 @@ import {
   reasonLabel
 } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
+import { emailDocument } from '../email-preview';
 import { describe, quietText } from '../schedule';
 
 /** One campaign: approval, actions, runs and history. */
@@ -43,6 +45,7 @@ export class CampaignViewComponent implements OnInit {
   private service = inject(CampaignsService);
   private route = inject(ActivatedRoute);
   private changeDetector = inject(ChangeDetectorRef);
+  private sanitizer = inject(DomSanitizer);
 
   readonly statusLabels = STATUS_LABELS;
   readonly statusTone = STATUS_TONE;
@@ -54,6 +57,8 @@ export class CampaignViewComponent implements OnInit {
   campaign: Campaign | null = null;
   runs: CampaignRun[] = [];
   preview: MessageCheck | null = null;
+  /** Email campaigns: the preview page for a sandboxed frame. */
+  previewHtml: SafeHtml | null = null;
   filters: AudienceFilter[] = [];
   rejecting = false;
   reason = new FormControl('', [
@@ -107,10 +112,16 @@ export class CampaignViewComponent implements OnInit {
       this.campaign = campaign;
       this.filters = JSON.parse(campaign.audience || '[]');
       this.busy = false;
-      this.service.preview({ text: campaign.messageText }).subscribe((preview) => {
-        this.preview = preview;
-        this.changeDetector.markForCheck();
-      });
+      this.service
+        .preview({ text: campaign.messageText, channel: campaign.channel, emailSubject: campaign.emailSubject })
+        .subscribe((preview) => {
+          this.preview = preview;
+          this.previewHtml =
+            campaign.channel === 'EMAIL'
+              ? this.sanitizer.bypassSecurityTrustHtml(emailDocument(preview.message))
+              : null;
+          this.changeDetector.markForCheck();
+        });
       this.changeDetector.markForCheck();
     });
     this.service.getRuns(this.id).subscribe((runs) => {

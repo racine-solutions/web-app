@@ -48,6 +48,7 @@ describe('TemplateFormComponent', () => {
                 'Loan'
               ]),
             preview: () => of(null),
+            getCampaignDefaults: () => of({ emailEnabled: true }),
             saveTemplate
           }
         }
@@ -84,5 +85,42 @@ describe('TemplateFormComponent', () => {
     textarea.selectionStart = textarea.selectionEnd = 3;
     component.insert({ key: 'client.name', label: '', group: '', example: '', maxLength: 20 }, textarea);
     expect(component.form.controls.text.value).toBe('Hi {{client.name}}, welcome');
+  });
+
+  it('an email needs a subject but no SMS length check, and is saved with it', () => {
+    component.form.patchValue({ name: 'Statement', tag: 'General', channel: 'EMAIL', text: 'x'.repeat(500) });
+    expect(component.isEmail).toBe(true);
+    expect(component.fits).toBe(true);
+    component.save();
+    expect(saveTemplate).not.toHaveBeenCalled();
+    component.form.controls.emailSubject.setValue('Your statement, {{client.name}}');
+    component.save();
+    expect(saveTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({ channel: 'EMAIL', emailSubject: 'Your statement, {{client.name}}' }),
+      undefined
+    );
+  });
+
+  it('puts a placeholder in the subject when the cursor was last there', () => {
+    component.form.controls.channel.setValue('EMAIL');
+    const body = document.createElement('textarea');
+    const subject = document.createElement('input');
+    component.form.controls.emailSubject.setValue('Hello ');
+    subject.value = 'Hello ';
+    subject.selectionStart = subject.selectionEnd = 6;
+    component.focusOn('subject');
+    component.insert({ key: 'client.name', label: '', group: '', example: '', maxLength: 20 }, body, subject);
+    expect(component.form.controls.emailSubject.value).toBe('Hello {{client.name}}');
+    expect(component.form.controls.text.value).toBe('');
+  });
+
+  it('wraps the selected email text in a tag', () => {
+    const body = document.createElement('textarea');
+    component.form.controls.text.setValue('Pay now');
+    body.value = 'Pay now';
+    body.selectionStart = 0;
+    body.selectionEnd = 3;
+    component.wrap('<b>', '</b>', body);
+    expect(component.form.controls.text.value).toBe('<b>Pay</b> now');
   });
 });

@@ -167,13 +167,23 @@
         </div>
       </mat-card>
       <mat-card>
-        <h3>Message</h3>
-        <div class="phone">
-          <div class="sender">SMS</div>
-          <div class="bubble">{{ preview?.message || c.messageText }}</div>
-        </div>
-        @if (preview) {
-          <p class="muted center">Example values · longest {{ preview.longestLength }} / {{ preview.limit }}</p>
+        <h3>{{ c.channel === 'EMAIL' ? 'Email' : 'Message' }}</h3>
+        @if (c.channel === 'EMAIL') {
+          <div class="email-preview">
+            <div class="email-subject">
+              <span class="muted">Subject</span><b>{{ preview?.subject || c.emailSubject }}</b>
+            </div>
+            <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+          </div>
+          <p class="muted center">Example values</p>
+        } @else {
+          <div class="phone">
+            <div class="sender">SMS</div>
+            <div class="bubble">{{ preview?.message || c.messageText }}</div>
+          </div>
+          @if (preview) {
+            <p class="muted center">Example values · longest {{ preview.longestLength }} / {{ preview.limit }}</p>
+          }
         }
       </mat-card>
     </div>

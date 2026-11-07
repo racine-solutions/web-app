@@ -48,9 +48,12 @@ export interface MessageCheck {
   message: string;
   length: number;
   longestLength: number;
-  limit: number;
+  /** 160 or 70 for SMS; null for email, which has no length limit. */
+  limit: number | null;
   unicode: boolean;
   fits: boolean;
+  /** Email only: the filled-in subject. */
+  subject?: string;
 }
 
 export interface AudienceFilter {
@@ -72,6 +75,7 @@ export interface AudienceClient {
   displayName: string;
   officeName: string;
   mobileNo: string;
+  emailAddress?: string;
   skipReason?: string;
 }
 
@@ -113,6 +117,10 @@ export interface CampaignRun {
   skipped: number;
   retryable: number;
   reasons: Record<string, number>;
+  /** Emails the email service confirmed reached the inbox. */
+  delivered: number;
+  /** Emails the client reported as spam. */
+  spam: number;
 }
 
 export interface CampaignHistory {
@@ -132,6 +140,7 @@ export interface Campaign {
   purpose: 'GENERAL' | 'MARKETING';
   tag: string;
   messageText: string;
+  emailSubject?: string;
   audience: string;
   scheduleType: 'NOW' | 'ONCE' | 'REPEAT';
   scheduledAt?: string;
@@ -185,6 +194,8 @@ export interface ClientCampaignMessage {
   status: DeliveryStatus;
   reason?: string;
   sentOn: string;
+  subject?: string;
+  providerEvent?: string;
 }
 
 export interface Delivery {
@@ -200,6 +211,10 @@ export interface Delivery {
   retryable: boolean;
   attempts: number;
   lastAttemptOn?: string;
+  subject?: string;
+  /** Email only: the latest event from the email service, e.g. DELIVERED or HARD_BOUNCE. */
+  providerEvent?: string;
+  providerEventOn?: string;
 }
 
 export interface DeliveryPage {
@@ -248,8 +263,39 @@ export const REASON_LABELS: Record<string, string> = {
   SMS_ACCOUNT_INACTIVE: 'SMS account inactive',
   GATEWAY_REFUSED: 'Gateway refused',
   SEND_ERROR: 'Sending error',
-  STOPPED: 'Campaign stopped'
+  STOPPED: 'Campaign stopped',
+  NO_EMAIL: 'No email address',
+  INVALID_EMAIL: 'Invalid email address',
+  EMAIL_SHARED: 'Email shared with another client',
+  EMAIL_OFF: 'Email service not available',
+  EMAIL_REFUSED: 'Email service refused',
+  HARD_BOUNCE: 'Bounced (address does not exist)',
+  SOFT_BOUNCE: 'Bounced (mailbox full or unavailable)',
+  BLOCKED: 'Blocked by the email service',
+  SPAM: 'Marked as spam by the client'
 };
+
+/** What the email service last reported about an email. */
+export const EMAIL_EVENT_LABELS: Record<string, string> = {
+  DELIVERED: 'Delivered',
+  DEFERRED: 'Delayed',
+  SPAM: 'Marked as spam',
+  HARD_BOUNCE: 'Bounced',
+  SOFT_BOUNCE: 'Bounced',
+  INVALID_EMAIL: 'Invalid address',
+  BLOCKED: 'Blocked',
+  ERROR: 'Error'
+};
+
+/** Defaults and email availability for a new campaign. */
+export interface CampaignDefaults {
+  quietFrom?: string;
+  quietTo?: string;
+  emailEnabled?: boolean;
+  /** Campaign emails allowed a day; null when there is no limit. */
+  emailDailyLimit?: number | null;
+  emailsLeftToday?: number | null;
+}
 
 export const HISTORY_LABELS: Record<string, string> = {
   CREATED: 'Created',

@@ -23,7 +23,7 @@
           <mat-select [(ngModel)]="templateId" (selectionChange)="templateChanged()">
             @for (template of templates; track template.id) {
               <mat-option [value]="template.id"
-                >{{ template.name }} · {{ template.tag
+                >{{ template.name }} · {{ template.channel === 'EMAIL' ? 'Email' : 'SMS' }} · {{ template.tag
                 }}{{ template.purpose === 'MARKETING' ? ' · Marketing' : '' }}</mat-option
               >
             }
@@ -32,19 +32,32 @@
             <mat-hint>No templates yet: create one under Templates first.</mat-hint>
           }
         </mat-form-field>
+        @if (isEmail && !emailEnabled) {
+          <div class="banner">
+            <mat-icon>warning</mat-icon>Email isn't set up on the server yet. An approved email campaign waits until
+            your administrator sets it up.
+          </div>
+        }
         @if (preview) {
           <div class="two-col">
             <div>
-              <p class="muted">Example message</p>
-              <div class="phone">
-                <div class="sender">SMS</div>
-                <div class="bubble">{{ preview.message }}</div>
-              </div>
+              <p class="muted">{{ isEmail ? 'Example email' : 'Example message' }}</p>
+              @if (isEmail) {
+                <ng-container *ngTemplateOutlet="emailPreview"></ng-container>
+              } @else {
+                <div class="phone">
+                  <div class="sender">SMS</div>
+                  <div class="bubble">{{ preview.message }}</div>
+                </div>
+              }
             </div>
             <div class="kv">
-              <span>Tag</span><span>{{ template?.tag }}</span> <span>Purpose</span
+              <span>Channel</span><span>{{ isEmail ? 'Email' : 'SMS' }}</span> <span>Tag</span
+              ><span>{{ template?.tag }}</span> <span>Purpose</span
               ><span>{{ purpose === 'MARKETING' ? 'Sales & marketing' : 'General communication' }}</span>
-              <span>Longest SMS</span><span>{{ preview.longestLength }} / {{ preview.limit }}</span>
+              @if (!isEmail) {
+                <span>Longest SMS</span><span>{{ preview.longestLength }} / {{ preview.limit }}</span>
+              }
             </div>
           </div>
         }
@@ -251,7 +264,7 @@
           @if (count) {
             <div class="big">{{ count.matching | number }}</div>
             <p class="muted">
-              will get this SMS: <b>{{ count.recipients | number }}</b
+              will get this {{ isEmail ? 'email' : 'SMS' }}: <b>{{ count.recipients | number }}</b
               >{{ counting ? ' (updating…)' : '' }}
             </p>
             @if (skippedReasons.length) {
@@ -376,34 +389,54 @@
             <p class="muted">Who gets it is worked out again at every run, so new clients who match are included.</p>
           }
         </div>
-        <mat-card>
-          <h3>{{ scheduleType === 'REPEAT' ? 'Cost per run' : 'Cost' }}</h3>
-          <div class="kv">
-            <span>SMS to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
-            @if (smsCost !== null) {
-              <span>Price per SMS (last top-up)</span><span>{{ smsCost | number: '1.0-2' }}</span>
-              <span><b>Cost</b></span
-              ><span
-                ><b>{{ cost | number: '1.0-2' }}</b></span
-              >
-            }
-            @if (smsBalance !== null) {
-              <span>SMS Wallet balance</span><span>{{ smsBalance | number }} SMS</span>
-            }
-          </div>
-          @if (scheduleType === 'REPEAT' && runsCovered !== null) {
-            <p class="muted">
-              The wallet covers {{ runsCovered | number }} run{{ runsCovered === 1 ? '' : 's' }} at today's audience
-              size.
-            </p>
-          }
-          @if (smsBalance !== null && count && count.recipients > smsBalance) {
-            <div class="banner">
-              <mat-icon>warning</mat-icon>Not enough SMS credit. The campaign waits after approval until the wallet is
-              topped up.
+        @if (isEmail) {
+          <mat-card>
+            <h3>{{ scheduleType === 'REPEAT' ? 'Emails per run' : 'Emails' }}</h3>
+            <div class="kv">
+              <span>Emails to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
+              <span>Daily email limit</span
+              ><span>{{ emailDailyLimit === null ? 'No limit' : (emailDailyLimit | number) }}</span>
+              @if (emailsLeftToday !== null) {
+                <span>Left today</span><span>{{ emailsLeftToday | number }}</span>
+              }
             </div>
-          }
-        </mat-card>
+            @if (emailRunDays > 1) {
+              <p class="muted">
+                At {{ emailDailyLimit | number }} a day, a run takes about {{ emailRunDays }} days: the rest wait and go
+                out the next day.
+              </p>
+            }
+          </mat-card>
+        } @else {
+          <mat-card>
+            <h3>{{ scheduleType === 'REPEAT' ? 'Cost per run' : 'Cost' }}</h3>
+            <div class="kv">
+              <span>SMS to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
+              @if (smsCost !== null) {
+                <span>Price per SMS (last top-up)</span><span>{{ smsCost | number: '1.0-2' }}</span>
+                <span><b>Cost</b></span
+                ><span
+                  ><b>{{ cost | number: '1.0-2' }}</b></span
+                >
+              }
+              @if (smsBalance !== null) {
+                <span>SMS Wallet balance</span><span>{{ smsBalance | number }} SMS</span>
+              }
+            </div>
+            @if (scheduleType === 'REPEAT' && runsCovered !== null) {
+              <p class="muted">
+                The wallet covers {{ runsCovered | number }} run{{ runsCovered === 1 ? '' : 's' }} at today's audience
+                size.
+              </p>
+            }
+            @if (smsBalance !== null && count && count.recipients > smsBalance) {
+              <div class="banner">
+                <mat-icon>warning</mat-icon>Not enough SMS credit. The campaign waits after approval until the wallet is
+                topped up.
+              </div>
+            }
+          </mat-card>
+        }
       </div>
       <div class="nav">
         <button mat-button matStepperPrevious type="button">Back</button>
@@ -432,15 +465,17 @@
           ><span>{{ quietHours ? 'Only ' + quietFrom + '–' + quietTo : 'Any time' }}</span>
         </div>
         @if (preview) {
-          <div class="phone">
-            <div class="sender">SMS</div>
-            <div class="bubble">{{ preview.message }}</div>
-          </div>
+          @if (isEmail) {
+            <div><ng-container *ngTemplateOutlet="emailPreview"></ng-container></div>
+          } @else {
+            <div class="phone">
+              <div class="sender">SMS</div>
+              <div class="bubble">{{ preview.message }}</div>
+            </div>
+          }
         }
       </div>
-      <div class="banner blue">
-        <mat-icon>verified_user</mat-icon>Nothing is sent until someone else approves the campaign.
-      </div>
+      <div class="banner blue"><mat-icon>verified_user</mat-icon>Nothing is sent until the campaign is approved.</div>
       <div class="nav">
         <button mat-button matStepperPrevious type="button">Back</button>
         <button mat-stroked-button type="button" [disabled]="saving" (click)="save(false)">Save as draft</button>
@@ -451,3 +486,12 @@
     </mat-step>
   </mat-stepper>
 </div>
+
+<ng-template #emailPreview>
+  <div class="email-preview">
+    <div class="email-subject">
+      <span class="muted">Subject</span><b>{{ preview?.subject }}</b>
+    </div>
+    <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+  </div>
+</ng-template>

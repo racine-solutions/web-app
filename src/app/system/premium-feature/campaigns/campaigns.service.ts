@@ -16,15 +16,16 @@ import {
   AudienceFilter,
   AudienceOptions,
   Campaign,
+  CampaignDefaults,
   CampaignRun,
+  ClientCampaignMessage,
   CommTemplate,
   DeliveryPage,
   MarketingConsent,
   MessageCheck,
   Paged,
-  SavedAudience,
-  ClientCampaignMessage,
-  Placeholder
+  Placeholder,
+  SavedAudience
 } from './campaigns.model';
 
 /** Calls for communication templates, audiences, campaigns and marketing consent. */
@@ -52,7 +53,13 @@ export class CampaignsService {
     return this.http.get<string[]>('/comm/templates/tags');
   }
 
-  preview(body: { text?: string; templateId?: number; clientId?: number }): Observable<MessageCheck> {
+  preview(body: {
+    text?: string;
+    templateId?: number;
+    clientId?: number;
+    channel?: string;
+    emailSubject?: string;
+  }): Observable<MessageCheck> {
     return this.http.post<MessageCheck>('/comm/templates/preview', body);
   }
 
@@ -68,17 +75,18 @@ export class CampaignsService {
     return this.http.get<AudienceOptions>('/comm/audiences/template');
   }
 
-  countAudience(audience: AudienceFilter[], purpose: string): Observable<AudienceCount> {
-    return this.http.post<AudienceCount>('/comm/audiences/count', { audience, purpose });
+  countAudience(audience: AudienceFilter[], purpose: string, channel = 'SMS'): Observable<AudienceCount> {
+    return this.http.post<AudienceCount>('/comm/audiences/count', { audience, purpose, channel });
   }
 
   /** One page of the matching clients; show is ALL, RECIPIENTS or SKIPPED. */
   audienceClients(
     audience: AudienceFilter[],
     purpose: string,
-    query: { show: string; search?: string; offset: number; limit: number }
+    query: { show: string; search?: string; offset: number; limit: number },
+    channel = 'SMS'
   ): Observable<AudienceClientPage> {
-    return this.http.post<AudienceClientPage>('/comm/audiences/clients', { audience, purpose, ...query });
+    return this.http.post<AudienceClientPage>('/comm/audiences/clients', { audience, purpose, channel, ...query });
   }
 
   getCampaigns(status: string | undefined, offset = 0, limit = 25): Observable<Paged<Campaign>> {
@@ -90,8 +98,8 @@ export class CampaignsService {
   }
 
   /** Defaults for a new campaign, such as the institution's quiet hours. */
-  getCampaignDefaults(): Observable<{ quietFrom?: string; quietTo?: string }> {
-    return this.http.get<{ quietFrom?: string; quietTo?: string }>('/comm/campaigns/template');
+  getCampaignDefaults(): Observable<CampaignDefaults> {
+    return this.http.get<CampaignDefaults>('/comm/campaigns/template');
   }
 
   getSavedAudiences(offset = 0, limit = 25): Observable<Paged<SavedAudience>> {

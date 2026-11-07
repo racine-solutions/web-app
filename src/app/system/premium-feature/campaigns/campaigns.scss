@@ -150,6 +150,10 @@
       border-top-color: #2b6fe3;
     }
 
+    &.amber {
+      border-top-color: #f0a020;
+    }
+
     .label {
       font-size: 12px;
       opacity: 0.7;
@@ -206,4 +210,30 @@ table.full {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Email preview: subject line and a sandboxed frame */
+.email-preview {
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .email-subject {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    padding: 10px 12px;
+    border-bottom: 1px solid #d9dde3;
+    background: #f6f7f9;
+    overflow-wrap: anywhere;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 420px;
+    max-height: 60vh;
+    border: 0;
+    background: #fff;
+  }
 }

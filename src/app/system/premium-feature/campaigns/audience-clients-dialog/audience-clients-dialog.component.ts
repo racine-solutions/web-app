@@ -29,6 +29,8 @@ import { CampaignsService } from '../campaigns.service';
 export interface AudienceClientsDialogData {
   audience: AudienceFilter[];
   purpose: string;
+  /** SMS (default) or EMAIL: decides which contact is checked and shown. */
+  channel?: 'SMS' | 'EMAIL';
   count: AudienceCount;
 }
 
@@ -78,6 +80,10 @@ export class AudienceClientsDialogComponent implements OnInit {
 
   private requests = new Subject<void>();
 
+  get isEmail(): boolean {
+    return this.data.channel === 'EMAIL';
+  }
+
   ngOnInit() {
     this.requests
       .pipe(
@@ -85,12 +91,17 @@ export class AudienceClientsDialogComponent implements OnInit {
           this.loading = true;
           this.changeDetector.markForCheck();
           return this.service
-            .audienceClients(this.data.audience, this.data.purpose, {
-              show: this.show,
-              search: this.search.value || '',
-              offset: this.pageIndex * this.pageSize,
-              limit: this.pageSize
-            })
+            .audienceClients(
+              this.data.audience,
+              this.data.purpose,
+              {
+                show: this.show,
+                search: this.search.value || '',
+                offset: this.pageIndex * this.pageSize,
+                limit: this.pageSize
+              },
+              this.data.channel || 'SMS'
+            )
             .pipe(catchError(() => of({ totalFilteredRecords: 0, pageItems: [] })));
         }),
         takeUntilDestroyed(this.destroyRef)

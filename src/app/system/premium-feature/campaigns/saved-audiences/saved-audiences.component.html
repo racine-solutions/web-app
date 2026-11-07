@@ -7,6 +7,19 @@
 -->
 
 <div class="container">
+  <div class="page-actions">
+    <span class="muted grow"
+      >A saved audience is a named set of filters, such as "Women 18–35 with savings". Who it reaches is worked out
+      again each time it is used.</span
+    >
+    <a
+      mat-raised-button
+      color="primary"
+      [routerLink]="['/system', 'premium-feature', 'campaigns', 'audiences', 'create']"
+      *mifosxHasPermission="'CREATE_COMMAUDIENCE'"
+      ><mat-icon>add</mat-icon> New audience</a
+    >
+  </div>
   <mat-card>
     @if (loading && !audiences.length) {
       <p class="muted">Loading audiences…</p>
@@ -14,7 +27,10 @@
       <div class="empty">
         <mat-icon>groups</mat-icon>
         <p>No saved audiences yet.</p>
-        <p class="muted">In a campaign's Audience step, set the filters and use "Save audience" to reuse them later.</p>
+        <p class="muted">
+          Click "New audience": add filters, review the matching clients and leave out any you don't want, then name and
+          save it. Campaigns can then start from it.
+        </p>
       </div>
     } @else {
       <div class="table-scroll">
@@ -35,7 +51,7 @@
                   <strong>{{ audience.name }}</strong>
                   <div class="muted">Updated {{ audience.updatedOn | date: 'dd MMM yyyy' }}</div>
                 </td>
-                <td>{{ filters(audience) }}</td>
+                <td>{{ filters(audience) || 'All active clients' }}</td>
                 <td>{{ audience.officeName }}</td>
                 <td>{{ audience.createdBy }}</td>
                 <td class="num">
@@ -44,6 +60,27 @@
                     <button mat-button type="button" (click)="confirming = null">Keep</button>
                     <button mat-raised-button color="warn" type="button" (click)="delete(audience)">Delete</button>
                   } @else {
+                    <button
+                      mat-button
+                      type="button"
+                      [disabled]="opening === audience.id"
+                      (click)="viewClients(audience)"
+                    >
+                      View clients
+                    </button>
+                    <a
+                      mat-button
+                      [routerLink]="['/system', 'premium-feature', 'campaigns', 'audiences', audience.id, 'edit']"
+                      *mifosxHasPermission="'UPDATE_COMMAUDIENCE'"
+                      >Edit</a
+                    >
+                    <a
+                      mat-button
+                      [routerLink]="['/system', 'premium-feature', 'campaigns', 'create']"
+                      [queryParams]="{ audience: audience.id }"
+                      *mifosxHasPermission="'CREATE_COMMCAMPAIGN'"
+                      >Use in campaign</a
+                    >
                     <button
                       mat-button
                       type="button"

@@ -34,63 +34,11 @@
   }
 }
 
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 10px;
-  align-items: center;
-
-  .op {
-    width: 130px;
-  }
-
-  .value {
-    min-width: 220px;
-    flex: 1;
-  }
-}
-
-.and {
-  font-size: 12px;
-  opacity: 0.6;
-  margin: -6px 0 4px 4px;
-}
-
 .row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-}
-
-.quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  margin-top: 12px;
-
-  button.chip {
-    cursor: pointer;
-    font: inherit;
-    font-size: 12px;
-  }
-}
-
-.count-card {
-  h3 {
-    margin: 0 0 4px;
-  }
-
-  .big {
-    font-size: 32px;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.view-clients {
-  margin-top: 12px;
 }
 
 .when {

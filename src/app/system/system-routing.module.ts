@@ -61,6 +61,7 @@ import { CampaignFormComponent } from './premium-feature/campaigns/campaign-form
 import { CampaignViewComponent } from './premium-feature/campaigns/campaign-view/campaign-view.component';
 import { CampaignRunComponent } from './premium-feature/campaigns/campaign-run/campaign-run.component';
 import { SavedAudiencesComponent } from './premium-feature/campaigns/saved-audiences/saved-audiences.component';
+import { AudienceFormComponent } from './premium-feature/campaigns/audience-form/audience-form.component';
 import { AddRoleComponent } from './roles-and-permissions/add-role/add-role.component';
 import { EditRoleComponent } from './roles-and-permissions/edit-role/edit-role.component';
 import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-permissions.component';
@@ -698,7 +699,19 @@ const routes: Routes = [
                 {
                   path: 'audiences',
                   data: { title: 'Saved audiences', breadcrumb: 'Saved audiences' },
-                  component: SavedAudiencesComponent
+                  children: [
+                    { path: '', component: SavedAudiencesComponent },
+                    {
+                      path: 'create',
+                      data: { title: 'New audience', breadcrumb: 'New' },
+                      component: AudienceFormComponent
+                    },
+                    {
+                      path: ':audienceId/edit',
+                      data: { title: 'Edit audience', breadcrumb: 'Edit', routeParamBreadcrumb: false },
+                      component: AudienceFormComponent
+                    }
+                  ]
                 },
                 {
                   path: 'create',

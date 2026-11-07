@@ -32,3 +32,18 @@ export function emailDays(
   const today = Math.max(0, leftToday ?? dailyLimit);
   return recipients <= today ? 1 : 1 + Math.ceil((recipients - today) / dailyLimit);
 }
+
+export function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/** As the server sends it: plain text keeps its line breaks; a body with HTML tags is used as written. */
+export function asEmailHtml(text: string): string {
+  if (/<\/?[a-zA-Z][^>]*>/.test(text)) {
+    return text;
+  }
+  return escapeHtml(text)
+    .replace(/&quot;/g, '"')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n/g, '<br>\n');
+}

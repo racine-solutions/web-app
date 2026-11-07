@@ -57,6 +57,15 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 12px;
+
+  > .grow {
+    flex: 1 1 280px;
+  }
+}
+
+.audience-mode {
   margin-bottom: 12px;
 }
 

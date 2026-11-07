@@ -12,15 +12,17 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatIcon } from '@angular/material/icon';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject, debounceTime, merge, of, switchMap } from 'rxjs';
-import { catchError, distinctUntilChanged, filter } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { SearchService } from 'app/search/search.service';
 
 import { MessageCheck, Placeholder } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
-import { emailDocument } from '../email-preview';
+import { asEmailHtml, emailDocument, escapeHtml } from '../email-preview';
+import { EMAIL_HINT, SMS_HINT, SUBJECT_HINT, TEMPLATE_EXAMPLES, TemplateExample } from './template-examples';
 
 /** Characters of the standard SMS alphabet; anything else makes the SMS Unicode (70 characters). */
 const GSM_7 =
@@ -43,7 +45,8 @@ const GSM_7 =
     MatAutocomplete,
     MatAutocompleteTrigger,
     MatButtonToggleGroup,
-    MatButtonToggle
+    MatButtonToggle,
+    MatIcon
   ]
 })
 export class TemplateFormComponent implements OnInit {
@@ -77,11 +80,22 @@ export class TemplateFormComponent implements OnInit {
   tags: string[] = [];
   clients: any[] = [];
   previewClient: { id: number; name: string } | null = null;
+  /** The server's preview for the chosen client, and the channel it was made for. */
   preview: MessageCheck | null = null;
-  /** The email preview, shown in a sandboxed frame that can't run scripts or reach the app. */
-  previewHtml: SafeHtml | null = null;
+  private previewChannel: 'SMS' | 'EMAIL' | null = null;
+  /** The email page last handed to the preview frame, kept so the frame only reloads when the email changes. */
+  private shownDocument = '';
+  private shownHtml: SafeHtml | null = null;
   saving = false;
   emailEnabled = true;
+  readonly subjectHint = SUBJECT_HINT;
+  /** Suggested name, shown faded in the empty Name box; the user types their own. */
+  nameHint = 'e.g. Repayment reminder';
+  /** The message written for each channel, so switching channel never judges an email as an SMS. */
+  private drafts: Partial<Record<'SMS' | 'EMAIL', string>> = {};
+  private channelNow: 'SMS' | 'EMAIL' = 'SMS';
+  /** True while the form is filled in by code (loading, examples), when channel changes keep the text. */
+  private applying = false;
   /** Where a placeholder button inserts: the subject or the message body. */
   private target: 'subject' | 'text' = 'text';
 
@@ -117,7 +131,11 @@ export class TemplateFormComponent implements OnInit {
     });
     if (this.templateId) {
       this.service.getTemplate(this.templateId).subscribe((template) => {
+        this.applying = true;
         this.form.patchValue(template);
+        this.applying = false;
+        this.channelNow = template.channel;
+        this.changeDetector.markForCheck();
         this.requestPreview();
       });
     }
@@ -138,26 +156,40 @@ export class TemplateFormComponent implements OnInit {
       );
       subject.updateValueAndValidity({ emitEvent: false });
       this.target = 'text';
+      if (!this.applying && channel && channel !== this.channelNow) {
+        // Keep what was written for the other channel and bring back this channel's own message
+        this.drafts[this.channelNow] = this.form.controls.text.value || '';
+        this.form.controls.text.setValue(this.drafts[channel] || '');
+      }
+      this.channelNow = channel || 'SMS';
+      this.changeDetector.markForCheck();
     });
     this.previewRequests
       .pipe(
         debounceTime(300),
-        switchMap(() =>
-          this.service
+        switchMap(() => {
+          // Example values are filled in here as the user types; the server is asked only for a real client
+          if (!this.previewClient) {
+            return of(null);
+          }
+          const channel = this.form.controls.channel.value || 'SMS';
+          return this.service
             .preview({
               text: this.form.controls.text.value || '',
-              clientId: this.previewClient?.id,
-              channel: this.form.controls.channel.value || 'SMS',
+              clientId: this.previewClient.id,
+              channel,
               emailSubject: this.form.controls.emailSubject.value || ''
             })
-            .pipe(catchError(() => of(null)))
-        ),
+            .pipe(
+              map((preview) => ({ preview, channel })),
+              catchError(() => of(null))
+            );
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe((preview) => {
-        this.preview = preview;
-        this.previewHtml =
-          preview && this.isEmail ? this.sanitizer.bypassSecurityTrustHtml(emailDocument(preview.message)) : null;
+      .subscribe((result) => {
+        this.preview = result?.preview ?? null;
+        this.previewChannel = result?.channel ?? null;
         this.changeDetector.markForCheck();
       });
     this.clientSearch.valueChanges
@@ -179,6 +211,38 @@ export class TemplateFormComponent implements OnInit {
 
   get isEmail(): boolean {
     return this.form.controls.channel.value === 'EMAIL';
+  }
+
+  /** Examples for the chosen channel. */
+  get examples(): TemplateExample[] {
+    return TEMPLATE_EXAMPLES.filter((example) => example.channel === (this.isEmail ? 'EMAIL' : 'SMS'));
+  }
+
+  get bodyHint(): string {
+    return this.isEmail ? EMAIL_HINT : SMS_HINT;
+  }
+
+  /** Fills the form with an example to change; asks first when a message is already written. */
+  useExample(example: TemplateExample) {
+    const written = (this.form.controls.text.value || '').trim();
+    if (written && written !== example.text && !window.confirm('Replace your message with this example?')) {
+      return;
+    }
+    this.applying = true;
+    this.form.patchValue({
+      channel: example.channel,
+      text: example.text,
+      emailSubject: example.emailSubject || '',
+      purpose: example.purpose,
+      tag:
+        this.form.controls.tag.value && this.form.controls.tag.value !== 'General'
+          ? this.form.controls.tag.value
+          : example.tag
+    });
+    this.nameHint = `e.g. ${example.name}`;
+    this.applying = false;
+    this.channelNow = example.channel;
+    this.changeDetector.markForCheck();
   }
 
   /** Remembers the field the cursor was last in, so placeholders go into the subject or the body. */
@@ -228,8 +292,45 @@ export class TemplateFormComponent implements OnInit {
   }
 
   /** Worked out here as the user types, so the counter never waits for the server. */
+  /**
+   * What the preview shows: the chosen client's message from the server when it is for this channel, else the
+   * message filled in here with example values, so the preview always follows what is typed and the channel picked.
+   */
+  get shown(): { message: string; subject: string } {
+    const channel = this.isEmail ? 'EMAIL' : 'SMS';
+    if (this.previewClient && this.preview && this.previewChannel === channel) {
+      return { message: this.preview.message || '', subject: this.preview.subject || '' };
+    }
+    const text = this.form.controls.text.value || '';
+    return {
+      message: this.isEmail ? this.fill(asEmailHtml(text), true) : this.fill(text, false).trim(),
+      subject: this.isEmail ? this.fill(this.form.controls.emailSubject.value || '', false) : ''
+    };
+  }
+
+  /** The email page for the sandboxed preview frame; the same object while the email is unchanged. */
+  get emailHtml(): SafeHtml | null {
+    const page = emailDocument(this.shown.message);
+    if (page !== this.shownDocument) {
+      this.shownDocument = page;
+      this.shownHtml = this.sanitizer.bypassSecurityTrustHtml(page);
+    }
+    return this.shownHtml;
+  }
+
+  /** Puts each placeholder's example value in place, escaped for HTML when the message is an email. */
+  private fill(text: string, html: boolean): string {
+    return text.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, key) => {
+      const placeholder = this.placeholders.find((p) => p.key === key);
+      if (!placeholder) {
+        return match;
+      }
+      return html ? escapeHtml(placeholder.example) : placeholder.example;
+    });
+  }
+
   get typedLength(): number {
-    return this.preview?.length ?? (this.form.controls.text.value || '').length;
+    return this.shown.message.length;
   }
 
   get longestLength(): number {
@@ -241,8 +342,18 @@ export class TemplateFormComponent implements OnInit {
   }
 
   get limit(): number {
-    const text = (this.form.controls.text.value || '') + (this.preview?.message || '');
+    const text = (this.form.controls.text.value || '') + this.shown.message;
     return [...text].some((ch) => !GSM_7.includes(ch)) ? 70 : 160;
+  }
+
+  /** True when the email body is HTML rather than plain text. */
+  get hasHtml(): boolean {
+    return /<\/?[a-zA-Z][^>]*>/.test(this.form.controls.text.value || '');
+  }
+
+  /** SMS parts the longest message needs; more than one is never allowed. */
+  get smsParts(): number {
+    return Math.max(1, Math.ceil(this.longestLength / this.limit));
   }
 
   get fits(): boolean {

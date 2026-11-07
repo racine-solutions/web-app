@@ -32,6 +32,8 @@ export interface AudienceClientsDialogData {
   /** SMS (default) or EMAIL: decides which contact is checked and shown. */
   channel?: 'SMS' | 'EMAIL';
   count: AudienceCount;
+  /** Shown as the heading, e.g. a saved audience's name. */
+  title?: string;
 }
 
 /**

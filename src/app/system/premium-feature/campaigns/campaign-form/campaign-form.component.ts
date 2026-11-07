@@ -6,45 +6,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { FormControl, FormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
 import { MatStep, MatStepper, MatStepperNext, MatStepperPrevious } from '@angular/material/stepper';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, debounceTime, of, switchMap } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { SearchService } from 'app/search/search.service';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { SKIP_GLOBAL_ERROR_HANDLER } from 'app/core/http/error-handler.interceptor';
 
-import {
-  AudienceCount,
-  AudienceFilter,
-  AudienceOptions,
-  CommTemplate,
-  MessageCheck,
-  SavedAudience,
-  reasonLabel
-} from '../campaigns.model';
+import { AudienceCount, AudienceFilter, CommTemplate, MessageCheck } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
 import { emailDays, emailDocument } from '../email-preview';
-import { FIELD_SPECS, FieldSpec, QUICK_PICKS, optionsFor } from './audience-fields';
+import { AudienceEditorComponent, AudienceState } from '../audience-editor/audience-editor.component';
 import { RepeatStop, RepeatUnit, Schedule, ScheduleType, describe, upcoming } from '../schedule';
-import {
-  AudienceClientsDialogComponent,
-  AudienceClientsDialogData
-} from '../audience-clients-dialog/audience-clients-dialog.component';
-
-interface FilterRow extends AudienceFilter {
-  operator: string;
-}
 
 /** Create or edit a campaign in four steps: template, audience, schedule, review. It is then submitted for approval. */
 @Component({
@@ -66,8 +46,7 @@ interface FilterRow extends AudienceFilter {
     MatRadioGroup,
     MatRadioButton,
     MatCheckbox,
-    MatAutocomplete,
-    MatAutocompleteTrigger
+    AudienceEditorComponent
   ]
 })
 export class CampaignFormComponent implements OnInit {
@@ -76,14 +55,15 @@ export class CampaignFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private changeDetector = inject(ChangeDetectorRef);
-  private destroyRef = inject(DestroyRef);
   private sanitizer = inject(DomSanitizer);
-  private dialog = inject(MatDialog);
-  private searchService = inject(SearchService);
 
-  readonly specs = FIELD_SPECS;
-  readonly quickPicks = QUICK_PICKS;
-  readonly reasonLabel = reasonLabel;
+  /** A saved audience to start the campaign with (from Saved audiences, "Use in campaign"). */
+  startAudienceId: number | null = null;
+  /** The campaign's filters when editing, handed to the audience editor once. */
+  initialFilters: AudienceFilter[] | null = null;
+  /** The audience as the editor last reported it. */
+  audienceFilters: AudienceFilter[] = [];
+  audienceLines: string[] = [];
 
   campaignId?: number;
   name = new FormControl('', [
@@ -92,8 +72,6 @@ export class CampaignFormComponent implements OnInit {
   ]);
   templateId: number | null = null;
   templates: CommTemplate[] = [];
-  options: AudienceOptions | null = null;
-  filters: FilterRow[] = [];
   scheduleType: ScheduleType = 'NOW';
   sendDate = '';
   sendTime = '09:00';
@@ -106,12 +84,6 @@ export class CampaignFormComponent implements OnInit {
   quietFrom = '08:00';
   quietTo = '20:00';
 
-  savedAudiences: SavedAudience[] = [];
-  savedAudienceId: number | null = null;
-  audienceName = '';
-  savingAudience = false;
-  audienceMessage = '';
-
   preview: MessageCheck | null = null;
   /** Email templates: the preview page for a sandboxed frame. */
   previewHtml: SafeHtml | null = null;
@@ -119,26 +91,16 @@ export class CampaignFormComponent implements OnInit {
   emailDailyLimit: number | null = null;
   emailsLeftToday: number | null = null;
   count: AudienceCount | null = null;
-  counting = false;
+
   smsCost: number | null = null;
   smsBalance: number | null = null;
   saving = false;
 
-  /** Names of clients picked in a "Specific clients" filter, by id. */
-  clientNames: Record<string, string> = {};
-  clientMatches: any[] = [];
-  private clientQueries = new Subject<string>();
-
-  private countRequests = new Subject<void>();
-
   ngOnInit() {
     this.campaignId = Number(this.route.snapshot.paramMap.get('id')) || undefined;
+    this.startAudienceId = this.campaignId ? null : Number(this.route.snapshot.queryParamMap?.get('audience')) || null;
     this.service.getTemplates(false, 0, 500).subscribe((page) => {
       this.templates = page.pageItems;
-      this.changeDetector.markForCheck();
-    });
-    this.service.getAudienceOptions().subscribe((options) => {
-      this.options = options;
       this.changeDetector.markForCheck();
     });
     this.http
@@ -149,38 +111,6 @@ export class CampaignFormComponent implements OnInit {
         this.smsBalance = status?.smsBalance ?? null;
         this.changeDetector.markForCheck();
       });
-    this.countRequests
-      .pipe(
-        debounceTime(400),
-        switchMap(() => {
-          this.counting = true;
-          this.changeDetector.markForCheck();
-          return this.service
-            .countAudience(this.cleanFilters(), this.purpose, this.channel)
-            .pipe(catchError(() => of(null)));
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((count) => {
-        this.count = count;
-        this.counting = false;
-        this.changeDetector.markForCheck();
-      });
-    this.clientQueries
-      .pipe(
-        debounceTime(300),
-        switchMap((query) =>
-          query.trim().length < 2
-            ? of([])
-            : this.searchService.getSearchResults(query.trim(), 'clients').pipe(catchError(() => of([])))
-        ),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((results: any) => {
-        this.clientMatches = (results || []).slice(0, 10);
-        this.changeDetector.markForCheck();
-      });
-    this.loadSavedAudiences();
     this.service.getCampaignDefaults().subscribe((defaults) => {
       if (!this.campaignId) {
         this.quietHours = !!defaults.quietFrom;
@@ -196,11 +126,7 @@ export class CampaignFormComponent implements OnInit {
       this.service.getCampaign(this.campaignId).subscribe((campaign) => {
         this.name.setValue(campaign.name);
         this.templateId = campaign.templateId;
-        this.filters = (JSON.parse(campaign.audience || '[]') as AudienceFilter[]).map((filter) => ({
-          ...filter,
-          operator: filter.operator || 'IN',
-          values: filter.values || []
-        }));
+        this.initialFilters = JSON.parse(campaign.audience || '[]') as AudienceFilter[];
         this.scheduleType = campaign.scheduleType;
         this.repeatEvery = campaign.repeatEvery || 1;
         this.repeatUnit = campaign.repeatUnit || 'MONTHS';
@@ -217,10 +143,8 @@ export class CampaignFormComponent implements OnInit {
           ] = campaign.scheduledAt.split(' ');
         }
         this.templateChanged();
-        this.recount();
+        this.changeDetector.markForCheck();
       });
-    } else {
-      this.recount();
     }
   }
 
@@ -250,7 +174,6 @@ export class CampaignFormComponent implements OnInit {
         this.changeDetector.markForCheck();
       });
     }
-    this.recount();
   }
 
   /** Days one run takes under the daily email limit. */
@@ -258,102 +181,12 @@ export class CampaignFormComponent implements OnInit {
     return emailDays(this.count?.recipients ?? 0, this.emailDailyLimit, this.emailsLeftToday);
   }
 
-  spec(field: string): FieldSpec {
-    return this.specs[field] || { kind: 'number' };
-  }
-
-  choices(field: string) {
-    return optionsFor(this.spec(field), this.options);
-  }
-
-  addFilter(filter?: { field: string; operator?: string; values: string[] }) {
-    const field = filter?.field || 'GENDER';
-    this.filters = [
-      ...this.filters,
-      {
-        field,
-        operator: filter?.operator || 'IN',
-        values: filter?.values ? [...filter.values] : [],
-        includeChildren: true
-      }
-    ];
-    this.recount();
-  }
-
-  fieldChanged(row: FilterRow) {
-    row.values = [];
-    row.operator = 'IN';
-    this.recount();
-  }
-
-  removeFilter(index: number) {
-    this.filters = this.filters.filter((_, i) => i !== index);
-    this.recount();
-  }
-
-  setValue(row: FilterRow, index: number, value: string | number | null) {
-    const values = [...row.values];
-    values[index] = value === null || value === undefined ? '' : String(value);
-    row.values = values;
-    this.recount();
-  }
-
-  searchClients(query: string) {
-    this.clientQueries.next(query || '');
-  }
-
-  addClient(row: FilterRow, client: any, input: HTMLInputElement) {
-    const id = String(client.entityId);
-    this.clientNames[id] = `${client.entityName} · ${client.entityAccountNo}`;
-    if (!row.values.includes(id)) {
-      row.values = [
-        ...row.values,
-        id
-      ];
-    }
-    input.value = '';
-    this.clientMatches = [];
-    this.recount();
-  }
-
-  removeClient(row: FilterRow, id: string) {
-    row.values = row.values.filter((value) => value !== id);
-    this.recount();
-  }
-
-  clientLabel(id: string): string {
-    return this.clientNames[id] || `Client #${id}`;
-  }
-
-  recount() {
+  /** The audience editor reports its filters, count and summary after every change. */
+  audienceChanged(state: AudienceState) {
+    this.audienceFilters = state.filters;
+    this.count = state.count;
+    this.audienceLines = state.summary;
     this.changeDetector.markForCheck();
-    this.countRequests.next();
-  }
-
-  /** Opens every matching client in a paged list; closing it comes back here unchanged. */
-  showClients() {
-    if (!this.count?.matching) {
-      return;
-    }
-    this.dialog.open(AudienceClientsDialogComponent, {
-      width: '960px',
-      maxWidth: '95vw',
-      data: {
-        audience: this.cleanFilters(),
-        purpose: this.purpose,
-        channel: this.channel,
-        count: this.count
-      } as AudienceClientsDialogData
-    });
-  }
-
-  get skippedReasons(): { reason: string; count: number }[] {
-    return Object.entries(this.count?.skipped || {}).map(
-      ([
-        reason,
-        count
-      ]) => ({ reason, count })
-    );
   }
 
   get cost(): number | null {
@@ -366,7 +199,8 @@ export class CampaignFormComponent implements OnInit {
 
   get schedule(): Schedule {
     return {
-      ...this.schedule,
+      scheduleType: this.scheduleType,
+      scheduledAt: this.scheduledAt,
       repeatEvery: this.scheduleType === 'REPEAT' ? this.repeatEvery : null,
       repeatUnit: this.scheduleType === 'REPEAT' ? this.repeatUnit : null,
       repeatStop: this.scheduleType === 'REPEAT' ? this.repeatStop : null,
@@ -423,69 +257,8 @@ export class CampaignFormComponent implements OnInit {
     return Math.floor(this.smsBalance / this.count.recipients);
   }
 
-  loadSavedAudience() {
-    const saved = this.savedAudiences.find((audience) => audience.id === this.savedAudienceId);
-    if (!saved) {
-      return;
-    }
-    this.filters = (JSON.parse(saved.audience || '[]') as AudienceFilter[]).map((filter) => ({
-      ...filter,
-      operator: filter.operator || 'IN',
-      values: filter.values || []
-    }));
-    this.audienceName = saved.name;
-    this.audienceMessage = `Loaded "${saved.name}".`;
-    this.recount();
-  }
-
-  saveAudience() {
-    const name = this.audienceName.trim();
-    if (!name || !this.cleanFilters().length) {
-      this.audienceMessage = 'Give the audience a name and at least one filter.';
-      return;
-    }
-    const existing = this.savedAudiences.find((audience) => audience.name.toLowerCase() === name.toLowerCase());
-    this.savingAudience = true;
-    this.service.saveAudience(name, this.cleanFilters(), existing?.id).subscribe({
-      next: () => {
-        this.audienceMessage = existing ? `Updated "${name}".` : `Saved as "${name}".`;
-        this.savingAudience = false;
-        this.loadSavedAudiences();
-      },
-      error: () => {
-        this.savingAudience = false;
-        this.changeDetector.markForCheck();
-      }
-    });
-  }
-
-  private loadSavedAudiences() {
-    this.service.getSavedAudiences(0, 500).subscribe((page) => {
-      this.savedAudiences = page.pageItems;
-      this.changeDetector.markForCheck();
-    });
-  }
-
-  audienceSummary(row: FilterRow): string {
-    const label = this.options?.fields.find((field) => field.field === row.field)?.label || row.field;
-    const spec = this.spec(row.field);
-    if (spec.kind === 'options' || spec.kind === 'choice') {
-      const names = this.choices(row.field)
-        .filter((choice) => row.values.includes(choice.value))
-        .map((choice) => choice.label);
-      return `${label} ${row.operator === 'NOT_IN' ? 'is none of' : 'is'} ${names.join(', ') || '—'}`;
-    }
-    if (spec.kind === 'clients') {
-      return `${row.operator === 'NOT_IN' ? 'Leave out' : 'Only'} ${row.values.map((id) => this.clientLabel(id)).join(', ') || '—'}`;
-    }
-    if (spec.kind === 'range') {
-      return `${label} ${row.values[0] || 'any'} – ${row.values[1] || 'any'} ${spec.unit || ''}`;
-    }
-    return `${label} ${row.values[0] || '—'} ${spec.unit || ''}`;
-  }
-
   save(submit: boolean) {
-    if (this.name.invalid || !this.templateId || !this.scheduleValid) {
+    if (this.name.invalid || !this.templateId || !this.audienceFilters.length || !this.scheduleValid) {
       this.name.markAsTouched();
       return;
     }
@@ -493,9 +266,8 @@ export class CampaignFormComponent implements OnInit {
     const body = {
       name: this.name.value,
       templateId: this.templateId,
-      audience: this.cleanFilters(),
-      scheduleType: this.scheduleType,
-      scheduledAt: this.scheduledAt
+      audience: this.audienceFilters,
+      ...this.schedule
     };
     this.service.saveCampaign(body, this.campaignId).subscribe({
       next: (result) => {
@@ -518,17 +290,5 @@ export class CampaignFormComponent implements OnInit {
         this.changeDetector.markForCheck();
       }
     });
-  }
-
-  /** Rows with a value only: an empty row added by mistake doesn't block the count. */
-  private cleanFilters(): AudienceFilter[] {
-    return this.filters
-      .filter((row) => row.values.some((value) => value !== '' && value !== null && value !== undefined))
-      .map((row) => ({
-        field: row.field,
-        operator: row.operator,
-        values: row.values,
-        includeChildren: row.field === 'OFFICE' ? !!row.includeChildren : undefined
-      }));
   }
 }

@@ -9,10 +9,15 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 import { AudienceFilter, SavedAudience } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
+import {
+  AudienceClientsDialogComponent,
+  AudienceClientsDialogData
+} from '../audience-clients-dialog/audience-clients-dialog.component';
 
 /** Saved audiences: named sets of filters any campaign can start from. */
 @Component({
@@ -32,6 +37,7 @@ import { CampaignsService } from '../campaigns.service';
 export class SavedAudiencesComponent implements OnInit {
   private service = inject(CampaignsService);
   private changeDetector = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   audiences: SavedAudience[] = [];
   total = 0;
@@ -39,6 +45,8 @@ export class SavedAudiencesComponent implements OnInit {
   pageSize = 25;
   loading = true;
   confirming: number | null = null;
+  /** The audience whose clients are being counted before the list opens. */
+  opening: number | null = null;
 
   ngOnInit() {
     this.load();
@@ -53,6 +61,33 @@ export class SavedAudiencesComponent implements OnInit {
   filters(audience: SavedAudience): string {
     const filters = JSON.parse(audience.audience || '[]') as AudienceFilter[];
     return filters.map((filter) => filter.field.replace(/_/g, ' ').toLowerCase()).join(' · ');
+  }
+
+  /** Who the audience reaches today, in the same paged list the campaign wizard uses. */
+  viewClients(audience: SavedAudience) {
+    const filters = JSON.parse(audience.audience || '[]') as AudienceFilter[];
+    this.opening = audience.id;
+    this.service.countAudience(filters, 'GENERAL').subscribe({
+      next: (count) => {
+        this.opening = null;
+        this.changeDetector.markForCheck();
+        this.dialog.open(AudienceClientsDialogComponent, {
+          width: '960px',
+          maxWidth: '95vw',
+          data: {
+            audience: filters,
+            purpose: 'GENERAL',
+            channel: 'SMS',
+            count,
+            title: audience.name
+          } as AudienceClientsDialogData
+        });
+      },
+      error: () => {
+        this.opening = null;
+        this.changeDetector.markForCheck();
+      }
+    });
   }
 
   delete(audience: SavedAudience) {

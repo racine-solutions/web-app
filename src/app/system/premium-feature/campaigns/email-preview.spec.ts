@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { emailDays, emailDocument } from './email-preview';
+import { asEmailHtml, emailDays, emailDocument } from './email-preview';
 
 describe('email preview helpers', () => {
   it('wraps the email in a page with a placeholder when empty', () => {
@@ -20,5 +20,10 @@ describe('email preview helpers', () => {
     expect(emailDays(300, 250, 100)).toBe(2);
     expect(emailDays(300, 250, 0)).toBe(3);
     expect(emailDays(5000, null, null)).toBe(1);
+  });
+
+  it('turns plain text into HTML like the server does, and leaves HTML alone', () => {
+    expect(asEmailHtml('Hi\nA & B <3')).toBe('Hi<br>\nA &amp; B &lt;3');
+    expect(asEmailHtml('<p>Hi</p>\n<p>There</p>')).toBe('<p>Hi</p>\n<p>There</p>');
   });
 });

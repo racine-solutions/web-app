@@ -14,6 +14,7 @@ import { SearchService } from 'app/search/search.service';
 
 import { CampaignsService } from '../campaigns.service';
 import { TemplateFormComponent } from './template-form.component';
+import { TEMPLATE_EXAMPLES } from './template-examples';
 
 describe('TemplateFormComponent', () => {
   let fixture: ComponentFixture<TemplateFormComponent>;
@@ -122,5 +123,78 @@ describe('TemplateFormComponent', () => {
     body.selectionEnd = 3;
     component.wrap('<b>', '</b>', body);
     expect(component.form.controls.text.value).toBe('<b>Pay</b> now');
+  });
+
+  it('every SMS example fits one SMS with the longest client details', () => {
+    const longest: Record<string, number> = {
+      'client.name': 20,
+      'client.firstName': 20,
+      'tenant.name': 20,
+      'loans.nextDueAmount': 17,
+      'loans.nextDueDate': 11,
+      'loans.daysInArrears': 5,
+      'loans.arrearsAmount': 17,
+      'savings.totalBalance': 17
+    };
+    TEMPLATE_EXAMPLES.filter((example) => example.channel === 'SMS').forEach((example) => {
+      const length = example.text.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, key) => {
+        expect(longest[key]).toBeDefined();
+        return 'x'.repeat(longest[key]);
+      }).length;
+      expect(length).toBeLessThanOrEqual(160);
+    });
+  });
+
+  it('starts from an example, switching channel and filling the subject', () => {
+    const example = TEMPLATE_EXAMPLES.find((candidate) => candidate.channel === 'EMAIL')!;
+    component.useExample(example);
+    expect(component.isEmail).toBe(true);
+    expect(component.form.controls.emailSubject.value).toBe(example.emailSubject);
+    expect(component.form.controls.text.value).toBe(example.text);
+    expect(component.form.controls.name.value).toBe('');
+    expect(component.nameHint).toBe(`e.g. ${example.name}`);
+    expect(component.examples.every((candidate) => candidate.channel === 'EMAIL')).toBe(true);
+  });
+
+  it('asks before replacing a message already written', () => {
+    component.form.controls.text.setValue('My own message');
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    component.useExample(TEMPLATE_EXAMPLES[0]);
+    expect(confirm).toHaveBeenCalled();
+    expect(component.form.controls.text.value).toBe('My own message');
+    confirm.mockRestore();
+  });
+
+  it('keeps a separate message for SMS and email when switching channel', () => {
+    component.form.controls.text.setValue('Short SMS');
+    component.form.controls.channel.setValue('EMAIL');
+    expect(component.form.controls.text.value).toBe('');
+    component.form.controls.text.setValue('A long email body');
+    component.form.controls.channel.setValue('SMS');
+    expect(component.form.controls.text.value).toBe('Short SMS');
+    component.form.controls.channel.setValue('EMAIL');
+    expect(component.form.controls.text.value).toBe('A long email body');
+  });
+
+  it('previews an email with its subject and keeps plain-text line breaks', () => {
+    component.form.patchValue({ channel: 'EMAIL' });
+    component.form.patchValue({ emailSubject: 'Update, {{client.name}}', text: 'Hi {{client.name}},\nA & B' });
+    fixture.detectChanges();
+    expect(component.shown.subject).toBe('Update, Mwesigye');
+    expect(component.shown.message).toBe('Hi Mwesigye,<br>\nA &amp; B');
+    expect(fixture.nativeElement.querySelector('.email-subject').textContent).toContain('Update, Mwesigye');
+    expect(fixture.nativeElement.querySelector('iframe')).not.toBeNull();
+  });
+
+  it('the SMS preview never shows the email', () => {
+    component.form.patchValue({ channel: 'EMAIL' });
+    component.form.patchValue({ text: '<p>Hi {{client.name}}</p>' });
+    component.form.controls.channel.setValue('SMS');
+    component.form.controls.text.setValue('Hi {{client.name}}, pay {{loans.nextDueAmount}}.');
+    fixture.detectChanges();
+    const bubble = fixture.nativeElement.querySelector('.bubble').textContent;
+    expect(bubble).toContain('Hi Mwesigye, pay UGX 85,000.');
+    expect(bubble).not.toContain('<p>');
+    expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
   });
 });

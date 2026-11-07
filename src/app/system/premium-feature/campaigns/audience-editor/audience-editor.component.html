@@ -1,0 +1,252 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="step two-col audience">
+  <div class="filters">
+    @if (showSavedPicker) {
+      <div class="saved row">
+        <mat-form-field class="value">
+          <mat-label>{{ readOnly ? 'Saved audience' : 'Start from a saved audience' }}</mat-label>
+          <mat-select [(ngModel)]="savedAudienceId" (selectionChange)="loadSavedAudience()">
+            @for (saved of savedAudiences; track saved.id) {
+              <mat-option [value]="saved.id">{{ saved.name }}</mat-option>
+            }
+          </mat-select>
+          @if (!savedAudiences.length) {
+            <mat-hint>None saved yet</mat-hint>
+          }
+        </mat-form-field>
+      </div>
+    }
+    @if (readOnly) {
+      @if (filters.length) {
+        <p class="muted">Clients must match every condition:</p>
+        <ul class="summary">
+          @for (row of filters; track $index) {
+            <li>{{ audienceSummary(row) }}</li>
+          }
+        </ul>
+        <p class="muted">To change who it reaches, edit the audience under Saved audiences.</p>
+      } @else {
+        <p class="muted">
+          Pick a saved audience. Audiences are created under Campaigns › Saved audiences, where you choose the filters
+          and review the clients.
+        </p>
+      }
+    } @else {
+      <p class="muted">
+        Clients must match every condition. With no conditions, every active client of your offices is included.
+      </p>
+      @for (row of filters; track $index; let i = $index) {
+        @if (i > 0) {
+          <div class="and">and</div>
+        }
+        <div class="filter-row">
+          <mat-form-field>
+            <mat-label>Filter</mat-label>
+            <mat-select [(ngModel)]="row.field" (selectionChange)="fieldChanged(row)">
+              @for (field of options?.fields || []; track field.field) {
+                <mat-option [value]="field.field">{{ field.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @switch (spec(row.field).kind) {
+            @case ('options') {
+              @if (spec(row.field).negatable) {
+                <mat-form-field class="op">
+                  <mat-label>Is</mat-label>
+                  <mat-select [(ngModel)]="row.operator" (selectionChange)="recount()">
+                    <mat-option value="IN">any of</mat-option>
+                    <mat-option value="NOT_IN">none of</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              }
+              <mat-form-field class="value">
+                <mat-label>Values</mat-label>
+                <mat-select multiple [(ngModel)]="row.values" (selectionChange)="recount()">
+                  @for (choice of choices(row.field); track choice.value) {
+                    <mat-option [value]="choice.value">{{ choice.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (row.field === 'DELINQUENCY' && !choices(row.field).length) {
+                  <mat-hint>No delinquency ranges are set up yet.</mat-hint>
+                }
+              </mat-form-field>
+              @if (row.field === 'OFFICE') {
+                <mat-checkbox [(ngModel)]="row.includeChildren" (change)="recount()">Include sub-offices</mat-checkbox>
+              }
+            }
+            @case ('clients') {
+              <mat-form-field class="op">
+                <mat-label>Clients</mat-label>
+                <mat-select [(ngModel)]="row.operator" (selectionChange)="recount()">
+                  <mat-option value="IN">only these</mat-option>
+                  <mat-option value="NOT_IN">all but these</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="client-picker">
+                <mat-form-field class="value">
+                  <mat-label>Add a client</mat-label>
+                  <input
+                    #clientInput
+                    matInput
+                    placeholder="Name or account number"
+                    [matAutocomplete]="clientList"
+                    (input)="searchClients(clientInput.value)"
+                  />
+                  <mat-autocomplete
+                    #clientList="matAutocomplete"
+                    (optionSelected)="addClient(row, $event.option.value, clientInput)"
+                  >
+                    @for (client of clientMatches; track client.entityId) {
+                      <mat-option [value]="client">{{ client.entityName }} · {{ client.entityAccountNo }}</mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+                <div class="picked">
+                  @for (id of row.values; track id) {
+                    <span class="chip blue"
+                      >{{ clientLabel(id) }}
+                      <button
+                        type="button"
+                        class="remove"
+                        (click)="removeClient(row, id)"
+                        [attr.aria-label]="'Remove ' + clientLabel(id)"
+                      >
+                        ×
+                      </button></span
+                    >
+                  }
+                </div>
+              </div>
+            }
+            @case ('choice') {
+              <mat-form-field class="value">
+                <mat-label>Value</mat-label>
+                <mat-select [ngModel]="row.values[0]" (ngModelChange)="setValue(row, 0, $event)">
+                  @for (choice of choices(row.field); track choice.value) {
+                    <mat-option [value]="choice.value">{{ choice.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+            @case ('range') {
+              <mat-form-field class="op">
+                <mat-label>{{ spec(row.field).placeholderMin }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  [ngModel]="row.values[0]"
+                  (ngModelChange)="setValue(row, 0, $event)"
+                />
+              </mat-form-field>
+              <mat-form-field class="op">
+                <mat-label>{{ spec(row.field).placeholderMax }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  [ngModel]="row.values[1]"
+                  (ngModelChange)="setValue(row, 1, $event)"
+                />
+              </mat-form-field>
+              <span class="muted">{{ spec(row.field).unit }}</span>
+            }
+            @default {
+              <mat-form-field class="op">
+                <mat-label>{{
+                  row.field === 'INACTIVE' ? 'In the last' : row.field === 'SHARES' ? 'At least' : 'Within'
+                }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  [ngModel]="row.values[0]"
+                  (ngModelChange)="setValue(row, 0, $event)"
+                />
+              </mat-form-field>
+              <span class="muted">{{ spec(row.field).unit }}</span>
+            }
+          }
+          <button mat-icon-button type="button" (click)="removeFilter(i)" aria-label="Remove filter">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+      <div class="row">
+        <button mat-stroked-button type="button" (click)="addFilter()"><mat-icon>add</mat-icon> Add filter</button>
+      </div>
+      @if (showSave) {
+        <div class="row save-audience" *mifosxHasPermission="'CREATE_COMMAUDIENCE'">
+          <mat-form-field class="value">
+            <mat-label>Save these filters as</mat-label>
+            <input matInput [(ngModel)]="audienceName" maxlength="100" [placeholder]="audienceNameHint" />
+          </mat-form-field>
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="savingAudience || !filters.length"
+            (click)="saveAudience()"
+          >
+            <mat-icon>bookmark_add</mat-icon> Save audience
+          </button>
+          @if (audienceMessage) {
+            <span class="muted">{{ audienceMessage }}</span>
+          }
+        </div>
+      }
+      <div class="quick">
+        <span class="muted">Quick picks:</span>
+        @for (pick of quickPicks; track pick.label) {
+          <button type="button" class="chip" (click)="addFilter(pick.filter)">{{ pick.label }}</button>
+        }
+        <button type="button" class="chip" (click)="addFilter({ field: 'DELINQUENCY', values: [] })">
+          Delinquent loans
+        </button>
+      </div>
+    }
+  </div>
+
+  <mat-card class="count-card">
+    <h3>Matching clients</h3>
+    @if (readOnly && !filters.length) {
+      <p class="muted">Pick a saved audience to see who it reaches.</p>
+    } @else if (count) {
+      <div class="big">{{ count.matching | number }}</div>
+      <p class="muted">
+        will get this {{ channel === 'EMAIL' ? 'email' : 'SMS' }}: <b>{{ count.recipients | number }}</b
+        >{{ counting ? ' (updating…)' : '' }}
+      </p>
+      @if (skippedReasons.length) {
+        <div class="kv">
+          @for (skip of skippedReasons; track skip.reason) {
+            <span>Skipped: {{ reasonLabel(skip.reason).toLowerCase() }}</span
+            ><span>{{ skip.count | number }}</span>
+          }
+        </div>
+      }
+      <button
+        mat-stroked-button
+        type="button"
+        class="view-clients"
+        [disabled]="!count.matching"
+        (click)="showClients()"
+      >
+        <mat-icon>groups</mat-icon>
+        {{
+          count.matching === 1
+            ? 'View the matching client'
+            : 'View the ' + (count.matching | number) + ' matching clients'
+        }}
+      </button>
+    } @else {
+      <p class="muted">{{ counting || readOnly ? 'Counting…' : 'Add filters to see who matches.' }}</p>
+    }
+  </mat-card>
+</div>

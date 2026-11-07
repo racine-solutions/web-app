@@ -12,7 +12,7 @@
       <div class="fields">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="e.g. Repayment reminder" />
+          <input matInput formControlName="name" [placeholder]="nameHint" />
           @if (form.controls.name.hasError('required')) {
             <mat-error>Give the template a name.</mat-error>
           }
@@ -53,6 +53,34 @@
       </div>
 
       <div class="message">
+        <div class="how-to">
+          <mat-icon>lightbulb</mat-icon>
+          @if (isEmail) {
+            <div>
+              <b>How an email works:</b> give it a subject and write the body once for everyone. Click a button below to
+              add a client detail where the cursor is, in the subject or the body. Each
+              <code>{{ '{{' }}…{{ '}}' }}</code> is filled in for every client, e.g.
+              <code>{{ '{{' }}client.name{{ '}}' }}</code> becomes "Mwesigye". Write plain text (line breaks are kept)
+              or paste HTML for a designed email; the format buttons style the selected text. Emails have no length
+              limit and go out up to the daily email limit.
+            </div>
+          } @else {
+            <div>
+              <b>How an SMS works:</b> write one short message for everyone. Click a button below to add a client detail
+              where the cursor is. Each <code>{{ '{{' }}…{{ '}}' }}</code> is filled in for every client, e.g.
+              <code>{{ '{{' }}client.name{{ '}}' }}</code> becomes "Mwesigye" and
+              <code>{{ '{{' }}loans.nextDueAmount{{ '}}' }}</code> becomes "UGX 85,000". One SMS holds 160 characters
+              (70 with accented letters such as "ó"); the counter checks the longest client details, so no client gets a
+              cut-off message.
+            </div>
+          }
+        </div>
+        <div class="examples">
+          <span class="muted">Start from an example:</span>
+          @for (example of examples; track example.label) {
+            <button type="button" class="chip blue" (click)="useExample(example)">{{ example.label }}</button>
+          }
+        </div>
         <div class="placeholders" aria-label="Insert placeholder">
           @for (group of groups; track group.name) {
             <div class="group">
@@ -77,7 +105,7 @@
             matInput
             formControlName="emailSubject"
             (focus)="focusOn('subject')"
-            placeholder="e.g. Your loan statement, {{ '{{' }}client.name{{ '}}' }}"
+            [placeholder]="subjectHint"
           />
           @if (form.controls.emailSubject.hasError('required')) {
             <mat-error>Give the email a subject.</mat-error>
@@ -110,7 +138,7 @@
             formControlName="text"
             (focus)="focusOn('text')"
             [rows]="isEmail ? 14 : 5"
-            placeholder="Hi {{ '{{' }}client.name{{ '}}' }}, …"
+            [placeholder]="bodyHint"
           ></textarea>
           @if (isEmail) {
             <mat-hint>Plain text keeps its line breaks. Paste HTML for a designed email.</mat-hint>
@@ -143,19 +171,32 @@
     </mat-card>
 
     <mat-card class="preview-card">
-      <h3>Preview</h3>
+      <h3>{{ isEmail ? 'Email preview' : 'SMS preview' }}</h3>
       @if (isEmail) {
         <div class="email-preview">
           <div class="email-subject">
             <span class="muted">Subject</span>
-            <b>{{ preview?.subject || 'Your subject appears here.' }}</b>
+            <b>{{ shown.subject || 'Your subject appears here.' }}</b>
           </div>
-          <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+          <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="emailHtml"></iframe>
+        </div>
+        <div class="preview-facts">
+          <span>Goes to the client's email address</span>
+          <span>{{ hasHtml ? 'Designed (HTML) email' : 'Plain text: line breaks kept' }}</span>
+          <span>No length limit</span>
         </div>
       } @else {
         <div class="phone">
           <div class="sender">SMS</div>
-          <div class="bubble">{{ preview?.message || 'Your message appears here.' }}</div>
+          <div class="bubble">{{ shown.message || 'Your message appears here.' }}</div>
+        </div>
+        <div class="preview-facts">
+          <span>Goes to the client's mobile number</span>
+          <span>This client: {{ typedLength }} characters</span>
+          <span [class.over]="!fits" [class.ok]="fits">
+            Longest client: {{ longestLength }} / {{ limit }} ·
+            {{ fits ? (limit === 70 ? '1 Unicode SMS' : '1 SMS') : smsParts + ' SMS: too long' }}
+          </span>
         </div>
       }
       <div class="preview-as">

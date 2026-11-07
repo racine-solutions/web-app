@@ -67,6 +67,48 @@
       <strong>Working Capital Loans:</strong> Support for pause/resume delinquency classification, charge adjustments,
       and originator configuration.
     </li>
+    <li>
+      <strong>Communication Campaigns:</strong> Send SMS and email campaigns to the clients you choose, under RacinePay
+      Premium &gt; Campaigns. Messages are filled in for each client (name, loan balance, next due date, savings, shares
+      and more), and every SMS is checked to fit one message.
+    </li>
+    <li>
+      <strong>Campaign Approval:</strong> Every campaign is submitted for approval before anything is sent, and can be
+      rejected with a reason. Maker-checker applies when it is switched on.
+    </li>
+    <li>
+      <strong>Campaign Scheduling:</strong> Send now, at a set time, or repeatedly (every few days, weeks or months)
+      until a date or a number of runs. Quiet hours (08:00–20:00 by default) keep messages to daytime; campaigns can be
+      paused, resumed or stopped.
+    </li>
+    <li>
+      <strong>Campaign Delivery Reports:</strong> Each run shows who was sent, failed or skipped and why, with retry for
+      failed messages and CSV export. Clients without a phone or email, or sharing one with another client, are skipped.
+    </li>
+    <li>
+      <strong>Email Campaigns:</strong> Email templates with a subject and a plain or designed (HTML) body. Reports show
+      which emails were delivered, bounced or marked as spam. A daily email limit (250 by default) keeps room for
+      passwords and codes; emails over it go out the next day.
+    </li>
+    <li>
+      <strong>Email Sender Name:</strong> Each institution can set the name its clients see as the sender of its emails
+      (Configurations &gt; email-sender-name).
+    </li>
+    <li>
+      <strong>Marketing Opt-out:</strong> Staff can record on a client's profile that they do not want sales and
+      marketing messages; marketing campaigns then skip them. The profile also lists the campaign messages each client
+      received.
+    </li>
+    <li>
+      <strong>Campaign Audiences:</strong> Build an audience on its own page in three steps: choose the filters, review
+      the matching clients and leave out anyone who should not get the message, then name and save it. Saved audiences
+      can be edited, their clients viewed, and used to start a campaign.
+    </li>
+    <li>
+      <strong>Campaign Template Guidance:</strong> The template editor explains how SMS and email messages work, offers
+      ready-made examples to start from (repayment reminder, overdue loan, savings balance, birthday wishes, account
+      summary and loan offer emails) and shows a live preview as you type.
+    </li>
   </ul>
 
   <h3><fa-icon icon="bug" class="icon-red"></fa-icon> Bug Fixes</h3>
@@ -95,6 +137,10 @@
     <li><strong>Datatable Scrolling:</strong> Restored horizontal scrolling on custom datatable views.</li>
     <li><strong>Formula Injection Prevention:</strong> Sanitized CSV/XLSX exports to prevent formula injection.</li>
     <li><strong>Templates ID:</strong> Ensured template ID is included on template updates.</li>
+    <li>
+      <strong>Client and Loan Screen Reports:</strong> Generating a screen report from a template now shows the report
+      filled in for the client or loan, instead of the template itself.
+    </li>
   </ul>
 
   <h3><fa-icon icon="anchor" class="icon-coral"></fa-icon> Improvements</h3>
@@ -118,6 +164,18 @@
       labels translations.
     </li>
     <li><strong>Autocomplete Results:</strong> Refresh transfer client autocomplete results on demand.</li>
+    <li>
+      <strong>Campaign Audience Step:</strong> A campaign now reaches a saved audience chosen from a list, so who it
+      reaches is set in one place and a campaign can no longer go to every client by mistake.
+    </li>
+    <li>
+      <strong>SMS and Email Templates:</strong> The SMS and the email version of a template are kept apart while
+      editing, so an email is never checked against the SMS length. Names are suggested, not filled in.
+    </li>
+    <li>
+      <strong>Campaigns Replace SMS Campaigns:</strong> The old SMS Campaigns screen under Organization is replaced by
+      RacinePay Premium &gt; Campaigns, and campaign templates no longer appear among the screen report templates.
+    </li>
   </ul>
 </mat-dialog-content>
 

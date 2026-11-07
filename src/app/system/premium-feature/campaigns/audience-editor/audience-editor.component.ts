@@ -32,7 +32,7 @@ import { SearchService } from 'app/search/search.service';
 
 import { AudienceCount, AudienceFilter, AudienceOptions, SavedAudience, reasonLabel } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
-import { FIELD_SPECS, FieldSpec, QUICK_PICKS, optionsFor } from '../campaign-form/audience-fields';
+import { FIELD_SPECS, FieldSpec, QUICK_PICKS, STAFF_QUICK_PICKS, optionsFor } from '../campaign-form/audience-fields';
 import {
   AudienceClientsDialogComponent,
   AudienceClientsDialogData
@@ -50,7 +50,15 @@ export interface AudienceState {
   counting: boolean;
   /** One readable line per filter, e.g. "Gender is Female". */
   summary: string[];
+  /** Who the audience reaches. */
+  audienceType: AudienceType;
 }
+
+/** Clients, or the institution's own staff and system users. */
+export type AudienceType = 'CLIENTS' | 'STAFF';
+
+/** The filter that marks a staff audience; it is never shown as a row. */
+const STAFF_MARKER: AudienceFilter = { field: 'RECIPIENTS', operator: 'IN', values: ['STAFF'] };
 
 /**
  * Builds an audience: filters, quick picks, a live count of who matches and who is skipped, and the paged list of
@@ -90,12 +98,15 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
   @Input() startAudienceId: number | null = null;
   @Input() showSavedPicker = true;
   @Input() showSave = true;
+  /** Clients or staff; a saved audience or campaign being loaded sets it from its own filters. */
+  @Input() audienceType: AudienceType = 'CLIENTS';
   /** Pick a saved audience and see it, without changing its filters (campaign wizard). */
   @Input() readOnly = false;
   @Output() changed = new EventEmitter<AudienceState>();
 
   readonly specs = FIELD_SPECS;
   readonly quickPicks = QUICK_PICKS;
+  readonly staffQuickPicks = STAFF_QUICK_PICKS;
   readonly reasonLabel = reasonLabel;
 
   options: AudienceOptions | null = null;
@@ -166,7 +177,11 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
     if (changes['initialFilters'] && this.initialFilters) {
       this.filters = this.toRows(this.initialFilters);
     }
-    if (changes['initialFilters'] || changes['purpose'] || changes['channel']) {
+    if (changes['audienceType'] && !changes['audienceType'].firstChange && !changes['initialFilters']) {
+      // Client and staff filters don't mix: start again
+      this.filters = [];
+    }
+    if (changes['initialFilters'] || changes['purpose'] || changes['channel'] || changes['audienceType']) {
       this.recount();
     }
   }
@@ -179,8 +194,17 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
     return optionsFor(this.spec(field), this.options);
   }
 
+  get isStaff(): boolean {
+    return this.audienceType === 'STAFF';
+  }
+
+  /** The fields for clients or for staff. */
+  get fields(): { field: string; label: string }[] {
+    return (this.isStaff ? this.options?.staffFields : this.options?.fields) || [];
+  }
+
   addFilter(filter?: { field: string; operator?: string; values: string[] }) {
-    const field = filter?.field || 'GENDER';
+    const field = filter?.field || (this.isStaff ? 'STAFF_TYPE' : 'GENDER');
     this.filters = [
       ...this.filters,
       {
@@ -262,7 +286,8 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
         audience: this.cleanFilters(),
         purpose: this.purpose,
         channel: this.channel,
-        count: this.count
+        count: this.count,
+        title: this.isStaff ? 'Matching staff' : undefined
       } as AudienceClientsDialogData
     });
   }
@@ -329,22 +354,31 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
 
   /** Rows with a value only: an empty row added by mistake doesn't block the count. */
   cleanFilters(): AudienceFilter[] {
-    return this.filters
+    const rows = this.filters
       .filter((row) => row.values.some((value) => value !== '' && value !== null && value !== undefined))
       .map((row) => ({
         field: row.field,
         operator: row.operator,
         values: row.values,
-        includeChildren: row.field === 'OFFICE' ? !!row.includeChildren : undefined
+        includeChildren: row.field === 'OFFICE' || row.field === 'STAFF_OFFICE' ? !!row.includeChildren : undefined
       }));
+    return this.isStaff ? [
+          { ...STAFF_MARKER },
+          ...rows
+        ] : rows;
   }
 
+  /** Filter rows to edit; a staff marker sets the audience type instead of showing as a row. */
   private toRows(filters: AudienceFilter[]): FilterRow[] {
-    return filters.map((filter) => ({
-      ...filter,
-      operator: filter.operator || 'IN',
-      values: filter.values || []
-    }));
+    const staff = filters.some((filter) => filter.field === 'RECIPIENTS' && (filter.values || []).includes('STAFF'));
+    this.audienceType = staff ? 'STAFF' : 'CLIENTS';
+    return filters
+      .filter((filter) => filter.field !== 'RECIPIENTS')
+      .map((filter) => ({
+        ...filter,
+        operator: filter.operator || 'IN',
+        values: filter.values || []
+      }));
   }
 
   private loadSavedAudiences() {
@@ -364,7 +398,11 @@ export class AudienceEditorComponent implements OnInit, OnChanges {
       filters: this.cleanFilters(),
       count: this.count,
       counting: this.counting,
-      summary: this.filters.map((row) => this.audienceSummary(row))
+      summary: [
+        ...(this.isStaff ? ['Goes to staff and system users'] : []),
+        ...this.filters.map((row) => this.audienceSummary(row))
+      ],
+      audienceType: this.audienceType
     });
   }
 }

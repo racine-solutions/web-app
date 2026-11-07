@@ -84,7 +84,8 @@ describe('AudienceFormComponent', () => {
       filters: [{ field: 'GENDER', operator: 'IN', values: ['22'] }],
       count: { matching: 40, recipients: 38, skipped: {} },
       counting: false,
-      summary: ['Gender is Female']
+      summary: ['Gender is Female'],
+      audienceType: 'CLIENTS'
     });
     expect(component.canSave).toBe(true);
     component.save();
@@ -111,7 +112,8 @@ describe('AudienceFormComponent', () => {
       filters: component.initialFilters!,
       count: null,
       counting: false,
-      summary: []
+      summary: [],
+      audienceType: 'CLIENTS'
     });
     component.save();
     expect(saveAudience).toHaveBeenCalledWith('Women with savings', component.initialFilters, 3);
@@ -132,7 +134,8 @@ describe('AudienceFormComponent', () => {
       filters: [{ field: 'GENDER', operator: 'IN', values: ['22'] }],
       count: null,
       counting: false,
-      summary: ['Gender is Female']
+      summary: ['Gender is Female'],
+      audienceType: 'CLIENTS'
     });
     const client = (id: number, name: string) =>
       ({ clientId: id, accountNo: '0001', displayName: name, officeName: 'Head Office', mobileNo: '0785' }) as any;
@@ -153,12 +156,37 @@ describe('AudienceFormComponent', () => {
       filters: [{ field: 'CLIENT', operator: 'NOT_IN', values: ['1'] }],
       count: null,
       counting: false,
-      summary: []
+      summary: [],
+      audienceType: 'CLIENTS'
     });
     component.toggle({ clientId: 7, displayName: 'Campaign Test' } as any);
     expect(component.filtersToSave).toEqual([{ field: 'CLIENT', operator: 'NOT_IN', values: [
           '1',
           '7'
         ] }]);
+  });
+
+  it('staff audiences leave people out by their staff or user key', async () => {
+    const fixture = await create({});
+    const component = fixture.componentInstance;
+    component.audienceType = 'STAFF';
+    component.typeChanged();
+    component.audienceChanged({
+      filters: [
+        { field: 'RECIPIENTS', operator: 'IN', values: ['STAFF'] },
+        { field: 'STAFF_TYPE', operator: 'IN', values: ['LOAN_OFFICER'] }
+      ],
+      count: null,
+      counting: false,
+      summary: [],
+      audienceType: 'STAFF'
+    });
+    component.toggle({ clientId: null, displayName: 'Sarah', recipientType: 'STAFF', recipientKey: 'STAFF:3' } as any);
+    expect(component.purpose).toBe('GENERAL');
+    expect(component.filtersToSave).toEqual([
+      { field: 'RECIPIENTS', operator: 'IN', values: ['STAFF'] },
+      { field: 'STAFF_TYPE', operator: 'IN', values: ['LOAN_OFFICER'] },
+      { field: 'STAFF_MEMBER', operator: 'NOT_IN', values: ['STAFF:3'] }
+    ]);
   });
 });

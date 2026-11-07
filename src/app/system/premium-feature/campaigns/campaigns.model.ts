@@ -77,6 +77,10 @@ export interface AudienceClient {
   mobileNo: string;
   emailAddress?: string;
   skipReason?: string;
+  /** CLIENT, STAFF or USER (a system user without a staff record). */
+  recipientType?: string;
+  /** "CLIENT:7", "STAFF:3" or "USER:5". */
+  recipientKey?: string;
 }
 
 export interface Paged<T> {
@@ -101,6 +105,14 @@ export interface AudienceOptions {
   clientTypes: Option[];
   classifications: Option[];
   loanProducts: Option[];
+  loanPurposes?: Option[];
+  savingsProducts?: Option[];
+  loanOfficers?: Option[];
+  groups?: Option[];
+  /** Staff audiences: their fields, login roles, and staff and system users ("STAFF:3", "USER:5"). */
+  staffFields?: { field: string; label: string }[];
+  roles?: Option[];
+  staffPeople?: { id: string; name: string }[];
   delinquencyRanges: (Option & { min_age_days?: number; max_age_days?: number })[];
 }
 
@@ -215,6 +227,8 @@ export interface Delivery {
   /** Email only: the latest event from the email service, e.g. DELIVERED or HARD_BOUNCE. */
   providerEvent?: string;
   providerEventOn?: string;
+  /** CLIENT, STAFF or USER. */
+  recipientType?: string;
 }
 
 export interface DeliveryPage {

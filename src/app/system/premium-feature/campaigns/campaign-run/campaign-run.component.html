@@ -130,8 +130,13 @@
                     }
                   </td>
                   <td>
-                    <a [routerLink]="['/clients', d.clientId, 'general']">{{ d.clientName }}</a>
-                    <div class="muted">{{ d.accountNo }}</div>
+                    @if (d.clientId) {
+                      <a [routerLink]="['/clients', d.clientId, 'general']">{{ d.clientName }}</a>
+                      <div class="muted">{{ d.accountNo }}</div>
+                    } @else {
+                      {{ d.clientName }}
+                      <div class="muted">{{ d.recipientType === 'USER' ? 'System user' : 'Staff' }}</div>
+                    }
                   </td>
                   <td>{{ d.address || '—' }}</td>
                   <td>

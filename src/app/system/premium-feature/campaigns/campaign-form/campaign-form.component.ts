@@ -181,8 +181,34 @@ export class CampaignFormComponent implements OnInit {
     return emailDays(this.count?.recipients ?? 0, this.emailDailyLimit, this.emailsLeftToday);
   }
 
+  /** True when the chosen audience is staff, not clients. */
+  audienceIsStaff = false;
+
+  /** Tags in the template that don't suit the audience, e.g. a loan balance in a message to staff. */
+  get unsuitableTags(): string[] {
+    const text = `${this.template?.text || ''} ${this.template?.emailSubject || ''}`;
+    const clientGroups = [
+      'client',
+      'loans',
+      'savings',
+      'fixedDeposit',
+      'recurringDeposit',
+      'shares'
+    ];
+    const tags = Array.from(text.matchAll(/\{\{\s*([\w.]+)\s*\}\}/g), (match) => match[1]);
+    return Array.from(
+      new Set(
+        tags.filter((tag) => {
+          const group = tag.split('.')[0];
+          return this.audienceIsStaff ? clientGroups.includes(group) : group === 'staff';
+        })
+      )
+    );
+  }
+
   /** The audience editor reports its filters, count and summary after every change. */
   audienceChanged(state: AudienceState) {
+    this.audienceIsStaff = state.audienceType === 'STAFF';
     this.audienceFilters = state.filters;
     this.count = state.count;
     this.audienceLines = state.summary;

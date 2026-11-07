@@ -22,6 +22,8 @@ export interface FieldSpec {
   unit?: string;
   placeholderMin?: string;
   placeholderMax?: string;
+  /** For number: the word before the box, e.g. "In the last" (default "Within"). */
+  numberLabel?: string;
 }
 
 const YES_NO = [
@@ -60,19 +62,19 @@ export const FIELD_SPECS: Record<string, FieldSpec> = {
       { value: 'ENTITY', label: 'Entity' }
     ]
   },
-  NEW_CLIENTS: { kind: 'number', unit: 'days' },
+  NEW_CLIENTS: { kind: 'number', unit: 'days', numberLabel: 'In the last' },
   HAS_ACTIVE_LOAN: { kind: 'choice', staticOptions: YES_NO },
   LOAN_PRODUCT: { kind: 'options', source: 'loanProducts', negatable: true },
   NEXT_DUE: { kind: 'number', unit: 'days' },
   DELINQUENCY: { kind: 'options', source: 'delinquencyRanges', negatable: true },
-  LOAN_REPAID: { kind: 'number', unit: 'days' },
+  LOAN_REPAID: { kind: 'number', unit: 'days', numberLabel: 'In the last' },
   HAS_SAVINGS: { kind: 'choice', staticOptions: YES_NO },
   SAVINGS_BALANCE: { kind: 'range', placeholderMin: 'At least', placeholderMax: 'At most' },
   HAS_FIXED_DEPOSIT: { kind: 'choice', staticOptions: YES_NO },
   FD_MATURING: { kind: 'number', unit: 'days' },
   HAS_RECURRING_DEPOSIT: { kind: 'choice', staticOptions: YES_NO },
   HAS_SHARES: { kind: 'choice', staticOptions: YES_NO },
-  SHARES: { kind: 'number', unit: 'shares' },
+  SHARES: { kind: 'number', unit: 'shares', numberLabel: 'At least' },
   MOBILE_APP: {
     kind: 'choice',
     staticOptions: [
@@ -81,7 +83,37 @@ export const FIELD_SPECS: Record<string, FieldSpec> = {
       { value: 'NOT_ON_APP', label: 'Not on the app' }
     ]
   },
-  INACTIVE: { kind: 'number', unit: 'days' }
+  INACTIVE: { kind: 'number', unit: 'days', numberLabel: 'In the last' },
+  LOAN_OFFICER: { kind: 'options', source: 'loanOfficers', negatable: true },
+  GROUP: { kind: 'options', source: 'groups', negatable: true },
+  IN_GROUP: { kind: 'choice', staticOptions: YES_NO },
+  MEMBER_FOR: { kind: 'range', unit: 'years', placeholderMin: 'From', placeholderMax: 'To' },
+  HAS_PHONE: { kind: 'choice', staticOptions: YES_NO },
+  HAS_EMAIL: { kind: 'choice', staticOptions: YES_NO },
+  LOAN_PURPOSE: { kind: 'options', source: 'loanPurposes', negatable: true },
+  LOAN_BALANCE: { kind: 'range', placeholderMin: 'At least', placeholderMax: 'At most' },
+  DAYS_IN_ARREARS: { kind: 'range', unit: 'days late', placeholderMin: 'From', placeholderMax: 'To' },
+  LOAN_ENDING: { kind: 'number', unit: 'days' },
+  LOAN_DISBURSED: { kind: 'number', unit: 'days', numberLabel: 'In the last' },
+  LOANS_TAKEN: { kind: 'range', unit: 'loans', placeholderMin: 'At least', placeholderMax: 'At most' },
+  LOAN_PENDING: { kind: 'choice', staticOptions: YES_NO },
+  SAVINGS_PRODUCT: { kind: 'options', source: 'savingsProducts', negatable: true },
+  NO_DEPOSIT_IN: { kind: 'number', unit: 'days', numberLabel: 'In the last' },
+  IS_STAFF: { kind: 'choice', staticOptions: YES_NO },
+  // Staff audiences
+  STAFF_TYPE: {
+    kind: 'options',
+    source: 'static',
+    staticOptions: [
+      { value: 'LOAN_OFFICER', label: 'Loan officers' },
+      { value: 'SYSTEM_USER', label: 'Has a system login' },
+      { value: 'NO_LOGIN', label: 'No system login' }
+    ]
+  },
+  STAFF_OFFICE: { kind: 'options', source: 'offices' },
+  STAFF_ROLE: { kind: 'options', source: 'roles', negatable: true },
+  STAFF_MEMBER: { kind: 'options', source: 'staffPeople', negatable: true },
+  STAFF_IS_CLIENT: { kind: 'choice', staticOptions: YES_NO }
 };
 
 /** Ready-made audiences for common groups. */
@@ -91,13 +123,32 @@ export const QUICK_PICKS: { label: string; filter: { field: string; operator?: s
   { label: 'Birthday this month', filter: { field: 'BIRTHDAY', values: ['THIS_MONTH'] } },
   { label: 'Share holders', filter: { field: 'HAS_SHARES', values: ['YES'] } },
   { label: 'Mobile app users', filter: { field: 'MOBILE_APP', values: ['USES'] } },
-  { label: 'Fixed deposit maturing in 30 days', filter: { field: 'FD_MATURING', values: ['30'] } }
+  { label: 'Fixed deposit maturing in 30 days', filter: { field: 'FD_MATURING', values: ['30'] } },
+  { label: 'In arrears 30+ days', filter: { field: 'DAYS_IN_ARREARS', values: [
+        '30',
+        ''
+      ] } },
+  { label: 'Loan ending in 30 days', filter: { field: 'LOAN_ENDING', values: ['30'] } },
+  { label: 'New borrowers (30 days)', filter: { field: 'LOAN_DISBURSED', values: ['30'] } },
+  { label: 'Pending loan applications', filter: { field: 'LOAN_PENDING', values: ['YES'] } },
+  { label: 'No savings deposit in 60 days', filter: { field: 'NO_DEPOSIT_IN', values: ['60'] } },
+  { label: 'Repeat borrowers', filter: { field: 'LOANS_TAKEN', values: [
+        '2',
+        ''
+      ] } }
+];
+
+/** Ready-made staff audiences. */
+export const STAFF_QUICK_PICKS: { label: string; filter: { field: string; operator?: string; values: string[] } }[] = [
+  { label: 'Loan officers', filter: { field: 'STAFF_TYPE', values: ['LOAN_OFFICER'] } },
+  { label: 'System users', filter: { field: 'STAFF_TYPE', values: ['SYSTEM_USER'] } },
+  { label: 'Staff who are also clients', filter: { field: 'STAFF_IS_CLIENT', values: ['YES'] } }
 ];
 
 export function optionsFor(spec: FieldSpec, options: AudienceOptions | null): { value: string; label: string }[] {
   if (spec.source === 'static' || !spec.source) {
     return spec.staticOptions || [];
   }
-  const list = ((options?.[spec.source] as Option[]) || []) as Option[];
+  const list = ((options?.[spec.source] as unknown as Option[]) || []) as Option[];
   return list.map((option) => ({ value: String(option.id), label: option.name }));
 }

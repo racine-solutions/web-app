@@ -22,6 +22,7 @@ import { SearchService } from 'app/search/search.service';
 import { MessageCheck, Placeholder } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
 import { asEmailHtml, emailDocument, escapeHtml } from '../email-preview';
+import { EMAIL_BLOCKS, EMAIL_FORMATS, EmailBlock, EmailFormat } from './email-blocks';
 import { EMAIL_HINT, SMS_HINT, SUBJECT_HINT, TEMPLATE_EXAMPLES, TemplateExample } from './template-examples';
 
 /** Characters of the standard SMS alphabet; anything else makes the SMS Unicode (70 characters). */
@@ -89,6 +90,8 @@ export class TemplateFormComponent implements OnInit {
   saving = false;
   emailEnabled = true;
   readonly subjectHint = SUBJECT_HINT;
+  readonly emailFormats = EMAIL_FORMATS;
+  readonly emailBlocks = EMAIL_BLOCKS;
   /** Suggested name, shown faded in the empty Name box; the user types their own. */
   nameHint = 'e.g. Repayment reminder';
   /** The message written for each channel, so switching channel never judges an email as an SMS. */
@@ -256,6 +259,34 @@ export class TemplateFormComponent implements OnInit {
   }
 
   /** Wraps the selected text of the email body in a tag, e.g. <b>…</b>. */
+  /** Applies a format button: lists turn each selected line into an item. */
+  applyFormat(format: EmailFormat, body: HTMLTextAreaElement) {
+    if (!format.perLine) {
+      this.wrap(format.open, format.close, body);
+      return;
+    }
+    const value = this.form.controls.text.value || '';
+    const start = body.selectionStart ?? value.length;
+    const end = body.selectionEnd ?? value.length;
+    const lines = value
+      .slice(start, end)
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line);
+    const items = (lines.length ? lines : [
+            'Item one',
+            'Item two'
+          ])
+      .map((line) => format.perLine!.open + line + format.perLine!.close)
+      .join('');
+    this.insertText(format.open + items + format.close, body, 'text', start, end);
+  }
+
+  /** Inserts a ready-made block at the cursor. */
+  insertBlock(block: EmailBlock, body: HTMLTextAreaElement) {
+    this.insertText(block.html, body, 'text');
+  }
+
   wrap(open: string, close: string, body: HTMLTextAreaElement) {
     const value = this.form.controls.text.value || '';
     const start = body.selectionStart ?? value.length;
@@ -268,10 +299,16 @@ export class TemplateFormComponent implements OnInit {
     });
   }
 
-  private insertText(token: string, field: HTMLTextAreaElement | HTMLInputElement, control: 'text' | 'emailSubject') {
+  private insertText(
+    token: string,
+    field: HTMLTextAreaElement | HTMLInputElement,
+    control: 'text' | 'emailSubject',
+    from?: number,
+    to?: number
+  ) {
     const value = this.form.controls[control].value || '';
-    const start = field.selectionStart ?? value.length;
-    const end = field.selectionEnd ?? value.length;
+    const start = from ?? field.selectionStart ?? value.length;
+    const end = to ?? field.selectionEnd ?? value.length;
     this.form.controls[control].setValue(value.slice(0, start) + token + value.slice(end));
     setTimeout(() => {
       field.focus();

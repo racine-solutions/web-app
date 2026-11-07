@@ -25,7 +25,7 @@
     }
     @if (readOnly) {
       @if (filters.length) {
-        <p class="muted">Clients must match every condition:</p>
+        <p class="muted">{{ isStaff ? 'Goes to staff. They' : 'Clients' }} must match every condition:</p>
         <ul class="summary">
           @for (row of filters; track $index) {
             <li>{{ audienceSummary(row) }}</li>
@@ -40,7 +40,12 @@
       }
     } @else {
       <p class="muted">
-        Clients must match every condition. With no conditions, every active client of your offices is included.
+        @if (isStaff) {
+          Staff must match every condition. With no conditions, all active staff and system users of your offices are
+          included.
+        } @else {
+          Clients must match every condition. With no conditions, every active client of your offices is included.
+        }
       </p>
       @for (row of filters; track $index; let i = $index) {
         @if (i > 0) {
@@ -50,7 +55,7 @@
           <mat-form-field>
             <mat-label>Filter</mat-label>
             <mat-select [(ngModel)]="row.field" (selectionChange)="fieldChanged(row)">
-              @for (field of options?.fields || []; track field.field) {
+              @for (field of fields; track field.field) {
                 <mat-option [value]="field.field">{{ field.label }}</mat-option>
               }
             </mat-select>
@@ -77,7 +82,7 @@
                   <mat-hint>No delinquency ranges are set up yet.</mat-hint>
                 }
               </mat-form-field>
-              @if (row.field === 'OFFICE') {
+              @if (row.field === 'OFFICE' || row.field === 'STAFF_OFFICE') {
                 <mat-checkbox [(ngModel)]="row.includeChildren" (change)="recount()">Include sub-offices</mat-checkbox>
               }
             }
@@ -160,9 +165,7 @@
             }
             @default {
               <mat-form-field class="op">
-                <mat-label>{{
-                  row.field === 'INACTIVE' ? 'In the last' : row.field === 'SHARES' ? 'At least' : 'Within'
-                }}</mat-label>
+                <mat-label>{{ spec(row.field).numberLabel || 'Within' }}</mat-label>
                 <input
                   matInput
                   type="number"
@@ -203,18 +206,20 @@
       }
       <div class="quick">
         <span class="muted">Quick picks:</span>
-        @for (pick of quickPicks; track pick.label) {
+        @for (pick of isStaff ? staffQuickPicks : quickPicks; track pick.label) {
           <button type="button" class="chip" (click)="addFilter(pick.filter)">{{ pick.label }}</button>
         }
-        <button type="button" class="chip" (click)="addFilter({ field: 'DELINQUENCY', values: [] })">
-          Delinquent loans
-        </button>
+        @if (!isStaff) {
+          <button type="button" class="chip" (click)="addFilter({ field: 'DELINQUENCY', values: [] })">
+            Delinquent loans
+          </button>
+        }
       </div>
     }
   </div>
 
   <mat-card class="count-card">
-    <h3>Matching clients</h3>
+    <h3>{{ isStaff ? 'Matching staff' : 'Matching clients' }}</h3>
     @if (readOnly && !filters.length) {
       <p class="muted">Pick a saved audience to see who it reaches.</p>
     } @else if (count) {
@@ -241,8 +246,8 @@
         <mat-icon>groups</mat-icon>
         {{
           count.matching === 1
-            ? 'View the matching client'
-            : 'View the ' + (count.matching | number) + ' matching clients'
+            ? 'View the match'
+            : 'View the ' + (count.matching | number) + (isStaff ? ' matching staff' : ' matching clients')
         }}
       </button>
     } @else {

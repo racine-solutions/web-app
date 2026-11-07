@@ -115,19 +115,21 @@
           }
         </mat-form-field>
         @if (isEmail) {
-          <div class="format" aria-label="Format the email">
-            <button type="button" class="chip" (click)="wrap('<b>', '</b>', body)" title="Bold"><b>B</b></button>
-            <button type="button" class="chip" (click)="wrap('<i>', '</i>', body)" title="Italic"><i>I</i></button>
-            <button type="button" class="chip" (click)="wrap('<h2>', '</h2>', body)" title="Heading">Heading</button>
-            <button type="button" class="chip" (click)="wrap('<p>', '</p>', body)" title="Paragraph">Paragraph</button>
-            <button
-              type="button"
-              class="chip"
-              (click)="wrap('<a href=&quot;https://&quot;>', '</a>', body)"
-              title="Link"
-            >
-              Link
-            </button>
+          <div class="format" aria-label="Format the selected text">
+            <span class="muted">Format selected text:</span>
+            @for (format of emailFormats; track format.label) {
+              <button type="button" class="chip" (click)="applyFormat(format, body)" [title]="format.title">
+                {{ format.label }}
+              </button>
+            }
+          </div>
+          <div class="format" aria-label="Insert a block">
+            <span class="muted">Insert at the cursor:</span>
+            @for (block of emailBlocks; track block.label) {
+              <button type="button" class="chip blue" (click)="insertBlock(block, body)" [title]="block.title">
+                {{ block.label }}
+              </button>
+            }
           </div>
         }
         <mat-form-field class="body">

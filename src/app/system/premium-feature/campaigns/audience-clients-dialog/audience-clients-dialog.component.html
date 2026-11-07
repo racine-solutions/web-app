@@ -42,22 +42,34 @@
     <table class="full">
       <thead>
         <tr>
-          <th>Client</th>
-          <th>Account</th>
+          <th>Name</th>
+          <th>Account / kind</th>
           <th>Office</th>
           <th>{{ isEmail ? 'Email' : 'Phone' }}</th>
           <th>{{ isEmail ? 'Gets the email?' : 'Gets the SMS?' }}</th>
         </tr>
       </thead>
       <tbody>
-        @for (client of clients; track client.clientId) {
+        @for (client of clients; track client.recipientKey || client.clientId) {
           <tr>
             <td>
-              <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
-                client.displayName
-              }}</a>
+              @if (client.clientId) {
+                <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
+                  client.displayName
+                }}</a>
+              } @else {
+                {{ client.displayName }}
+              }
             </td>
-            <td class="mono">{{ client.accountNo }}</td>
+            <td class="mono">
+              {{
+                client.recipientType === 'STAFF'
+                  ? 'Staff'
+                  : client.recipientType === 'USER'
+                    ? 'System user'
+                    : client.accountNo
+              }}
+            </td>
             <td>{{ client.officeName }}</td>
             <td class="mono">{{ (isEmail ? client.emailAddress : client.mobileNo) || '—' }}</td>
             <td>

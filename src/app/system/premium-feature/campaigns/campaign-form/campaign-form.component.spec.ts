@@ -116,7 +116,8 @@ describe('CampaignFormComponent', () => {
       filters: [{ field: 'GENDER', operator: 'IN', values: ['22'] }],
       count: { matching: 10, recipients: 10, skipped: {} },
       counting: false,
-      summary: ['Gender is Female']
+      summary: ['Gender is Female'],
+      audienceType: 'CLIENTS'
     });
     component.save(false);
     expect(saveCampaign).toHaveBeenCalledWith(
@@ -142,9 +143,35 @@ describe('CampaignFormComponent', () => {
       filters: [],
       count: { matching: 600, recipients: 600, skipped: {} },
       counting: false,
-      summary: []
+      summary: [],
+      audienceType: 'CLIENTS'
     });
     expect(component.isEmail).toBe(true);
     expect(component.emailRunDays).toBe(3);
+  });
+
+  it('warns when the template does not suit a staff audience', () => {
+    component.templates = [
+      {
+        id: 1,
+        name: 'Reminder',
+        channel: 'SMS',
+        tag: 'Loan',
+        purpose: 'GENERAL',
+        text: 'Hi {{client.name}}, pay {{loans.nextDueAmount}}'
+      }
+    ] as any;
+    component.templateId = 1;
+    component.audienceChanged({
+      filters: [{ field: 'RECIPIENTS', operator: 'IN', values: ['STAFF'] }],
+      count: { matching: 3, recipients: 3, skipped: {} },
+      counting: false,
+      summary: ['Goes to staff and system users'],
+      audienceType: 'STAFF'
+    });
+    expect(component.unsuitableTags).toEqual([
+      'client.name',
+      'loans.nextDueAmount'
+    ]);
   });
 });

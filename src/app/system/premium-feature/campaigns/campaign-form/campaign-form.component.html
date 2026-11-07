@@ -78,6 +78,14 @@
         [readOnly]="true"
         (changed)="audienceChanged($event)"
       ></mifosx-audience-editor>
+      @if (unsuitableTags.length) {
+        <div class="banner">
+          <mat-icon>warning</mat-icon>
+          This audience is {{ audienceIsStaff ? 'staff' : 'clients' }}, but the template uses
+          {{ audienceIsStaff ? 'client' : 'staff' }} details ({{ unsuitableTags.join(', ') }}). Pick a template written
+          for {{ audienceIsStaff ? 'staff' : 'clients' }} on the Template step.
+        </div>
+      }
       <div class="nav">
         <button mat-button matStepperPrevious type="button">Back</button>
         <button
@@ -85,7 +93,7 @@
           color="primary"
           matStepperNext
           type="button"
-          [disabled]="!audienceFilters.length || !count?.recipients"
+          [disabled]="!audienceFilters.length || !count?.recipients || unsuitableTags.length > 0"
         >
           Next: schedule
         </button>

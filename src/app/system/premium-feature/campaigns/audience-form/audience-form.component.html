@@ -14,12 +14,19 @@
       <!-- 1. Filters -->
       <mat-step [completed]="hasFilters" label="Filters">
         <div class="check">
+          <span class="muted">Who gets it</span>
+          <mat-button-toggle-group [(ngModel)]="audienceType" (change)="typeChanged()" aria-label="Who gets it">
+            <mat-button-toggle value="CLIENTS">Clients</mat-button-toggle>
+            <mat-button-toggle value="STAFF">Staff</mat-button-toggle>
+          </mat-button-toggle-group>
           <span class="muted">Check contacts for</span>
           <mat-button-toggle-group [(ngModel)]="channel" aria-label="Check contacts for">
             <mat-button-toggle value="SMS">SMS</mat-button-toggle>
             <mat-button-toggle value="EMAIL">Email</mat-button-toggle>
           </mat-button-toggle-group>
-          <mat-checkbox [(ngModel)]="marketing">Sales &amp; marketing (leave out clients who opted out)</mat-checkbox>
+          @if (!isStaff) {
+            <mat-checkbox [(ngModel)]="marketing">Sales &amp; marketing (leave out clients who opted out)</mat-checkbox>
+          }
         </div>
         <p class="muted">
           An audience is a set of filters: who it reaches is worked out again each time a campaign uses it. The choice
@@ -29,6 +36,7 @@
           [purpose]="purpose"
           [channel]="channel"
           [initialFilters]="initialFilters"
+          [audienceType]="audienceType"
           [showSavedPicker]="false"
           [showSave]="false"
           (changed)="audienceChanged($event)"
@@ -79,8 +87,8 @@
           <table class="full">
             <thead>
               <tr>
-                <th>Client</th>
-                <th>Account</th>
+                <th>{{ isStaff ? 'Staff' : 'Client' }}</th>
+                <th>{{ isStaff ? 'Kind' : 'Account' }}</th>
                 <th>Office</th>
                 <th>{{ channel === 'EMAIL' ? 'Email' : 'Phone' }}</th>
                 <th>Gets it?</th>
@@ -88,14 +96,26 @@
               </tr>
             </thead>
             <tbody>
-              @for (client of clients; track client.clientId) {
+              @for (client of clients; track client.recipientKey || client.clientId) {
                 <tr [class.left-out]="isExcluded(client)">
                   <td>
-                    <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
-                      client.displayName
-                    }}</a>
+                    @if (client.clientId) {
+                      <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
+                        client.displayName
+                      }}</a>
+                    } @else {
+                      {{ client.displayName }}
+                    }
                   </td>
-                  <td class="mono">{{ client.accountNo }}</td>
+                  <td class="mono">
+                    {{
+                      client.recipientType === 'STAFF'
+                        ? 'Staff'
+                        : client.recipientType === 'USER'
+                          ? 'System user'
+                          : client.accountNo
+                    }}
+                  </td>
                   <td>{{ client.officeName }}</td>
                   <td class="mono">{{ (channel === 'EMAIL' ? client.emailAddress : client.mobileNo) || '—' }}</td>
                   <td>

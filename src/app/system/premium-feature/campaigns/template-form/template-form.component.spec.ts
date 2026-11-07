@@ -15,6 +15,7 @@ import { SearchService } from 'app/search/search.service';
 import { CampaignsService } from '../campaigns.service';
 import { TemplateFormComponent } from './template-form.component';
 import { TEMPLATE_EXAMPLES } from './template-examples';
+import { EMAIL_BLOCKS, EMAIL_FORMATS } from './email-blocks';
 
 describe('TemplateFormComponent', () => {
   let fixture: ComponentFixture<TemplateFormComponent>;
@@ -196,5 +197,42 @@ describe('TemplateFormComponent', () => {
     expect(bubble).toContain('Hi Mwesigye, pay UGX 85,000.');
     expect(bubble).not.toContain('<p>');
     expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
+  });
+
+  it('turns each selected line into a list item', () => {
+    const body = document.createElement('textarea');
+    component.form.controls.text.setValue('Pay on time\nSave weekly');
+    body.value = component.form.controls.text.value!;
+    body.selectionStart = 0;
+    body.selectionEnd = body.value.length;
+    component.applyFormat(EMAIL_FORMATS.find((format) => format.label === '• List')!, body);
+    expect(component.form.controls.text.value).toBe('<ul>\n  <li>Pay on time</li>\n  <li>Save weekly</li>\n</ul>');
+  });
+
+  it('inserts a ready-made block at the cursor', () => {
+    const body = document.createElement('textarea');
+    component.form.controls.text.setValue('Hi\n');
+    body.value = 'Hi\n';
+    body.selectionStart = body.selectionEnd = 3;
+    component.insertBlock(EMAIL_BLOCKS.find((block) => block.label === 'Details table')!, body);
+    expect(component.form.controls.text.value).toContain('Hi\n<table');
+    expect(component.form.controls.text.value).toContain('{{loans.totalOutstanding}}');
+  });
+
+  it('every block and format only uses placeholders the catalogue knows', () => {
+    const known = [
+      'client.office',
+      'client.loanOfficer',
+      'tenant.name',
+      'loans.totalOutstanding',
+      'loans.nextDueAmount',
+      'loans.nextDueDate',
+      'savings.totalBalance'
+    ];
+    EMAIL_BLOCKS.forEach((block) =>
+      (block.html.match(/\{\{\s*([\w.]+)\s*\}\}/g) || []).forEach((tag) =>
+        expect(known).toContain(tag.replace(/[{}\s]/g, ''))
+      )
+    );
   });
 });

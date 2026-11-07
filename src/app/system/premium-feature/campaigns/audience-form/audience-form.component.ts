@@ -22,7 +22,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 import { AudienceClient, AudienceCount, AudienceFilter, reasonLabel } from '../campaigns.model';
 import { CampaignsService } from '../campaigns.service';
-import { AudienceEditorComponent, AudienceState } from '../audience-editor/audience-editor.component';
+import { AudienceEditorComponent, AudienceState, AudienceType } from '../audience-editor/audience-editor.component';
 
 /**
  * Create or change a saved audience on its own, in three steps: filters, a review of the matching clients where some can
@@ -68,6 +68,8 @@ export class AudienceFormComponent implements OnInit {
   /** Only changes how the count is checked: whose phone or email, and whether opted-out clients are left out. */
   channel: 'SMS' | 'EMAIL' = 'SMS';
   marketing = false;
+  /** Clients, or the institution's own staff and system users. */
+  audienceType: AudienceType = 'CLIENTS';
   initialFilters: AudienceFilter[] | null = null;
   state: AudienceState | null = null;
   loaded = true;
@@ -97,6 +99,11 @@ export class AudienceFormComponent implements OnInit {
         if (saved) {
           this.name.setValue(saved.name);
           this.initialFilters = JSON.parse(saved.audience || '[]') as AudienceFilter[];
+          this.audienceType = this.initialFilters.some(
+            (filter) => filter.field === 'RECIPIENTS' && (filter.values || []).includes('STAFF')
+          )
+            ? 'STAFF'
+            : 'CLIENTS';
         }
         this.loaded = true;
         this.changeDetector.markForCheck();
@@ -136,8 +143,24 @@ export class AudienceFormComponent implements OnInit {
     });
   }
 
+  /** Switching between clients and staff starts the filters and left-out list again. */
+  typeChanged() {
+    this.marketing = false;
+    this.excluded = new Map();
+    this.changeDetector.markForCheck();
+  }
+
+  get isStaff(): boolean {
+    return this.audienceType === 'STAFF';
+  }
+
+  /** How a match is left out: clients by id, staff and system users by "STAFF:3" or "USER:5". */
+  private keyOf(client: AudienceClient): string {
+    return this.isStaff ? client.recipientKey || '' : String(client.clientId);
+  }
+
   get purpose(): string {
-    return this.marketing ? 'MARKETING' : 'GENERAL';
+    return this.marketing && !this.isStaff ? 'MARKETING' : 'GENERAL';
   }
 
   audienceChanged(state: AudienceState) {
@@ -171,11 +194,11 @@ export class AudienceFormComponent implements OnInit {
   }
 
   isExcluded(client: AudienceClient): boolean {
-    return this.excluded.has(String(client.clientId));
+    return this.excluded.has(this.keyOf(client));
   }
 
   toggle(client: AudienceClient) {
-    const id = String(client.clientId);
+    const id = this.keyOf(client);
     if (this.excluded.has(id)) {
       this.excluded.delete(id);
     } else {
@@ -201,14 +224,15 @@ export class AudienceFormComponent implements OnInit {
     );
   }
 
-  /** The filters, plus the left-out clients as "all but these" (joined to such a filter if there is one already). */
+  /** The filters, plus the left-out people as "all but these" (joined to such a filter if there is one already). */
   get filtersToSave(): AudienceFilter[] {
     const filters = (this.state?.filters || []).map((filter) => ({ ...filter, values: [...filter.values] }));
     if (!this.excluded.size) {
       return filters;
     }
     const ids = Array.from(this.excluded.keys());
-    const existing = filters.find((filter) => filter.field === 'CLIENT' && filter.operator === 'NOT_IN');
+    const field = this.isStaff ? 'STAFF_MEMBER' : 'CLIENT';
+    const existing = filters.find((filter) => filter.field === field && filter.operator === 'NOT_IN');
     if (existing) {
       existing.values = Array.from(
         new Set([
@@ -217,7 +241,7 @@ export class AudienceFormComponent implements OnInit {
         ])
       );
     } else {
-      filters.push({ field: 'CLIENT', operator: 'NOT_IN', values: ids });
+      filters.push({ field, operator: 'NOT_IN', values: ids });
     }
     return filters;
   }

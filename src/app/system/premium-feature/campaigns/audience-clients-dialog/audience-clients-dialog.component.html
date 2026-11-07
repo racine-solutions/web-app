@@ -1,0 +1,112 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h2 mat-dialog-title>{{ data.title ? data.title + ': matching clients' : 'Matching clients' }}</h2>
+
+<mat-dialog-content>
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Which clients">
+      @for (tab of tabs; track tab.value) {
+        <button
+          type="button"
+          role="tab"
+          class="chip"
+          [class.blue]="show === tab.value"
+          [attr.aria-selected]="show === tab.value"
+          (click)="setTab(tab.value)"
+        >
+          {{ tab.label }} · {{ tab.count | number }}
+        </button>
+      }
+    </div>
+    <mat-form-field class="search" subscriptSizing="dynamic">
+      <mat-label>Search</mat-label>
+      <input
+        matInput
+        [formControl]="search"
+        [placeholder]="isEmail ? 'Name, account or email' : 'Name, account or phone'"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+  <div class="table-scroll">
+    <table class="full">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Account / kind</th>
+          <th>Office</th>
+          <th>{{ isEmail ? 'Email' : 'Phone' }}</th>
+          <th>{{ isEmail ? 'Gets the email?' : 'Gets the SMS?' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of clients; track client.recipientKey || client.clientId) {
+          <tr>
+            <td>
+              @if (client.clientId) {
+                <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
+                  client.displayName
+                }}</a>
+              } @else {
+                {{ client.displayName }}
+              }
+            </td>
+            <td class="mono">
+              {{
+                client.recipientType === 'STAFF'
+                  ? 'Staff'
+                  : client.recipientType === 'USER'
+                    ? 'System user'
+                    : client.accountNo
+              }}
+            </td>
+            <td>{{ client.officeName }}</td>
+            <td class="mono">{{ (isEmail ? client.emailAddress : client.mobileNo) || '—' }}</td>
+            <td>
+              @if (client.skipReason) {
+                <span class="chip amber">Skipped · {{ reasonLabel(client.skipReason) }}</span>
+              } @else {
+                <span class="chip green">Yes</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          @if (!loading) {
+            <tr>
+              <td colspan="5" class="muted empty">
+                {{
+                  search.value
+                    ? 'No matching client has that name, account or ' + (isEmail ? 'email.' : 'phone.')
+                    : 'No clients here.'
+                }}
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <mat-paginator
+    [length]="total"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[25, 50, 100]"
+    (page)="page($event)"
+    aria-label="Pages of matching clients"
+  ></mat-paginator>
+  <span class="spacer"></span>
+  <button mat-raised-button color="primary" mat-dialog-close type="button">Back to campaign</button>
+</mat-dialog-actions>

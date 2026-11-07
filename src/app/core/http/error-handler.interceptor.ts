@@ -8,7 +8,14 @@
 
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpContextToken,
+  HttpEvent,
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpErrorResponse
+} from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable, throwError } from 'rxjs';
@@ -28,6 +35,12 @@ const log = new Logger('ErrorHandlerInterceptor');
 /**
  * Http Request interceptor to add a default error handler to requests.
  */
+/**
+ * Set on a request to handle its errors yourself, without the global error alert: for background calls (such as
+ * polling) whose failure must not interrupt the user.
+ */
+export const SKIP_GLOBAL_ERROR_HANDLER = new HttpContextToken<boolean>(() => false);
+
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
   private alertService = inject(AlertService);
@@ -38,6 +51,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   ];
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (request.context.get(SKIP_GLOBAL_ERROR_HANDLER)) {
+      return next.handle(request);
+    }
     return next.handle(request).pipe(catchError((error) => this.handleError(error, request)));
   }
 

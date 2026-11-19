@@ -20,6 +20,7 @@ import {
 import { ActivatedRoute, Router, NavigationEnd, RouterLink } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -28,6 +29,8 @@ import { map } from 'rxjs/operators';
 /** Custom Imports. */
 import { activities } from './activities';
 import { WarningDialogComponent } from './warning-dialog/warning-dialog.component';
+import { ReleaseNotesComponent, ReleaseNotesResult } from 'app/shared/release-notes/release-notes.component';
+import { RELEASE_NOTES_LOGIN_DIALOG_ID } from 'app/shared/release-notes/release-notes.constants';
 
 /** Custom Services */
 import { AuthenticationService } from '../core/authentication/authentication.service';
@@ -71,6 +74,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   private configurationWizardService = inject(ConfigurationWizardService);
   private popoverService = inject(PopoverService);
   private settingsService = inject(SettingsService);
+  private snackBar = inject(MatSnackBar);
 
   /** Username of authenticated user. */
   username: string;
@@ -104,9 +108,58 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.tenant = this.tenantIdentifier();
     this.setFilteredActivities();
     if (!this.authenticationService.hasDialogBeenShown()) {
-      this.dialog.open(WarningDialogComponent);
+      const warningRef = this.dialog.open(WarningDialogComponent);
       this.authenticationService.showDialog();
+      warningRef.afterClosed().subscribe(() => this.showReleaseNotesIfUnread());
+    } else {
+      this.showReleaseNotesIfUnread();
     }
+  }
+
+  /**
+   * Opens the release notes after login while the user has not read the current version.
+   * "Got it" is the only way to close it. A missing flag (older backend) counts as read.
+   */
+  private showReleaseNotesIfUnread(): void {
+    const credentials = this.authenticationService.getCredentials();
+    if (!credentials || credentials.viewedReleaseNote !== false || !credentials.releaseNoteVersion) {
+      return;
+    }
+    if (this.dialog.getDialogById(RELEASE_NOTES_LOGIN_DIALOG_ID)) {
+      return;
+    }
+    const dialogRef = this.dialog.open<ReleaseNotesComponent, unknown, ReleaseNotesResult>(ReleaseNotesComponent, {
+      id: RELEASE_NOTES_LOGIN_DIALOG_ID,
+      width: '640px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true,
+      data: { mode: 'login' }
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'viewed') {
+        this.authenticationService.markReleaseNoteViewed();
+        this.snackBar
+          .open('Release notes marked as read.', 'View again', { duration: 6000 })
+          .onAction()
+          .subscribe(() => this.openReleaseNotes());
+      } else if (result === 'save-failed') {
+        this.authenticationService.markReleaseNoteViewed();
+        this.snackBar.open("Couldn't save that you read the notes. They will show again next login.", 'Close', {
+          duration: 8000
+        });
+      }
+    });
+  }
+
+  /** Opens the release notes to read again, without changing whether they were read. */
+  private openReleaseNotes(): void {
+    this.dialog.open(ReleaseNotesComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { mode: 'menu' }
+    });
   }
 
   /**

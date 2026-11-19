@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faTags, faBug, faAnchor } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +15,10 @@ describe('ReleaseNotesComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReleaseNotesComponent],
       providers: [
-        { provide: MatDialogRef, useValue: {} }]
+        { provide: MatDialogRef, useValue: {} },
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
 
     const library = TestBed.inject(FaIconLibrary);

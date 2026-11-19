@@ -418,6 +418,18 @@ export class AuthenticationService {
   }
 
   /**
+   * Records in the stored credentials that the user has read the release notes,
+   * so the modal does not open again on Home in this session.
+   */
+  markReleaseNoteViewed(): void {
+    const credentials = this.getCredentials();
+    if (credentials) {
+      credentials.viewedReleaseNote = true;
+      this.storage.setItem(this.credentialsStorageKey, JSON.stringify(credentials));
+    }
+  }
+
+  /**
    * Gets the user credentials.
    * @returns {Credentials} The user credentials if the user is authenticated otherwise null.
    */

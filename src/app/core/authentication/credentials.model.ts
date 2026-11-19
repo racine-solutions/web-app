@@ -25,4 +25,8 @@ export interface Credentials {
   username: string;
   shouldRenewPassword: boolean;
   rememberMe?: boolean;
+  /** False when the user has not read the current release notes; they then open on Home after login. */
+  viewedReleaseNote?: boolean;
+  /** Current release-note version from the backend, or null while release notes after login are off. */
+  releaseNoteVersion?: string | null;
 }

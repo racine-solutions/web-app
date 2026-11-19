@@ -149,11 +149,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    * Opens Release Notes dialog.
    */
   showReleaseNotes() {
-    const dialogRef = this.dialog.open(ReleaseNotesComponent, {
-      width: '500px',
-      height: '600px'
+    this.dialog.open(ReleaseNotesComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { mode: 'menu' }
     });
-    dialogRef.afterClosed().subscribe(() => {});
   }
 
   /**

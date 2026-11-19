@@ -311,7 +311,10 @@ test.describe('Cache-key convention (sorted URLSearchParams)', () => {
       return 'template';
     };
 
-    const buildKey = (entries: ReadonlyArray<[string, string]>): string => {
+    const buildKey = (entries: ReadonlyArray<[
+          string,
+          string
+        ]>): string => {
       const params = new URLSearchParams();
       for (const [
         k,

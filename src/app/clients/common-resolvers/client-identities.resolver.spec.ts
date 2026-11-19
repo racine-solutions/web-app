@@ -35,7 +35,8 @@ describe('ClientIdentitiesResolver', () => {
     TestBed.configureTestingModule({
       providers: [
         ClientIdentitiesResolver,
-        { provide: ClientsService, useValue: clientsService }]
+        { provide: ClientsService, useValue: clientsService }
+      ]
     });
 
     resolver = TestBed.inject(ClientIdentitiesResolver);

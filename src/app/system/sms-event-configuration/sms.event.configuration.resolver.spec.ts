@@ -9,7 +9,8 @@ describe('SmsEventConfigurationResolver', () => {
     TestBed.configureTestingModule({
       providers: [
         SmsEventConfigurationResolver,
-        { provide: SystemService, useValue: {} }]
+        { provide: SystemService, useValue: {} }
+      ]
     });
     resolver = TestBed.inject(SmsEventConfigurationResolver);
   });

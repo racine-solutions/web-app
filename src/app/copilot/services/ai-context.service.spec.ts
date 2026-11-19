@@ -58,7 +58,8 @@ describe('AiContextService', () => {
         AiContextService,
         { provide: Router, useValue: routerMock },
         { provide: AuthenticationService, useValue: { getCredentials: () => credentials } },
-        { provide: TranslateService, useValue: translateMock }]
+        { provide: TranslateService, useValue: translateMock }
+      ]
     });
     service = TestBed.inject(AiContextService);
   });
@@ -78,7 +79,8 @@ describe('AiContextService', () => {
     setRoute(
       [
         { params: { clientId: '42' } },
-        { params: { loanId: '107' } }],
+        { params: { loanId: '107' } }
+      ],
       '/clients/42/loans-accounts/107/general'
     );
     const ctx = service.getContextSnapshot();

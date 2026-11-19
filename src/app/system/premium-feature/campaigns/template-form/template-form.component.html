@@ -1,0 +1,230 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <form [formGroup]="form" (ngSubmit)="save()" class="layout">
+    <mat-card class="editor-card">
+      <div class="fields">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" [placeholder]="nameHint" />
+          @if (form.controls.name.hasError('required')) {
+            <mat-error>Give the template a name.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Tag</mat-label>
+          <input matInput formControlName="tag" [matAutocomplete]="tagList" />
+          <mat-autocomplete #tagList="matAutocomplete">
+            @for (tag of tags; track tag) {
+              <mat-option [value]="tag">{{ tag }}</mat-option>
+            }
+          </mat-autocomplete>
+          <mat-hint>Pick one or type a new tag</mat-hint>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Purpose</mat-label>
+          <mat-select formControlName="purpose">
+            <mat-option value="GENERAL">General communication</mat-option>
+            <mat-option value="MARKETING">Sales &amp; marketing</mat-option>
+          </mat-select>
+          <mat-hint>{{
+            form.controls.purpose.value === 'MARKETING'
+              ? 'Skips clients who asked not to get marketing'
+              : 'Reaches every client you choose'
+          }}</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="channel">
+        <span class="muted">Channel</span>
+        <mat-button-toggle-group formControlName="channel" aria-label="Channel">
+          <mat-button-toggle value="SMS">SMS</mat-button-toggle>
+          <mat-button-toggle value="EMAIL" [disabled]="!emailEnabled && !isEmail">Email</mat-button-toggle>
+        </mat-button-toggle-group>
+        @if (!emailEnabled) {
+          <span class="muted">Email isn't set up on the server yet. Ask your administrator.</span>
+        }
+      </div>
+
+      <div class="message">
+        <div class="how-to">
+          <mat-icon>lightbulb</mat-icon>
+          @if (isEmail) {
+            <div>
+              <b>How an email works:</b> give it a subject and write the body once for everyone. Click a button below to
+              add a client detail where the cursor is, in the subject or the body. Each
+              <code>{{ '{{' }}…{{ '}}' }}</code> is filled in for every client, e.g.
+              <code>{{ '{{' }}client.name{{ '}}' }}</code> becomes "Mwesigye". Write plain text (line breaks are kept)
+              or paste HTML for a designed email; the format buttons style the selected text. Emails have no length
+              limit and go out up to the daily email limit.
+            </div>
+          } @else {
+            <div>
+              <b>How an SMS works:</b> write one short message for everyone. Click a button below to add a client detail
+              where the cursor is. Each <code>{{ '{{' }}…{{ '}}' }}</code> is filled in for every client, e.g.
+              <code>{{ '{{' }}client.name{{ '}}' }}</code> becomes "Mwesigye" and
+              <code>{{ '{{' }}loans.nextDueAmount{{ '}}' }}</code> becomes "UGX 85,000". One SMS holds 160 characters
+              (70 with accented letters such as "ó"); the counter checks the longest client details, so no client gets a
+              cut-off message.
+            </div>
+          }
+        </div>
+        <div class="examples">
+          <span class="muted">Start from an example:</span>
+          @for (example of examples; track example.label) {
+            <button type="button" class="chip blue" (click)="useExample(example)">{{ example.label }}</button>
+          }
+        </div>
+        <div class="placeholders" aria-label="Insert placeholder">
+          @for (group of groups; track group.name) {
+            <div class="group">
+              <span class="muted">{{ group.name }}</span>
+              @for (placeholder of group.items; track placeholder.key) {
+                <button
+                  type="button"
+                  class="chip"
+                  (click)="insert(placeholder, body, subject)"
+                  [title]="'Up to ' + placeholder.maxLength + ' characters, e.g. ' + placeholder.example"
+                >
+                  {{ placeholder.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <mat-form-field class="body" [class.hidden]="!isEmail">
+          <mat-label>Subject</mat-label>
+          <input
+            #subject
+            matInput
+            formControlName="emailSubject"
+            (focus)="focusOn('subject')"
+            [placeholder]="subjectHint"
+          />
+          @if (form.controls.emailSubject.hasError('required')) {
+            <mat-error>Give the email a subject.</mat-error>
+          }
+          @if (form.controls.emailSubject.hasError('maxlength')) {
+            <mat-error>Keep the subject to 200 characters.</mat-error>
+          }
+        </mat-form-field>
+        @if (isEmail) {
+          <div class="format" aria-label="Format the selected text">
+            <span class="muted">Format selected text:</span>
+            @for (format of emailFormats; track format.label) {
+              <button type="button" class="chip" (click)="applyFormat(format, body)" [title]="format.title">
+                {{ format.label }}
+              </button>
+            }
+          </div>
+          <div class="format" aria-label="Insert a block">
+            <span class="muted">Insert at the cursor:</span>
+            @for (block of emailBlocks; track block.label) {
+              <button type="button" class="chip blue" (click)="insertBlock(block, body)" [title]="block.title">
+                {{ block.label }}
+              </button>
+            }
+          </div>
+        }
+        <mat-form-field class="body">
+          <mat-label>{{ isEmail ? 'Email (text or HTML)' : 'Message' }}</mat-label>
+          <textarea
+            #body
+            matInput
+            formControlName="text"
+            (focus)="focusOn('text')"
+            [rows]="isEmail ? 14 : 5"
+            [placeholder]="bodyHint"
+          ></textarea>
+          @if (isEmail) {
+            <mat-hint>Plain text keeps its line breaks. Paste HTML for a designed email.</mat-hint>
+          }
+        </mat-form-field>
+        @if (!isEmail) {
+          <div class="counter">
+            <span
+              >As shown: <b>{{ typedLength }}</b> · Longest case: <b>{{ longestLength }}</b> / {{ limit }}</span
+            >
+            @if (fits) {
+              <span class="ok">{{ limit === 70 ? 'Fits one Unicode SMS' : 'Fits one SMS' }}</span>
+            } @else {
+              <span class="over">{{ longestLength - limit }} characters over: shorten to save</span>
+            }
+          </div>
+          <p class="muted">
+            "Longest case" fills every placeholder with the longest value it can take, such as a 20-letter name or UGX
+            9,999,999,999. Accented letters such as "ó" make the SMS Unicode, which holds 70 characters.
+          </p>
+        }
+      </div>
+
+      <div class="actions">
+        <a mat-button [routerLink]="['/system', 'premium-feature', 'campaigns', 'templates']">Cancel</a>
+        <button mat-raised-button color="primary" type="submit" [disabled]="saving || !fits">
+          {{ templateId ? 'Save changes' : 'Save template' }}
+        </button>
+      </div>
+    </mat-card>
+
+    <mat-card class="preview-card">
+      <h3>{{ isEmail ? 'Email preview' : 'SMS preview' }}</h3>
+      @if (isEmail) {
+        <div class="email-preview">
+          <div class="email-subject">
+            <span class="muted">Subject</span>
+            <b>{{ shown.subject || 'Your subject appears here.' }}</b>
+          </div>
+          <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="emailHtml"></iframe>
+        </div>
+        <div class="preview-facts">
+          <span>Goes to the client's email address</span>
+          <span>{{ hasHtml ? 'Designed (HTML) email' : 'Plain text: line breaks kept' }}</span>
+          <span>No length limit</span>
+        </div>
+      } @else {
+        <div class="phone">
+          <div class="sender">SMS</div>
+          <div class="bubble">{{ shown.message || 'Your message appears here.' }}</div>
+        </div>
+        <div class="preview-facts">
+          <span>Goes to the client's mobile number</span>
+          <span>This client: {{ typedLength }} characters</span>
+          <span [class.over]="!fits" [class.ok]="fits">
+            Longest client: {{ longestLength }} / {{ limit }} ·
+            {{ fits ? (limit === 70 ? '1 Unicode SMS' : '1 SMS') : smsParts + ' SMS: too long' }}
+          </span>
+        </div>
+      }
+      <div class="preview-as">
+        @if (previewClient) {
+          <span class="chip blue"
+            >{{ previewClient.name }}
+            <button type="button" class="clear" (click)="clearClient()" aria-label="Use example values">×</button></span
+          >
+        } @else {
+          <span class="muted">Showing example values.</span>
+        }
+        <mat-form-field class="client-search">
+          <mat-label>Preview as client</mat-label>
+          <input
+            matInput
+            [formControl]="clientSearch"
+            [matAutocomplete]="clientList"
+            placeholder="Name or account number"
+          />
+          <mat-autocomplete #clientList="matAutocomplete" (optionSelected)="pickClient($event.option.value)">
+            @for (client of clients; track client.entityId) {
+              <mat-option [value]="client">{{ client.entityName }} · {{ client.entityAccountNo }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </mat-card>
+  </form>
+</div>

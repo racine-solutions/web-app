@@ -1,0 +1,83 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (loaded) {
+  <section class="section">
+    <div class="section-head">
+      <span class="section-title">Campaign messages</span>
+      <span class="muted">{{ total | number }} in total</span>
+    </div>
+    <div class="consent-card messages">
+      @if (!total) {
+        <span class="muted">No campaign messages yet.</span>
+      } @else {
+        <div class="table-scroll">
+          <table class="full">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Campaign</th>
+                <th>Message</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of messages; track m.id) {
+                <tr>
+                  <td class="when">{{ m.sentOn | date: 'dd MMM yyyy HH:mm' }}</td>
+                  <td>
+                    <a [routerLink]="['/system', 'premium-feature', 'campaigns', m.campaignId]">{{ m.campaignName }}</a>
+                    <div class="muted">Run {{ m.runNumber }}</div>
+                  </td>
+                  <td class="text">
+                    @if (m.channel === 'EMAIL') {
+                      <span class="chip blue">Email</span> {{ m.subject || '—' }}
+                      <div class="muted">{{ m.address }}</div>
+                    } @else {
+                      {{ m.message || '—' }}
+                    }
+                  </td>
+                  <td>
+                    @switch (m.status) {
+                      @case ('SENT') {
+                        <span class="chip green">{{
+                          m.providerEvent === 'DELIVERED'
+                            ? 'Delivered'
+                            : m.providerEvent === 'SPAM'
+                              ? 'Sent · marked as spam'
+                              : 'Sent'
+                        }}</span>
+                      }
+                      @case ('QUEUED') {
+                        <span class="chip amber">Waiting</span>
+                      }
+                      @case ('FAILED') {
+                        <span class="chip red">Failed · {{ reasonLabel(m.reason) }}</span>
+                      }
+                      @default {
+                        <span class="chip grey">Skipped · {{ reasonLabel(m.reason) }}</span>
+                      }
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          [length]="total"
+          [pageIndex]="pageIndex"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="page($event)"
+          aria-label="Pages of campaign messages"
+        ></mat-paginator>
+      }
+    </div>
+  </section>
+}

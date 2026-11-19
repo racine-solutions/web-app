@@ -1,0 +1,295 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <mat-stepper linear #stepper class="mat-elevation-z1">
+    <!-- 1. Template -->
+    <mat-step [completed]="!name.invalid && !!templateId" label="Template">
+      <div class="step">
+        <mat-form-field class="wide">
+          <mat-label>Campaign name</mat-label>
+          <input matInput [formControl]="name" placeholder="e.g. November repayment reminder" />
+          @if (name.hasError('required')) {
+            <mat-error>Give the campaign a name.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="wide">
+          <mat-label>Template</mat-label>
+          <mat-select [(ngModel)]="templateId" (selectionChange)="templateChanged()">
+            @for (template of templates; track template.id) {
+              <mat-option [value]="template.id"
+                >{{ template.name }} · {{ template.channel === 'EMAIL' ? 'Email' : 'SMS' }} · {{ template.tag
+                }}{{ template.purpose === 'MARKETING' ? ' · Marketing' : '' }}</mat-option
+              >
+            }
+          </mat-select>
+          @if (!templates.length) {
+            <mat-hint>No templates yet: create one under Templates first.</mat-hint>
+          }
+        </mat-form-field>
+        @if (isEmail && !emailEnabled) {
+          <div class="banner">
+            <mat-icon>warning</mat-icon>Email isn't set up on the server yet. An approved email campaign waits until
+            your administrator sets it up.
+          </div>
+        }
+        @if (preview) {
+          <div class="two-col">
+            <div>
+              <p class="muted">{{ isEmail ? 'Example email' : 'Example message' }}</p>
+              @if (isEmail) {
+                <ng-container *ngTemplateOutlet="emailPreview"></ng-container>
+              } @else {
+                <div class="phone">
+                  <div class="sender">SMS</div>
+                  <div class="bubble">{{ preview.message }}</div>
+                </div>
+              }
+            </div>
+            <div class="kv">
+              <span>Channel</span><span>{{ isEmail ? 'Email' : 'SMS' }}</span> <span>Tag</span
+              ><span>{{ template?.tag }}</span> <span>Purpose</span
+              ><span>{{ purpose === 'MARKETING' ? 'Sales & marketing' : 'General communication' }}</span>
+              @if (!isEmail) {
+                <span>Longest SMS</span><span>{{ preview.longestLength }} / {{ preview.limit }}</span>
+              }
+            </div>
+          </div>
+        }
+        <div class="nav">
+          <button mat-raised-button color="primary" matStepperNext type="button">Next: audience</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 2. Audience -->
+    <mat-step [completed]="!!audienceFilters.length && !!count?.recipients" label="Audience">
+      <mifosx-audience-editor
+        [purpose]="purpose"
+        [channel]="channel"
+        [initialFilters]="initialFilters"
+        [startAudienceId]="startAudienceId"
+        [showSave]="false"
+        [readOnly]="true"
+        (changed)="audienceChanged($event)"
+      ></mifosx-audience-editor>
+      @if (unsuitableTags.length) {
+        <div class="banner">
+          <mat-icon>warning</mat-icon>
+          This audience is {{ audienceIsStaff ? 'staff' : 'clients' }}, but the template uses
+          {{ audienceIsStaff ? 'client' : 'staff' }} details ({{ unsuitableTags.join(', ') }}). Pick a template written
+          for {{ audienceIsStaff ? 'staff' : 'clients' }} on the Template step.
+        </div>
+      }
+      <div class="nav">
+        <button mat-button matStepperPrevious type="button">Back</button>
+        <button
+          mat-raised-button
+          color="primary"
+          matStepperNext
+          type="button"
+          [disabled]="!audienceFilters.length || !count?.recipients || unsuitableTags.length > 0"
+        >
+          Next: schedule
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- 3. Schedule -->
+    <mat-step [completed]="scheduleValid" label="Schedule">
+      <div class="step two-col">
+        <div>
+          <mat-radio-group [(ngModel)]="scheduleType" class="when">
+            <mat-radio-button value="NOW">Send as soon as it is approved</mat-radio-button>
+            <mat-radio-button value="ONCE">Send once at a set time</mat-radio-button>
+            <mat-radio-button value="REPEAT">Repeat on an interval</mat-radio-button>
+          </mat-radio-group>
+          @if (scheduleType !== 'NOW') {
+            <div class="row">
+              <mat-form-field>
+                <mat-label>{{ scheduleType === 'REPEAT' ? 'First send on' : 'Date' }}</mat-label>
+                <input matInput type="date" [(ngModel)]="sendDate" />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>At</mat-label>
+                <input matInput type="time" [(ngModel)]="sendTime" />
+              </mat-form-field>
+            </div>
+          }
+          @if (scheduleType === 'REPEAT') {
+            <div class="row">
+              <mat-form-field class="short">
+                <mat-label>Every</mat-label>
+                <input matInput type="number" min="1" max="365" [(ngModel)]="repeatEvery" />
+              </mat-form-field>
+              <mat-form-field class="short">
+                <mat-label>Unit</mat-label>
+                <mat-select [(ngModel)]="repeatUnit">
+                  <mat-option value="DAYS">days</mat-option>
+                  <mat-option value="WEEKS">weeks</mat-option>
+                  <mat-option value="MONTHS">months</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Stop</mat-label>
+                <mat-select [(ngModel)]="repeatStop">
+                  <mat-option value="NEVER">When I stop it</mat-option>
+                  <mat-option value="ON_DATE">On a date</mat-option>
+                  <mat-option value="AFTER_RUNS">After a number of runs</mat-option>
+                </mat-select>
+              </mat-form-field>
+              @if (repeatStop === 'ON_DATE') {
+                <mat-form-field>
+                  <mat-label>Last date</mat-label>
+                  <input matInput type="date" [(ngModel)]="repeatUntil" />
+                </mat-form-field>
+              }
+              @if (repeatStop === 'AFTER_RUNS') {
+                <mat-form-field class="short">
+                  <mat-label>Runs</mat-label>
+                  <input matInput type="number" min="1" max="1000" [(ngModel)]="repeatMaxRuns" />
+                </mat-form-field>
+              }
+            </div>
+          }
+          <div class="row quiet">
+            <mat-checkbox [(ngModel)]="quietHours">Only send between</mat-checkbox>
+            <mat-form-field class="short">
+              <mat-label>From</mat-label>
+              <input matInput type="time" [(ngModel)]="quietFrom" [disabled]="!quietHours" />
+            </mat-form-field>
+            <mat-form-field class="short">
+              <mat-label>To</mat-label>
+              <input matInput type="time" [(ngModel)]="quietTo" [disabled]="!quietHours" />
+            </mat-form-field>
+          </div>
+          <p class="muted">
+            Outside these hours sending waits and continues when they start again. The default comes from the
+            campaign-quiet-hours configuration.
+          </p>
+          @if (scheduleProblem) {
+            <p class="over">{{ scheduleProblem }}</p>
+          } @else if (upcomingRuns.length) {
+            <div class="upcoming">
+              <span class="muted">{{ scheduleType === 'REPEAT' ? 'Next runs' : 'Sends' }}:</span>
+              @for (time of upcomingRuns; track $index) {
+                <span class="chip">{{ time | date: 'd MMM yyyy HH:mm' }}</span>
+              }
+              @if (scheduleType === 'REPEAT' && repeatStop === 'NEVER') {
+                <span class="muted">… until you stop it</span>
+              }
+            </div>
+            <p class="muted">Who gets it is worked out again at every run, so new clients who match are included.</p>
+          }
+        </div>
+        @if (isEmail) {
+          <mat-card>
+            <h3>{{ scheduleType === 'REPEAT' ? 'Emails per run' : 'Emails' }}</h3>
+            <div class="kv">
+              <span>Emails to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
+              <span>Daily email limit</span
+              ><span>{{ emailDailyLimit === null ? 'No limit' : (emailDailyLimit | number) }}</span>
+              @if (emailsLeftToday !== null) {
+                <span>Left today</span><span>{{ emailsLeftToday | number }}</span>
+              }
+            </div>
+            @if (emailRunDays > 1) {
+              <p class="muted">
+                At {{ emailDailyLimit | number }} a day, a run takes about {{ emailRunDays }} days: the rest wait and go
+                out the next day.
+              </p>
+            }
+          </mat-card>
+        } @else {
+          <mat-card>
+            <h3>{{ scheduleType === 'REPEAT' ? 'Cost per run' : 'Cost' }}</h3>
+            <div class="kv">
+              <span>SMS to send</span><span>{{ count?.recipients ?? 0 | number }}</span>
+              @if (smsCost !== null) {
+                <span>Price per SMS (last top-up)</span><span>{{ smsCost | number: '1.0-2' }}</span>
+                <span><b>Cost</b></span
+                ><span
+                  ><b>{{ cost | number: '1.0-2' }}</b></span
+                >
+              }
+              @if (smsBalance !== null) {
+                <span>SMS Wallet balance</span><span>{{ smsBalance | number }} SMS</span>
+              }
+            </div>
+            @if (scheduleType === 'REPEAT' && runsCovered !== null) {
+              <p class="muted">
+                The wallet covers {{ runsCovered | number }} run{{ runsCovered === 1 ? '' : 's' }} at today's audience
+                size.
+              </p>
+            }
+            @if (smsBalance !== null && count && count.recipients > smsBalance) {
+              <div class="banner">
+                <mat-icon>warning</mat-icon>Not enough SMS credit. The campaign waits after approval until the wallet is
+                topped up.
+              </div>
+            }
+          </mat-card>
+        }
+      </div>
+      <div class="nav">
+        <button mat-button matStepperPrevious type="button">Back</button>
+        <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!scheduleValid">
+          Next: review
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- 4. Review -->
+    <mat-step label="Review & submit">
+      <div class="step two-col">
+        <div class="kv review">
+          <span>Name</span><span>{{ name.value }}</span> <span>Template</span><span>{{ template?.name }}</span>
+          <span>Purpose</span><span>{{ purpose === 'MARKETING' ? 'Sales & marketing' : 'General communication' }}</span>
+          <span>Audience</span
+          ><span>
+            @for (line of audienceLines; track $index) {
+              <div>{{ line }}</div>
+            } @empty {
+              All active clients of your offices
+            }
+          </span>
+          <span>Recipients</span><span>{{ count?.recipients ?? 0 | number }}</span> <span>When</span
+          ><span>{{ scheduleText }}</span> <span>Sending hours</span
+          ><span>{{ quietHours ? 'Only ' + quietFrom + '–' + quietTo : 'Any time' }}</span>
+        </div>
+        @if (preview) {
+          @if (isEmail) {
+            <div><ng-container *ngTemplateOutlet="emailPreview"></ng-container></div>
+          } @else {
+            <div class="phone">
+              <div class="sender">SMS</div>
+              <div class="bubble">{{ preview.message }}</div>
+            </div>
+          }
+        }
+      </div>
+      <div class="banner blue"><mat-icon>verified_user</mat-icon>Nothing is sent until the campaign is approved.</div>
+      <div class="nav">
+        <button mat-button matStepperPrevious type="button">Back</button>
+        <button mat-stroked-button type="button" [disabled]="saving" (click)="save(false)">Save as draft</button>
+        <button mat-raised-button color="primary" type="button" [disabled]="saving" (click)="save(true)">
+          Save and submit for approval
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>
+
+<ng-template #emailPreview>
+  <div class="email-preview">
+    <div class="email-subject">
+      <span class="muted">Subject</span><b>{{ preview?.subject }}</b>
+    </div>
+    <iframe title="Email preview" sandbox="allow-popups" [srcdoc]="previewHtml"></iframe>
+  </div>
+</ng-template>

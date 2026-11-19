@@ -463,34 +463,6 @@
             </mat-list-item>
           </div>
 
-          <div #smscampaigns>
-            <mat-list-item *mifosxHasPermission="'VIEW_SMSCAMPAIGNS'">
-              <div class="menu-list-item-content">
-                <div class="menu-left-section" [routerLink]="['sms-campaigns']">
-                  <mat-icon matListIcon>
-                    <fa-icon icon="envelope" size="sm"></fa-icon>
-                  </mat-icon>
-                  <div matLine>
-                    {{ 'labels.heading.SMS Campaigns' | translate }}
-                    @if (arrowBooleans[15]) {
-                      <p matLine [routerLink]="['sms-campaigns']" class="menu-explanation">
-                        {{ 'labels.text.Define SMS Campaigns for Organization' | translate }}
-                      </p>
-                    }
-                  </div>
-                </div>
-                <div class="menu-right-section">
-                  @if (!arrowBooleans[15]) {
-                    <fa-icon (click)="arrowBooleansToggle(15)" icon="arrow-down" size="md"></fa-icon>
-                  }
-                  @if (arrowBooleans[15]) {
-                    <fa-icon (click)="arrowBooleansToggle(15)" icon="arrow-up" size="md"></fa-icon>
-                  }
-                </div>
-              </div>
-            </mat-list-item>
-          </div>
-
           <div #adhocquery>
             <mat-list-item *mifosxHasPermission="'VIEW_ADHOC'">
               <div class="menu-list-item-content">

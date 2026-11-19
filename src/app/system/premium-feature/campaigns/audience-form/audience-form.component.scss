@@ -1,0 +1,85 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.check {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+
+  .grow {
+    flex: 1 1 200px;
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 8px 0;
+
+  .search {
+    width: 300px;
+    max-width: 100%;
+  }
+}
+
+.excluded {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+
+  .remove {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: inherit;
+  }
+}
+
+.table-scroll {
+  overflow: auto;
+  max-height: 55vh;
+}
+
+tr.left-out td {
+  opacity: 0.6;
+}
+
+.save-step {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  align-items: flex-start;
+  margin-top: 8px;
+
+  .name {
+    flex: 1 1 280px;
+    max-width: 480px;
+  }
+
+  .kv {
+    flex: 1 1 320px;
+  }
+}

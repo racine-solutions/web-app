@@ -1,0 +1,195 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  @if (!loaded) {
+    <mat-card><p class="muted">Loading audience…</p></mat-card>
+  } @else {
+    <mat-stepper linear #stepper class="mat-elevation-z1" (selectionChange)="stepChanged($event)">
+      <!-- 1. Filters -->
+      <mat-step [completed]="hasFilters" label="Filters">
+        <div class="check">
+          <span class="muted">Who gets it</span>
+          <mat-button-toggle-group [(ngModel)]="audienceType" (change)="typeChanged()" aria-label="Who gets it">
+            <mat-button-toggle value="CLIENTS">Clients</mat-button-toggle>
+            <mat-button-toggle value="STAFF">Staff</mat-button-toggle>
+          </mat-button-toggle-group>
+          <span class="muted">Check contacts for</span>
+          <mat-button-toggle-group [(ngModel)]="channel" aria-label="Check contacts for">
+            <mat-button-toggle value="SMS">SMS</mat-button-toggle>
+            <mat-button-toggle value="EMAIL">Email</mat-button-toggle>
+          </mat-button-toggle-group>
+          @if (!isStaff) {
+            <mat-checkbox [(ngModel)]="marketing">Sales &amp; marketing (leave out clients who opted out)</mat-checkbox>
+          }
+        </div>
+        <p class="muted">
+          An audience is a set of filters: who it reaches is worked out again each time a campaign uses it. The choice
+          above only changes how the count checks phones or emails; the campaign's template decides it when sending.
+        </p>
+        <mifosx-audience-editor
+          [purpose]="purpose"
+          [channel]="channel"
+          [initialFilters]="initialFilters"
+          [audienceType]="audienceType"
+          [showSavedPicker]="false"
+          [showSave]="false"
+          (changed)="audienceChanged($event)"
+        ></mifosx-audience-editor>
+        <div class="nav">
+          @if (!hasFilters) {
+            <span class="muted grow">Add at least one filter to continue.</span>
+          }
+          <a mat-button [routerLink]="['/system', 'premium-feature', 'campaigns', 'audiences']">Cancel</a>
+          <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="!hasFilters">
+            Next: review clients
+          </button>
+        </div>
+      </mat-step>
+
+      <!-- 2. Review clients -->
+      <mat-step label="Review clients">
+        <div class="toolbar">
+          <span
+            >{{ total | number }} matching{{ search.value ? ' this search' : '' }} ·
+            <b>{{ excluded.size | number }} left out</b></span
+          >
+          <mat-form-field class="search" subscriptSizing="dynamic">
+            <mat-label>Search</mat-label>
+            <input matInput [formControl]="search" placeholder="Name, account, phone or email" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        @if (excluded.size) {
+          <div class="excluded" aria-label="Left out clients">
+            <span class="muted">Left out:</span>
+            @for (client of excludedList; track client.id) {
+              <span class="chip amber"
+                >{{ client.name }}
+                <button
+                  type="button"
+                  class="remove"
+                  (click)="include(client.id)"
+                  [attr.aria-label]="'Put back ' + client.name"
+                >
+                  ×
+                </button></span
+              >
+            }
+          </div>
+        }
+        <div class="table-scroll">
+          <table class="full">
+            <thead>
+              <tr>
+                <th>{{ isStaff ? 'Staff' : 'Client' }}</th>
+                <th>{{ isStaff ? 'Kind' : 'Account' }}</th>
+                <th>Office</th>
+                <th>{{ channel === 'EMAIL' ? 'Email' : 'Phone' }}</th>
+                <th>Gets it?</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (client of clients; track client.recipientKey || client.clientId) {
+                <tr [class.left-out]="isExcluded(client)">
+                  <td>
+                    @if (client.clientId) {
+                      <a [routerLink]="['/clients', client.clientId, 'general']" target="_blank" rel="noopener">{{
+                        client.displayName
+                      }}</a>
+                    } @else {
+                      {{ client.displayName }}
+                    }
+                  </td>
+                  <td class="mono">
+                    {{
+                      client.recipientType === 'STAFF'
+                        ? 'Staff'
+                        : client.recipientType === 'USER'
+                          ? 'System user'
+                          : client.accountNo
+                    }}
+                  </td>
+                  <td>{{ client.officeName }}</td>
+                  <td class="mono">{{ (channel === 'EMAIL' ? client.emailAddress : client.mobileNo) || '—' }}</td>
+                  <td>
+                    @if (isExcluded(client)) {
+                      <span class="chip amber">Left out</span>
+                    } @else if (client.skipReason) {
+                      <span class="chip grey">Skipped · {{ reasonLabel(client.skipReason) }}</span>
+                    } @else {
+                      <span class="chip green">Yes</span>
+                    }
+                  </td>
+                  <td class="num">
+                    <button mat-button type="button" (click)="toggle(client)">
+                      {{ isExcluded(client) ? 'Put back' : 'Exclude' }}
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                @if (!loadingClients) {
+                  <tr>
+                    <td colspan="6" class="muted">
+                      {{ search.value ? 'No matching client fits that search.' : 'No clients match these filters.' }}
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator
+          [length]="total"
+          [pageIndex]="pageIndex"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[25, 50, 100]"
+          (page)="page($event)"
+          aria-label="Pages of matching clients"
+        ></mat-paginator>
+        <div class="nav">
+          <button mat-button matStepperPrevious type="button">Back</button>
+          <button mat-raised-button color="primary" matStepperNext type="button">Next: name and save</button>
+        </div>
+      </mat-step>
+
+      <!-- 3. Name and save -->
+      <mat-step label="Name & save">
+        <div class="save-step">
+          <mat-form-field class="name">
+            <mat-label>Audience name</mat-label>
+            <input matInput [formControl]="name" maxlength="100" placeholder="e.g. Women 18–35 with savings" />
+            @if (name.hasError('required')) {
+              <mat-error>Give the audience a name.</mat-error>
+            }
+          </mat-form-field>
+          <div class="kv">
+            <span>Filters</span
+            ><span>
+              @for (line of state?.summary || []; track $index) {
+                <div>{{ line }}</div>
+              }
+              @if (excluded.size) {
+                <div>Leave out {{ excluded.size }} client{{ excluded.size === 1 ? '' : 's' }}</div>
+              }
+            </span>
+            <span>Matching today</span><span>{{ finalCount ? (finalCount.matching | number) : 'Counting…' }}</span>
+            <span>Would get it today</span><span>{{ finalCount ? (finalCount.recipients | number) : '…' }}</span>
+          </div>
+        </div>
+        <div class="nav">
+          <button mat-button matStepperPrevious type="button">Back</button>
+          <button mat-raised-button color="primary" type="button" [disabled]="!canSave" (click)="save()">
+            <mat-icon>bookmark_add</mat-icon> {{ audienceId ? 'Save changes' : 'Save audience' }}
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  }
+</div>

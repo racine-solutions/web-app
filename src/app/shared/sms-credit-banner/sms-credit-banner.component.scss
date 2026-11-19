@@ -1,0 +1,58 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+// Amber while low, red once critical. Colours are set here (not from the theme) so the warning reads the same in
+// light and dark mode, and they keep 4.5:1 contrast with their text.
+.sms-credit-banner {
+  --sms-banner-bg: #fff4e5;
+  --sms-banner-border: #f0a020;
+  --sms-banner-text: #663c00;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 16px 0;
+  padding: 10px 16px;
+  border: 1px solid var(--sms-banner-border);
+  border-left-width: 6px;
+  border-radius: 6px;
+  background: var(--sms-banner-bg);
+  color: var(--sms-banner-text);
+
+  &.critical {
+    --sms-banner-bg: #fdecea;
+    --sms-banner-border: #d32f2f;
+    --sms-banner-text: #611a15;
+  }
+}
+
+.sms-credit-banner-icon {
+  flex: none;
+  color: var(--sms-banner-border);
+}
+
+.sms-credit-banner-text {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.sms-credit-banner-action {
+  flex: none;
+  color: var(--sms-banner-text);
+  font-weight: 600;
+}
+
+@media (width <= 600px) {
+  .sms-credit-banner {
+    flex-wrap: wrap;
+    margin: 8px 8px 0;
+  }
+}

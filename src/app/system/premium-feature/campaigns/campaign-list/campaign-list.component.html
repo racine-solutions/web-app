@@ -1,0 +1,102 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container">
+  <div class="page-actions">
+    <a mat-stroked-button [routerLink]="['templates']"><mat-icon>description</mat-icon> Templates</a>
+    <a mat-stroked-button [routerLink]="['audiences']" *mifosxHasPermission="'READ_COMMAUDIENCE'"
+      ><mat-icon>groups</mat-icon> Saved audiences</a
+    >
+    <a mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_COMMCAMPAIGN'"
+      ><mat-icon>add</mat-icon> New campaign</a
+    >
+  </div>
+
+  <div class="filters" role="group" aria-label="Filter by status">
+    @for (filter of filters; track filter.value) {
+      <button type="button" class="chip" [class.blue]="status === filter.value" (click)="setStatus(filter.value)">
+        {{ filter.label }}
+      </button>
+    }
+  </div>
+
+  <mat-card>
+    @if (loading && !campaigns.length) {
+      <p class="muted">Loading campaigns…</p>
+    } @else if (!total) {
+      <div class="empty">
+        <mat-icon>campaign</mat-icon>
+        <p>No campaigns{{ status ? ' with this status' : ' yet' }}.</p>
+        @if (!status) {
+          <p class="muted">Start with a template, then create a campaign to send it to the clients you choose.</p>
+        }
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="full">
+          <thead>
+            <tr>
+              <th>Campaign</th>
+              <th>Template · tag</th>
+              <th>When</th>
+              <th>Status</th>
+              <th class="num">Last run</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (campaign of campaigns; track campaign.id) {
+              <tr (click)="open(campaign)" tabindex="0" (keydown.enter)="open(campaign)">
+                <td>
+                  <strong>{{ campaign.name }}</strong>
+                  <div class="muted">{{ campaign.channel }} · {{ campaign.createdBy }}</div>
+                </td>
+                <td>
+                  {{ campaign.templateName }} <span class="chip">{{ campaign.tag }}</span>
+                  @if (campaign.purpose === 'MARKETING') {
+                    <span class="chip grey">Marketing</span>
+                  }
+                </td>
+                <td>
+                  {{ schedule(campaign) }}
+                  @if (campaign.nextRunAt && (campaign.status === 'SCHEDULED' || campaign.status === 'PAUSED')) {
+                    <div class="muted">Next: {{ campaign.nextRunAt }}</div>
+                  }
+                </td>
+                <td>
+                  <span class="chip" [ngClass]="statusTone[campaign.status]">{{ statusLabels[campaign.status] }}</span>
+                </td>
+                <td class="num">
+                  @if (campaign.lastRun; as run) {
+                    {{ run.sent | number }} sent
+                    @if (run.failed) {
+                      · {{ run.failed | number }} failed
+                    }
+                    @if (run.queued) {
+                      · {{ run.queued | number }} waiting
+                    }
+                  } @else {
+                    —
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        showFirstLastButtons
+        (page)="page($event)"
+        aria-label="Pages of campaigns"
+      ></mat-paginator>
+    }
+  </mat-card>
+</div>

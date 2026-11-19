@@ -365,9 +365,10 @@ export class ClientsService {
     return this.http.get('/templates', { params: httpParams });
   }
 
+  /** Fills the template in for the client: a POST merges, while a GET would only return the template itself. */
   retrieveClientReportTemplate(templateId: string, clientId: string) {
     const httpParams = new HttpParams().set('clientId', clientId);
-    return this.http.get(`/templates/${templateId}`, { params: httpParams, responseType: 'text' });
+    return this.http.post(`/templates/${templateId}`, {}, { params: httpParams, responseType: 'text' });
   }
 
   /**

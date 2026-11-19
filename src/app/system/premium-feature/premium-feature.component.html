@@ -21,5 +21,16 @@
         </mat-card-content>
       </mat-card>
     </div>
+    <div class="flex-50" *mifosxHasPermission="'READ_COMMCAMPAIGN'">
+      <mat-card class="feature-card" [routerLink]="['campaigns']">
+        <mat-card-content class="feature-card-content">
+          <mat-icon class="feature-icon">campaign</mat-icon>
+          <div>
+            <h3 class="feature-title">Campaigns</h3>
+            <p class="feature-description">Templates, audiences and approved SMS campaigns</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>

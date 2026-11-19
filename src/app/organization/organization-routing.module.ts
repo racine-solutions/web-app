@@ -21,7 +21,6 @@ import { EmployeesComponent } from './employees/employees.component';
 import { CreateEmployeeComponent } from './employees/create-employee/create-employee.component';
 import { ViewEmployeeComponent } from './employees/view-employee/view-employee.component';
 import { CurrenciesComponent } from './currencies/currencies.component';
-import { SmsCampaignsComponent } from './sms-campaigns/sms-campaigns.component';
 import { AdhocQueryComponent } from './adhoc-query/adhoc-query.component';
 import { ViewAdhocQueryComponent } from './adhoc-query/view-adhoc-query/view-adhoc-query.component';
 import { TellersComponent } from './tellers/tellers.component';
@@ -43,7 +42,6 @@ import { ViewHolidaysComponent } from './holidays/view-holidays/view-holidays.co
 import { ViewOfficeComponent } from './offices/view-office/view-office.component';
 import { GeneralTabComponent } from './offices/view-office/general-tab/general-tab.component';
 import { DatatableTabsComponent } from './offices/view-office/datatable-tabs/datatable-tabs.component';
-import { ViewCampaignComponent } from './sms-campaigns/view-campaign/view-campaign.component';
 import { ManageFundsComponent } from './manage-funds/manage-funds.component';
 import { ManageCurrenciesComponent } from './currencies/manage-currencies/manage-currencies.component';
 import { CashiersComponent } from './tellers/cashiers/cashiers.component';
@@ -58,8 +56,6 @@ import { EditOfficeComponent } from './offices/edit-office/edit-office.component
 import { BulkImportComponent } from './bulk-import/bulk-import.component';
 import { ViewBulkImportComponent } from './bulk-import/view-bulk-import/view-bulk-import.component';
 import { ViewLoanProvisioningCriteriaComponent } from './loan-provisioning-criteria/view-loan-provisioning-criteria/view-loan-provisioning-criteria.component';
-import { CreateCampaignComponent } from './sms-campaigns/create-campaign/create-campaign.component';
-import { EditCampaignComponent } from './sms-campaigns/edit-campaign/edit-campaign.component';
 import { CreateEntityDataTableChecksComponent } from './entity-data-table-checks/create-entity-data-table-checks/create-entity-data-table-checks.component';
 import { CreateLoanProvisioningCriteriaComponent } from './loan-provisioning-criteria/create-loan-provisioning-criteria/create-loan-provisioning-criteria.component';
 import { BulkLoanReassignmnetComponent } from './bulk-loan-reassignmnet/bulk-loan-reassignmnet.component';
@@ -297,50 +293,9 @@ const routes: Routes = [
           ]
         },
         {
+          // The old SMS Campaigns screens are replaced by RacinePay Premium > Campaigns
           path: 'sms-campaigns',
-          data: { title: 'SMS Campaigns', breadcrumb: 'SMS Campaigns' },
-          children: [
-            {
-              path: '',
-              component: SmsCampaignsComponent,
-              resolve: {
-                smsCampaigns: SmsCampaignsResolver
-              }
-            },
-            {
-              path: 'create',
-              data: { title: 'Create SMS Campaign', breadcrumb: 'Create Campaign' },
-              component: CreateCampaignComponent,
-              resolve: {
-                smsCampaignTemplate: SmsCampaignTemplateResolver
-              }
-            },
-            {
-              path: ':id',
-              data: { title: 'View SMS Campaign', routeResolveBreadcrumb: [
-                  'smsCampaign',
-                  'campaignName'
-                ] },
-              resolve: {
-                smsCampaign: SmsCampaignResolver
-              },
-              runGuardsAndResolvers: 'always',
-              children: [
-                {
-                  path: '',
-                  component: ViewCampaignComponent
-                },
-                {
-                  path: 'edit',
-                  component: EditCampaignComponent,
-                  data: { title: 'Edit SMS Campaign', breadcrumb: 'Edit', routeResolveBreadcrumb: false },
-                  resolve: {
-                    smsCampaignTemplate: SmsCampaignTemplateResolver
-                  }
-                }
-              ]
-            }
-          ]
+          children: [{ path: '**', redirectTo: '/system/premium-feature/campaigns' }]
         },
         {
           path: 'standing-instructions-history',

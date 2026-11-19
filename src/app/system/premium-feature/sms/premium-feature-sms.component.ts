@@ -43,6 +43,22 @@ export class PremiumFeatureSmsComponent {
     });
   }
 
+  /** SMS sent so far: everything ever credited minus what is left. One SMS uses one unit of credit. */
+  get smsUsed(): number {
+    const credit = this.smsAccount?.smsTotalCredit ?? 0;
+    const balance = this.smsAccount?.smsTotalBalance ?? 0;
+    return Math.max(0, credit - balance);
+  }
+
+  /** Share of all SMS credit ever bought that has been used, 0-100; null before any credit is bought. */
+  get percentageUsed(): number | null {
+    const credit = this.smsAccount?.smsTotalCredit ?? 0;
+    if (credit <= 0) {
+      return null;
+    }
+    return Math.min(100, (this.smsUsed / credit) * 100);
+  }
+
   get accountStatusLabel(): string {
     return this.smsAccount?.isActive ? 'Active' : 'Inactive';
   }

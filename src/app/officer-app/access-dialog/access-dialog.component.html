@@ -1,0 +1,57 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<h1 mat-dialog-title>{{ 'labels.heading.' + text.title | translate }}</h1>
+<div mat-dialog-content [formGroup]="form" class="dialog-content">
+  <p class="who">
+    {{ data.officerName }} · {{ data.username }}
+    @if (data.device) {
+      · {{ data.device.label }} ({{ data.device.shortCode }})
+    }
+  </p>
+  <p class="description" [class.warning]="text.danger">{{ 'labels.text.' + text.description | translate }}</p>
+  @if (webAppNote) {
+    <p class="web-note">{{ 'labels.text.Their web app login, roles and password do not change' | translate }}</p>
+  }
+
+  <mat-form-field class="full-width">
+    <mat-label>{{ 'labels.inputs.Reason' | translate }}</mat-label>
+    <textarea matInput formControlName="reason" rows="3" maxlength="500" [required]="text.reasonRequired"></textarea>
+    <mat-hint>
+      @if (reasonShownInApp) {
+        {{ 'labels.text.Shown to the officer in the app and in the activity timeline' | translate }}
+      } @else {
+        {{ 'labels.text.Shown in the activity timeline' | translate }}
+      }
+    </mat-hint>
+    @if (form.controls.reason.hasError('required')) {
+      <mat-error
+        >{{ 'labels.inputs.Reason' | translate }} {{ 'labels.commons.is' | translate }}
+        <strong>{{ 'labels.commons.required' | translate }}</strong></mat-error
+      >
+    }
+  </mat-form-field>
+
+  @if (isTurnOff && data.activeDevices) {
+    <mat-checkbox formControlName="blockDevices">
+      {{ 'labels.inputs.Also block their devices so nobody can use them with another account' | translate }}
+      ({{ data.activeDevices }})
+    </mat-checkbox>
+  }
+  @if (text.notify) {
+    <mat-checkbox formControlName="notify">{{
+      'labels.inputs.Tell the officer by email, or by SMS if they have no email' | translate
+    }}</mat-checkbox>
+  }
+</div>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close type="button">{{ 'labels.buttons.Cancel' | translate }}</button>
+  <button mat-raised-button [color]="text.danger ? 'warn' : 'primary'" type="button" (click)="submit()">
+    {{ 'labels.buttons.' + text.submit | translate }}
+  </button>
+</mat-dialog-actions>

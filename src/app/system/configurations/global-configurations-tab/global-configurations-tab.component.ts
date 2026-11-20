@@ -97,6 +97,8 @@ export class GlobalConfigurationsTabComponent implements OnInit, AfterViewInit {
   ];
   /** Data source for configurations table. */
   dataSource: MatTableDataSource<any>;
+  /** Filter given in the link (?filter=), e.g. from Admin › Mobile Officer App › Settings. */
+  initialFilter = '';
 
   /** Paginator for configurations table. */
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -142,6 +144,10 @@ export class GlobalConfigurationsTabComponent implements OnInit, AfterViewInit {
       this.dataSource = new MatTableDataSource(this.configurationData);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      this.initialFilter = this.route.snapshot.queryParamMap.get('filter') || '';
+      if (this.initialFilter) {
+        this.applyFilter(this.initialFilter);
+      }
     });
   }
 

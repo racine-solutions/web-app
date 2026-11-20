@@ -101,6 +101,10 @@ const routes: Routes = [
     loadChildren: () => import('./self-service-users/self-service-users.module').then((m) => m.SelfServiceUsersModule)
   },
   {
+    path: 'officerapp',
+    loadChildren: () => import('./officer-app/officer-app.module').then((m) => m.OfficerAppModule)
+  },
+  {
     path: 'callback',
     component: CallbackComponent
   },

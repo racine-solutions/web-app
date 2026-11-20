@@ -1,0 +1,93 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+@if (officer) {
+  <section class="access-card">
+    <div class="head">
+      <span class="title">{{ 'labels.heading.Mobile Officer App' | translate }}</span>
+      <span class="status-pill" [ngClass]="officer.accessStatus === 'OFF' ? 'off' : 'allowed'"
+        ><span class="dot"></span
+        >{{ 'labels.status.' + (officer.accessStatus === 'OFF' ? 'Access off' : 'Access allowed') | translate }}</span
+      >
+      @if (locked) {
+        <span class="status-pill locked"
+          ><span class="dot"></span>{{ 'labels.status.Account locked' | translate }}</span
+        >
+      }
+      @if (officer.devices) {
+        <span class="status-pill" [ngClass]="onlineSeverity(officer.onlineStatus)"
+          ><span class="dot"></span>{{ 'labels.status.' + onlineLabel(officer.onlineStatus) | translate }}</span
+        >
+      }
+    </div>
+    <dl class="kv">
+      @if (officer.accessChangedOn) {
+        <dt>
+          {{
+            officer.accessStatus === 'OFF'
+              ? ('labels.inputs.Turned off' | translate)
+              : ('labels.inputs.Changed on' | translate)
+          }}
+        </dt>
+        <dd>{{ officer.accessChangedOn | date: 'dd MMM yyyy HH:mm' }} · {{ officer.accessChangedBy || '-' }}</dd>
+        @if (officer.accessReason) {
+          <dt>{{ 'labels.inputs.Reason' | translate }}</dt>
+          <dd>{{ officer.accessReason }}</dd>
+        }
+      }
+      <dt>{{ 'labels.inputs.Devices' | translate }}</dt>
+      <dd>
+        {{ officer.devices }}
+        @if (officer.blockedDevices) {
+          ({{ officer.blockedDevices }} {{ 'labels.inputs.blocked' | translate }})
+        }
+      </dd>
+      <dt>{{ 'labels.inputs.Last seen' | translate }}</dt>
+      <dd>
+        {{
+          officer.lastSeenOn ? (officer.lastSeenOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate)
+        }}
+      </dd>
+    </dl>
+    <div class="actions">
+      @if (locked) {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="unlock()"
+          *mifosxHasPermission="permissions.unlock"
+        >
+          {{ 'labels.buttons.unlock' | translate }}
+        </button>
+      }
+      <button
+        mat-raised-button
+        type="button"
+        [color]="toggleCommand === 'turnOff' ? 'warn' : 'primary'"
+        (click)="toggle()"
+        *mifosxHasPermission="permissions[toggleCommand]"
+      >
+        {{ 'labels.buttons.' + toggleCommand | translate }}
+      </button>
+      <a mat-button color="primary" [routerLink]="['/officerapp', officer.userId]">{{
+        'labels.buttons.View app activity' | translate
+      }}</a>
+    </div>
+    @if (locked) {
+      <p class="note alert">
+        {{
+          'labels.text.Locked after too many failed sign-ins: the user cannot sign in to the web app or the field officer app until unlocked'
+            | translate
+        }}
+      </p>
+    } @else {
+      <p class="note">{{ 'labels.text.This user can still sign in to the web app' | translate }}</p>
+    }
+  </section>
+}

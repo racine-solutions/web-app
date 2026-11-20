@@ -7,7 +7,15 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  inject
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -80,6 +88,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 })
 export class AuditTrailsComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
+  private changeDetector = inject(ChangeDetectorRef);
   private systemService = inject(SystemService);
   private dateUtils = inject(Dates);
   private settingsService = inject(SettingsService);
@@ -112,7 +121,15 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
     'madeOnDate',
     'checker',
     'checkedOnDate',
-    'clientIp'
+    'clientIp',
+    'channel'
+  ];
+  /** Where an action came from (stored since RPAY-146). */
+  readonly channels = [
+    { value: 'WEB', label: 'Web app' },
+    { value: 'OFFICER_APP', label: 'Field officer app' },
+    { value: 'SELF_SERVICE', label: 'Self-service app' },
+    { value: 'API', label: 'Other API client' }
   ];
   /** Data source for audit trails table. */
   dataSource: AuditTrailsDataSource;
@@ -159,6 +176,10 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
       value: ''
     },
     {
+      type: 'channel',
+      value: ''
+    },
+    {
       type: 'dateFormat',
       value: this.settingsService.dateFormat
     },
@@ -179,6 +200,8 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
   checkedFromTime = new UntypedFormControl();
   /** Processing result form control. */
   processingResult = new UntypedFormControl();
+  /** Channel form control. */
+  channel = new UntypedFormControl('');
   /** Action name form control. */
   actionName = new UntypedFormControl();
   /** Resource ID form control. */
@@ -226,6 +249,8 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
     this.setFilteredEntities();
     this.setFilteredCheckers();
     this.dataSource = new AuditTrailsDataSource(this.systemService);
+    // OnPush: rows arrive after the request returns (filters, paging, sorting), so redraw the table then
+    this.dataSource.records$.subscribe(() => this.changeDetector.markForCheck());
     this.getAuditTrails();
   }
 
@@ -382,14 +407,14 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
    * Initializes the data source for audit trails table and loads the first page.
    */
   getAuditTrails() {
-    this.isLoading = true;
+    // No loading flag here: hiding the table, even for a moment, disconnects the data source, which ends its
+    // streams, so the table never showed results again after a filter, sort or page change
     const isActive: string = this.sort ? this.sort.active : '';
     const direction: string = this.sort ? this.sort.direction : '';
     const pageIndex: number = this.paginator ? this.paginator.pageIndex : 0;
     const pageSize: any = this.paginator ? this.paginator.pageSize : 20;
 
     this.dataSource.getAuditTrails(this.filterAuditTrailsBy, isActive, direction, pageIndex, pageSize);
-    this.isLoading = false;
   }
 
   /**
@@ -423,6 +448,15 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
    */
   displayUserName(user?: any): string | undefined {
     return user ? user.name : undefined;
+  }
+
+  /**
+   * Label (labels.inputs.*) of the channel an action came from.
+   * @param {string} channel WEB, OFFICER_APP, SELF_SERVICE or API.
+   * @returns {string} Label key.
+   */
+  channelLabel(channel: string): string {
+    return this.channels.find((c) => c.value === channel)?.label ?? channel;
   }
 
   /**
@@ -544,7 +578,8 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
       'Checker',
       'Entity',
       'Action',
-      'Client'
+      'Client',
+      'Channel'
     ];
     const headerCode = [
       'id',
@@ -557,7 +592,8 @@ export class AuditTrailsComponent implements OnInit, AfterViewInit {
       'checker',
       'entityName',
       'actionName',
-      'clientName'
+      'clientName',
+      'channel'
     ];
     this.systemService
       .getAuditTrails(this.filterAuditTrailsBy, this.sort?.active ?? '', this.sort?.direction ?? '', 0, -1)

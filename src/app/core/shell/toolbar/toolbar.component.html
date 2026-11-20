@@ -211,6 +211,9 @@
   <button mat-menu-item [routerLink]="['/selfserviceusers']" tabindex="0" *mifosxHasPermission="'READ_SELFSERVICEUSER'">
     {{ 'labels.menus.Self Service Users' | translate }}
   </button>
+  <button mat-menu-item [routerLink]="['/officerapp']" tabindex="0" *mifosxHasPermission="'READ_OFFICERAPP'">
+    {{ 'labels.menus.Mobile Officer App' | translate }}
+  </button>
   <button mat-menu-item [routerLink]="['/organization']" tabindex="0" *mifosxHasPermission="'READ_OFFICE'">
     {{ 'labels.menus.Organization' | translate }}
   </button>

@@ -27,7 +27,7 @@
             ><span class="dot"></span>{{ 'labels.status.' + onlineLabel(user.onlineStatus) | translate }}</span
           >
           <span class="status-pill" [ngClass]="user.webStatus === 'ACTIVE' ? 'active' : 'locked'"
-            ><span class="dot"></span>{{ 'labels.inputs.Web app' | translate }}:
+            ><span class="dot"></span>{{ 'labels.inputs.Account' | translate }}:
             {{
               'labels.status.' +
                 (user.webStatus === 'ACTIVE' ? 'Active' : user.webStatus === 'LOCKED' ? 'Locked' : 'Disabled')

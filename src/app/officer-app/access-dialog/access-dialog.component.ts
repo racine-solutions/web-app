@@ -68,6 +68,15 @@ const COMMAND_TEXT: Record<OfficerCommand | DeviceCommand, CommandText> = {
     notify: false,
     danger: false
   },
+  unlock: {
+    title: 'Unlock Account',
+    description:
+      'The user can sign in to the web app and the field officer app again. They are told by email, or by SMS when they have no email address',
+    submit: 'Unlock',
+    reasonRequired: false,
+    notify: false,
+    danger: false
+  },
   block: {
     title: 'Block Device',
     description:

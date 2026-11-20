@@ -62,4 +62,9 @@
   margin: 0;
   font-size: 12px;
   color: var(--ch-text-2);
+
+  &.alert {
+    color: var(--ch-alert);
+    font-weight: 600;
+  }
 }

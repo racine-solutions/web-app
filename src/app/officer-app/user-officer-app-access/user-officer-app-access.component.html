@@ -14,6 +14,11 @@
         ><span class="dot"></span
         >{{ 'labels.status.' + (officer.accessStatus === 'OFF' ? 'Access off' : 'Access allowed') | translate }}</span
       >
+      @if (locked) {
+        <span class="status-pill locked"
+          ><span class="dot"></span>{{ 'labels.status.Account locked' | translate }}</span
+        >
+      }
       @if (officer.devices) {
         <span class="status-pill" [ngClass]="onlineSeverity(officer.onlineStatus)"
           ><span class="dot"></span>{{ 'labels.status.' + onlineLabel(officer.onlineStatus) | translate }}</span
@@ -50,6 +55,17 @@
       </dd>
     </dl>
     <div class="actions">
+      @if (locked) {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="unlock()"
+          *mifosxHasPermission="permissions.unlock"
+        >
+          {{ 'labels.buttons.unlock' | translate }}
+        </button>
+      }
       <button
         mat-raised-button
         type="button"
@@ -63,6 +79,15 @@
         'labels.buttons.View app activity' | translate
       }}</a>
     </div>
-    <p class="note">{{ 'labels.text.This user can still sign in to the web app' | translate }}</p>
+    @if (locked) {
+      <p class="note alert">
+        {{
+          'labels.text.Locked after too many failed sign-ins: the user cannot sign in to the web app or the field officer app until unlocked'
+            | translate
+        }}
+      </p>
+    } @else {
+      <p class="note">{{ 'labels.text.This user can still sign in to the web app' | translate }}</p>
+    }
   </section>
 }

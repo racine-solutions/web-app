@@ -1668,7 +1668,8 @@
       "Sign Out of All Devices": "Sign Out of All Devices",
       "Turn Off Mobile App Access": "Turn Off Mobile App Access",
       "Turn On Mobile App Access": "Turn On Mobile App Access",
-      "Unblock Device": "Unblock Device"
+      "Unblock Device": "Unblock Device",
+      "Unlock Account": "Unlock Account"
     },
     "inputs": {
       "Annual interest rate": "Annual interest rate",
@@ -3336,7 +3337,8 @@
       "devices blocked": "devices blocked",
       "of": "of",
       "officers": "officers",
-      "registered": "registered"
+      "registered": "registered",
+      "Tell the officer by email, or by SMS if they have no email": "Tell the officer by email, or by SMS if they have no email"
     },
     "links": {
       "Community": "Comunidade",
@@ -3530,7 +3532,8 @@
       "Online": "Online",
       "Signed in": "Signed in",
       "Signed out": "Signed out",
-      "Waiting for approval": "Waiting for approval"
+      "Waiting for approval": "Waiting for approval",
+      "Account locked": "Account locked"
     },
     "dialogContext": {
       "Are you sure you want to resume the breach pause": "Tem a certeza de que quer retomar a violação?",
@@ -4403,7 +4406,9 @@
       "institution default": "institution default",
       "minutes without activity": "minutes without activity",
       "Mobile Officer App": "Mobile Officer App",
-      "Mobile Officer App User": "Mobile Officer App User"
+      "Mobile Officer App User": "Mobile Officer App User",
+      "The user can sign in to the web app and the field officer app again. They are told by email, or by SMS when they have no email address": "The user can sign in to the web app and the field officer app again. They are told by email, or by SMS when they have no email address",
+      "Locked after too many failed sign-ins: the user cannot sign in to the web app or the field officer app until unlocked": "Locked after too many failed sign-ins: the user cannot sign in to the web app or the field officer app until unlocked"
     },
     "permissions": {
       "actions": {
@@ -4649,7 +4654,8 @@
         "SIGNOUTALL": "Sign out of all devices",
         "BLOCK": "Block",
         "UNBLOCK": "Unblock",
-        "SIGNOUT": "Sign out"
+        "SIGNOUT": "Sign out",
+        "UNLOCK": "Unlock"
       },
       "entities": {
         "ROLE": "Função",

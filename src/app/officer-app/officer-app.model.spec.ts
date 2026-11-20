@@ -31,6 +31,13 @@ describe('officer app model', () => {
     ]);
   });
 
+  it('offers unlock first for a locked account', () => {
+    expect(officerCommands(officer({ webStatus: 'LOCKED' }))).toEqual([
+      'unlock',
+      'turnOff'
+    ]);
+  });
+
   it('offers turn on while access is off', () => {
     expect(officerCommands(officer({ accessStatus: 'OFF' }))).toEqual(['turnOn']);
   });

@@ -128,7 +128,7 @@ export interface OfficerAppEventFilter {
   deviceId?: number;
 }
 
-export type OfficerCommand = 'turnOff' | 'turnOn' | 'signOutAll';
+export type OfficerCommand = 'turnOff' | 'turnOn' | 'signOutAll' | 'unlock';
 export type DeviceCommand = 'block' | 'unblock' | 'signOut';
 
 export const READ_PERMISSION = 'READ_OFFICERAPP';
@@ -136,7 +136,8 @@ export const READ_PERMISSION = 'READ_OFFICERAPP';
 export const OFFICER_COMMAND_PERMISSIONS: Record<OfficerCommand, string> = {
   turnOff: 'TURNOFF_OFFICERAPPUSER',
   turnOn: 'TURNON_OFFICERAPPUSER',
-  signOutAll: 'SIGNOUTALL_OFFICERAPPUSER'
+  signOutAll: 'SIGNOUTALL_OFFICERAPPUSER',
+  unlock: 'UNLOCK_OFFICERAPPUSER'
 };
 
 export const DEVICE_COMMAND_PERMISSIONS: Record<DeviceCommand, string> = {
@@ -150,7 +151,12 @@ export function officerCommands(user: OfficerAppUser): OfficerCommand[] {
   if (!user) {
     return [];
   }
-  const commands: OfficerCommand[] = [user.accessStatus === 'OFF' ? 'turnOn' : 'turnOff'];
+  const commands: OfficerCommand[] = [];
+  // Locked after too many failed sign-ins: blocks the web app and the field officer app until unlocked
+  if (user.webStatus === 'LOCKED') {
+    commands.push('unlock');
+  }
+  commands.push(user.accessStatus === 'OFF' ? 'turnOn' : 'turnOff');
   if (user.liveSessions > 0) {
     commands.push('signOutAll');
   }

@@ -56,9 +56,20 @@ export class UserOfficerAppAccessComponent implements OnChanges {
     return this.officer?.accessStatus === 'OFF' ? 'turnOn' : 'turnOff';
   }
 
+  get locked(): boolean {
+    return this.officer?.webStatus === 'LOCKED';
+  }
+
   toggle() {
+    this.run(this.toggleCommand);
+  }
+
+  unlock() {
+    this.run('unlock');
+  }
+
+  private run(command: OfficerCommand) {
     const officer = this.officer;
-    const command = this.toggleCommand;
     const data: AccessDialogData = {
       command,
       officerName: officer.displayName,

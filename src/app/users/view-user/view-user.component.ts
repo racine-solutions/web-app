@@ -20,6 +20,7 @@ import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.co
 import { ChangePasswordDialogComponent } from 'app/shared/change-password-dialog/change-password-dialog.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { UserOfficerAppAccessComponent } from 'app/officer-app/user-officer-app-access/user-officer-app-access.component';
 
 /**
  * View user component.
@@ -31,7 +32,8 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
   standalone: true,
   imports: [
     ...STANDALONE_SHARED_IMPORTS,
-    FaIconComponent
+    FaIconComponent,
+    UserOfficerAppAccessComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

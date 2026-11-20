@@ -1,0 +1,439 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h2 class="page-title">{{ 'labels.heading.Mobile Officer App' | translate }}</h2>
+      <p class="page-subtitle">
+        {{ 'labels.text.Staff using the field officer app in your office and the offices under it' | translate }}
+      </p>
+    </div>
+    <div class="head-actions">
+      <button mat-raised-button type="button" (click)="openSettings()" *mifosxHasPermission="'READ_CONFIGURATION'">
+        <fa-icon icon="cog" class="m-r-10"></fa-icon>{{ 'labels.buttons.Settings' | translate }}
+      </button>
+      <button mat-raised-button type="button" (click)="exportCsv()" [disabled]="!officerTotal">
+        <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Export CSV' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (summary) {
+    @if (!summary.appEnabled) {
+      <div class="banner alert">
+        {{ 'labels.text.The field officer app is switched off for the whole institution' | translate }}
+      </div>
+    }
+    <p class="settings-line">
+      {{ 'labels.text.Sessions end after' | translate }} {{ summary.sessionTimeoutMinutes }}
+      {{ 'labels.text.minutes without activity' | translate }} · {{ 'labels.inputs.Minimum app version' | translate }}:
+      {{ summary.minimumVersion || ('labels.inputs.None' | translate) }}
+      ·
+      @if (summary.requireSession) {
+        {{ 'labels.text.Old app versions are refused' | translate }}
+      } @else {
+        {{ 'labels.text.Old app versions are still accepted' | translate }}
+      }
+      @if (!summary.accessByDefault) {
+        · {{ 'labels.text.New staff need app access turned on' | translate }}
+      }
+    </p>
+
+    <div class="kpi-grid">
+      <button type="button" class="kpi-card" (click)="showConnectedDevices()">
+        <span class="kpi-label">{{ 'labels.inputs.Devices connected' | translate }}</span>
+        <span class="kpi-value">{{ summary.devicesConnected | number }}</span>
+        <span class="kpi-note"
+          >{{ summary.registeredDevices | number }} {{ 'labels.inputs.registered' | translate }}</span
+        >
+      </button>
+      <button type="button" class="kpi-card" (click)="showOfficers({ online: 'ONLINE' })">
+        <span class="kpi-label"
+          ><span class="live" aria-hidden="true"></span>{{ 'labels.inputs.Online now' | translate }}</span
+        >
+        <span class="kpi-value">{{ summary.onlineNow | number }}</span>
+        <span class="kpi-note">{{ 'labels.inputs.Seen in the last 5 minutes' | translate }}</span>
+      </button>
+      <button type="button" class="kpi-card" (click)="showOfficers({ orderBy: 'lastSeen', sortOrder: 'DESC' })">
+        <span class="kpi-label">{{ 'labels.inputs.Active today' | translate }}</span>
+        <span class="kpi-value">{{ summary.activeToday | number }}</span>
+        <span class="kpi-note"
+          >{{ 'labels.inputs.of' | translate }} {{ summary.officers | number }}
+          {{ 'labels.inputs.officers' | translate }}</span
+        >
+      </button>
+      <button type="button" class="kpi-card" (click)="showOfficers({})">
+        <span class="kpi-label">{{ 'labels.inputs.Officers on app' | translate }}</span>
+        <span class="kpi-value">{{ summary.officersOnApp30Days | number }}</span>
+        <span class="kpi-note">{{ 'labels.inputs.Used it in the last 30 days' | translate }}</span>
+      </button>
+      <button
+        type="button"
+        class="kpi-card"
+        [class.kpi-alert]="summary.accessOff"
+        (click)="showOfficers({ access: 'OFF' })"
+      >
+        <span class="kpi-label">{{ 'labels.inputs.App access off' | translate }}</span>
+        <span class="kpi-value">{{ summary.accessOff | number }}</span>
+        <span class="kpi-note"
+          >{{ summary.blockedDevices | number }} {{ 'labels.inputs.devices blocked' | translate }}</span
+        >
+      </button>
+      <button type="button" class="kpi-card" [class.kpi-alert]="summary.oldVersionDevices" (click)="showOldVersions()">
+        <span class="kpi-label">{{ 'labels.inputs.Old app version' | translate }}</span>
+        <span class="kpi-value">{{ summary.oldVersionDevices | number }}</span>
+        <span class="kpi-note">
+          @if (summary.minimumVersion) {
+            {{ 'labels.inputs.below' | translate }} {{ summary.minimumVersion }}
+          } @else {
+            {{ 'labels.inputs.No minimum set' | translate }}
+          }
+        </span>
+      </button>
+    </div>
+  }
+
+  <div class="data-card">
+    <mat-tab-group [(selectedIndex)]="tab" animationDuration="0ms">
+      <!-- Officers -->
+      <mat-tab [label]="'labels.heading.Officers' | translate">
+        <div class="filters">
+          <mat-form-field class="search">
+            <mat-label>{{ 'labels.inputs.Search name, username, email or device' | translate }}</mat-label>
+            <input matInput #officerSearchInput (keyup)="onOfficerSearch(officerSearchInput.value)" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.Office' | translate }}</mat-label>
+            <mat-select
+              [value]="officerFilters.officeId ?? null"
+              (selectionChange)="setOfficerFilter({ officeId: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              @for (office of offices; track office.id) {
+                <mat-option [value]="office.id">{{ office.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.Online' | translate }}</mat-label>
+            <mat-select
+              [value]="officerFilters.online ?? null"
+              (selectionChange)="setOfficerFilter({ online: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              @for (option of onlineOptions; track option.value) {
+                <mat-option [value]="option.value">{{ 'labels.status.' + option.label | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.App access' | translate }}</mat-label>
+            <mat-select
+              [value]="officerFilters.access ?? null"
+              (selectionChange)="setOfficerFilter({ access: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              @for (option of accessOptions; track option.value) {
+                <mat-option [value]="option.value">{{ 'labels.status.' + option.label | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.App version' | translate }}</mat-label>
+            <mat-select
+              [value]="officerFilters.appVersion ?? null"
+              (selectionChange)="setOfficerFilter({ appVersion: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              @for (version of summary?.appVersions || []; track version.version) {
+                <mat-option [value]="version.version">{{ version.version || '-' }} ({{ version.devices }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-checkbox
+            [checked]="!!officerFilters.all"
+            (change)="setOfficerFilter({ all: $event.checked || undefined })"
+          >
+            {{ 'labels.inputs.Include staff who never used the app' | translate }}
+          </mat-checkbox>
+        </div>
+
+        <div class="table-wrap">
+          <table mat-table [dataSource]="officers" matSort (matSortChange)="onOfficerSort($event)" class="data-table">
+            <ng-container matColumnDef="displayName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Officer' | translate }}</th>
+              <td mat-cell *matCellDef="let user">
+                <div class="who">
+                  <span class="who-name">{{ user.displayName }}</span>
+                  <span class="who-sub"
+                    >{{ user.username }}
+                    @if (user.staffName) {
+                      · {{ user.staffName }}
+                    }
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="officeName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Office' | translate }}</th>
+              <td mat-cell *matCellDef="let user">{{ user.officeName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="online">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Online' | translate }}</th>
+              <td mat-cell *matCellDef="let user">
+                <span class="status-pill" [ngClass]="onlineSeverity(user.onlineStatus)"
+                  ><span class="dot"></span>{{ 'labels.status.' + onlineLabel(user.onlineStatus) | translate }}</span
+                >
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="devices">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Devices' | translate }}</th>
+              <td mat-cell *matCellDef="let user">
+                {{ user.devices }}
+                @if (user.blockedDevices) {
+                  <span class="muted">({{ user.blockedDevices }} {{ 'labels.inputs.blocked' | translate }})</span>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="access">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.App access' | translate }}</th>
+              <td mat-cell *matCellDef="let user">
+                <span class="status-pill" [ngClass]="user.accessStatus === 'OFF' ? 'off' : 'allowed'"
+                  ><span class="dot"></span
+                  >{{ 'labels.status.' + (user.accessStatus === 'OFF' ? 'Off' : 'Allowed') | translate }}</span
+                >
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastSeen">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Last seen' | translate }}</th>
+              <td mat-cell *matCellDef="let user">
+                {{
+                  user.lastSeenOn ? (user.lastSeenOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate)
+                }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastAction">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Last action' | translate }}</th>
+              <td mat-cell *matCellDef="let user" class="muted last-action">{{ user.lastAction || '-' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let user" (click)="$event.stopPropagation()">
+                <button mat-icon-button type="button" [matMenuTriggerFor]="officerMenu" aria-label="Actions">
+                  <fa-icon icon="bars"></fa-icon>
+                </button>
+                <mat-menu #officerMenu="matMenu">
+                  <button mat-menu-item type="button" (click)="openOfficer(user)">
+                    {{ 'labels.buttons.View activity' | translate }}
+                  </button>
+                  @for (command of officerCommands(user); track command) {
+                    <button
+                      mat-menu-item
+                      type="button"
+                      [class.danger]="command === 'turnOff'"
+                      (click)="runOfficerCommand(user, command)"
+                      *mifosxHasPermission="officerPermissions[command]"
+                    >
+                      {{ 'labels.buttons.' + command | translate }}
+                    </button>
+                  }
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="officerColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: officerColumns"
+              class="select-row"
+              (click)="openOfficer(row)"
+            ></tr>
+          </table>
+
+          @if (!officersLoading && !officers.data.length) {
+            <p class="empty">{{ 'labels.text.No officers match these filters' | translate }}</p>
+          }
+        </div>
+
+        <mat-paginator
+          [length]="officerTotal"
+          [pageIndex]="officerPage.index"
+          [pageSize]="officerPage.size"
+          [pageSizeOptions]="[25, 50, 100]"
+          (page)="onOfficerPage($event)"
+          showFirstLastButtons
+        ></mat-paginator>
+      </mat-tab>
+
+      <!-- Devices -->
+      <mat-tab [label]="'labels.heading.Devices' | translate">
+        <div class="filters">
+          <mat-form-field class="search">
+            <mat-label>{{ 'labels.inputs.Search device ID, model or officer' | translate }}</mat-label>
+            <input matInput #deviceSearchInput (keyup)="onDeviceSearch(deviceSearchInput.value)" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.Signed in' | translate }}</mat-label>
+            <mat-select
+              [value]="deviceFilters.signedIn ?? null"
+              (selectionChange)="setDeviceFilter({ signedIn: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              <mat-option [value]="true">{{ 'labels.status.Signed in' | translate }}</mat-option>
+              <mat-option [value]="false">{{ 'labels.status.Signed out' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'labels.inputs.App version' | translate }}</mat-label>
+            <mat-select
+              [value]="deviceFilters.appVersion ?? null"
+              (selectionChange)="setDeviceFilter({ appVersion: $event.value ?? undefined })"
+            >
+              <mat-option [value]="null">{{ 'labels.inputs.All' | translate }}</mat-option>
+              @for (version of summary?.appVersions || []; track version.version) {
+                <mat-option [value]="version.version">{{ version.version || '-' }} ({{ version.devices }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-checkbox
+            [checked]="deviceFilters.status === 'BLOCKED'"
+            (change)="setDeviceFilter({ status: $event.checked ? 'BLOCKED' : undefined })"
+          >
+            {{ 'labels.inputs.Blocked only' | translate }}
+          </mat-checkbox>
+        </div>
+
+        <div class="table-wrap">
+          <table mat-table [dataSource]="devices" class="data-table">
+            <ng-container matColumnDef="device">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Device' | translate }}</th>
+              <td mat-cell *matCellDef="let device">
+                <div class="who">
+                  <span class="who-name">{{ device.label }}</span>
+                  <span class="who-sub mono">{{ 'labels.inputs.ID' | translate }} {{ device.shortCode }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="officer">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Officer' | translate }}</th>
+              <td mat-cell *matCellDef="let device">
+                <a [routerLink]="['/officerapp', device.userId]">{{ device.officerName || device.username }}</a>
+                <div class="muted small">{{ device.officeName }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="android">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Android' | translate }}</th>
+              <td mat-cell *matCellDef="let device">{{ device.osVersion || '-' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="appVersion">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.App version' | translate }}</th>
+              <td mat-cell *matCellDef="let device" [class.warn-text]="device.belowMinimumVersion">
+                {{ device.appVersion || '-' }}
+                @if (device.belowMinimumVersion) {
+                  <fa-icon
+                    icon="exclamation-triangle"
+                    [title]="'labels.text.Below the minimum version' | translate"
+                  ></fa-icon>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="firstSeen">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.First seen' | translate }}</th>
+              <td mat-cell *matCellDef="let device">{{ device.firstSeenOn | date: 'dd MMM yyyy' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastSeen">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Last seen' | translate }}</th>
+              <td mat-cell *matCellDef="let device">{{ device.lastSeenOn | date: 'dd MMM yyyy HH:mm' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastIp">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Last IP' | translate }}</th>
+              <td mat-cell *matCellDef="let device" class="mono muted">{{ device.lastIp || '-' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Status' | translate }}</th>
+              <td mat-cell *matCellDef="let device">
+                @if (device.status === 'BLOCKED') {
+                  <span class="status-pill blocked" [title]="device.blockReason || ''"
+                    ><span class="dot"></span>{{ 'labels.status.Blocked' | translate }}</span
+                  >
+                } @else {
+                  <span class="status-pill" [ngClass]="onlineSeverity(device.onlineStatus)"
+                    ><span class="dot"></span
+                    >{{ 'labels.status.' + onlineLabel(device.onlineStatus) | translate }}</span
+                  >
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let device">
+                <button mat-icon-button type="button" [matMenuTriggerFor]="deviceMenu" aria-label="Actions">
+                  <fa-icon icon="bars"></fa-icon>
+                </button>
+                <mat-menu #deviceMenu="matMenu">
+                  @for (command of deviceCommands(device); track command) {
+                    <button
+                      mat-menu-item
+                      type="button"
+                      [class.danger]="command === 'block'"
+                      (click)="runDeviceCommand(device, command)"
+                      *mifosxHasPermission="devicePermissions[command]"
+                    >
+                      {{ 'labels.buttons.' + command | translate }}
+                    </button>
+                  }
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="deviceColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: deviceColumns"></tr>
+          </table>
+
+          @if (!devicesLoading && !devices.data.length) {
+            <p class="empty">{{ 'labels.text.No devices match these filters' | translate }}</p>
+          }
+        </div>
+
+        <mat-paginator
+          [length]="deviceTotal"
+          [pageIndex]="devicePage.index"
+          [pageSize]="devicePage.size"
+          [pageSizeOptions]="[25, 50, 100]"
+          (page)="onDevicePage($event)"
+          showFirstLastButtons
+        ></mat-paginator>
+      </mat-tab>
+
+      <!-- Activity -->
+      <mat-tab [label]="'labels.heading.Activity' | translate">
+        <ng-template matTabContent>
+          <div class="activity">
+            <mifosx-officer-activity [refresh]="refreshCount" title="All Officers"></mifosx-officer-activity>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

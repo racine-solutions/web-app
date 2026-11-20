@@ -10,7 +10,7 @@
   <div #filter class="layout-row">
     <mat-form-field class="flex-fill">
       <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
-      <input matInput (keyup)="applyFilter($event.target.value)" />
+      <input matInput [value]="initialFilter" (keyup)="applyFilter($event.target.value)" />
     </mat-form-field>
   </div>
 

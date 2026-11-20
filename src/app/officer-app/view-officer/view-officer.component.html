@@ -1,0 +1,172 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="page">
+  <section class="profile-card">
+    <div class="profile-head">
+      <div class="avatar" aria-hidden="true">{{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }}</div>
+      <div class="identity">
+        <h2 class="name">{{ user.displayName }}</h2>
+        <p class="sub">
+          {{ user.username }} · {{ user.officeName }}
+          @if (user.roles?.length) {
+            · {{ user.roles.join(', ') }}
+          }
+        </p>
+        <div class="pills">
+          <span class="status-pill" [ngClass]="user.accessStatus === 'OFF' ? 'off' : 'allowed'"
+            ><span class="dot"></span>{{ 'labels.inputs.App access' | translate }}:
+            {{ 'labels.status.' + (user.accessStatus === 'OFF' ? 'Off' : 'Allowed') | translate }}</span
+          >
+          <span class="status-pill" [ngClass]="onlineSeverity(user.onlineStatus)"
+            ><span class="dot"></span>{{ 'labels.status.' + onlineLabel(user.onlineStatus) | translate }}</span
+          >
+          <span class="status-pill" [ngClass]="user.webStatus === 'ACTIVE' ? 'active' : 'locked'"
+            ><span class="dot"></span>{{ 'labels.inputs.Web app' | translate }}:
+            {{
+              'labels.status.' +
+                (user.webStatus === 'ACTIVE' ? 'Active' : user.webStatus === 'LOCKED' ? 'Locked' : 'Disabled')
+                | translate
+            }}</span
+          >
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      @for (command of commands; track command) {
+        <button
+          mat-raised-button
+          type="button"
+          [color]="command === 'turnOff' ? 'warn' : command === 'turnOn' ? 'primary' : undefined"
+          (click)="runCommand(command)"
+          *mifosxHasPermission="officerPermissions[command]"
+        >
+          {{ 'labels.buttons.' + command | translate }}
+        </button>
+      }
+      <a mat-button [routerLink]="['/appusers', user.userId]">{{ 'labels.buttons.Staff user' | translate }}</a>
+    </div>
+  </section>
+  <p class="note">
+    {{ 'labels.text.Turning off app access does not change this user s web app login, roles or password' | translate }}
+  </p>
+
+  <div class="grid">
+    <section class="data-card">
+      <h3 class="section-title">{{ 'labels.heading.App Access' | translate }}</h3>
+      <dl class="kv">
+        <dt>{{ 'labels.inputs.Status' | translate }}</dt>
+        <dd>
+          {{ 'labels.status.' + (user.accessStatus === 'OFF' ? 'Off' : 'Allowed') | translate }}
+          @if (!user.accessExplicit) {
+            <span class="muted">({{ 'labels.text.institution default' | translate }})</span>
+          }
+        </dd>
+        @if (user.accessChangedOn) {
+          <dt>{{ 'labels.inputs.Changed on' | translate }}</dt>
+          <dd>{{ user.accessChangedOn | date: 'dd MMM yyyy HH:mm' }}</dd>
+          <dt>{{ 'labels.inputs.Changed by' | translate }}</dt>
+          <dd>{{ user.accessChangedBy || '-' }}</dd>
+          <dt>{{ 'labels.inputs.Reason' | translate }}</dt>
+          <dd>{{ user.accessReason || '-' }}</dd>
+        }
+        <dt>{{ 'labels.inputs.First app use' | translate }}</dt>
+        <dd>{{ user.firstSeenOn ? (user.firstSeenOn | date: 'dd MMM yyyy') : ('labels.inputs.Never' | translate) }}</dd>
+        <dt>{{ 'labels.inputs.Last seen' | translate }}</dt>
+        <dd>
+          {{ user.lastSeenOn ? (user.lastSeenOn | date: 'dd MMM yyyy HH:mm') : ('labels.inputs.Never' | translate) }}
+        </dd>
+      </dl>
+    </section>
+
+    <section class="data-card">
+      <h3 class="section-title">{{ 'labels.heading.Last 30 Days' | translate }}</h3>
+      <dl class="kv">
+        <dt>{{ 'labels.inputs.Days active' | translate }}</dt>
+        <dd>{{ user.stats30Days?.daysActive ?? 0 }}</dd>
+        <dt>{{ 'labels.inputs.Sign-ins' | translate }}</dt>
+        <dd>{{ user.stats30Days?.signIns ?? 0 }}</dd>
+        <dt>{{ 'labels.inputs.Actions' | translate }}</dt>
+        <dd>{{ user.stats30Days?.actions ?? 0 }}</dd>
+        <dt>{{ 'labels.inputs.Offline syncs' | translate }}</dt>
+        <dd>{{ user.stats30Days?.offlineSyncs ?? 0 }}</dd>
+        <dt>{{ 'labels.inputs.Refused sign-ins' | translate }}</dt>
+        <dd [class.alert-value]="user.stats30Days?.refused">{{ user.stats30Days?.refused ?? 0 }}</dd>
+      </dl>
+    </section>
+  </div>
+
+  <section class="data-card">
+    <h3 class="section-title">{{ 'labels.heading.Devices' | translate }}</h3>
+    @if (user.deviceList?.length) {
+      <div class="table-wrap">
+        <table class="devices">
+          <thead>
+            <tr>
+              <th>{{ 'labels.inputs.Device' | translate }}</th>
+              <th>{{ 'labels.inputs.Android' | translate }}</th>
+              <th>{{ 'labels.inputs.App version' | translate }}</th>
+              <th>{{ 'labels.inputs.Last seen' | translate }}</th>
+              <th>{{ 'labels.inputs.Last IP' | translate }}</th>
+              <th>{{ 'labels.inputs.Status' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (device of user.deviceList; track device.id) {
+              <tr>
+                <td>
+                  <strong>{{ device.label }}</strong
+                  ><span class="mono muted code">{{ device.shortCode }}</span>
+                </td>
+                <td>{{ device.osVersion || '-' }}</td>
+                <td [class.warn-text]="device.belowMinimumVersion">{{ device.appVersion || '-' }}</td>
+                <td>{{ device.lastSeenOn | date: 'dd MMM yyyy HH:mm' }}</td>
+                <td class="mono muted">{{ device.lastIp || '-' }}</td>
+                <td>
+                  @if (device.status === 'BLOCKED') {
+                    <span class="status-pill blocked"
+                      ><span class="dot"></span>{{ 'labels.status.Blocked' | translate }}</span
+                    >
+                    @if (device.blockReason) {
+                      <div class="muted small">{{ device.blockReason }}</div>
+                    }
+                  } @else {
+                    <span class="status-pill" [ngClass]="onlineSeverity(device.onlineStatus)"
+                      ><span class="dot"></span
+                      >{{ 'labels.status.' + onlineLabel(device.onlineStatus) | translate }}</span
+                    >
+                  }
+                </td>
+                <td class="row-actions">
+                  @for (command of deviceCommands(device); track command) {
+                    <button
+                      mat-button
+                      type="button"
+                      [color]="command === 'block' ? 'warn' : 'primary'"
+                      (click)="runDeviceCommand(device, command)"
+                      *mifosxHasPermission="devicePermissions[command]"
+                    >
+                      {{ 'labels.buttons.' + command | translate }}
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="empty">{{ 'labels.text.This user has not signed in to the field officer app' | translate }}</p>
+    }
+  </section>
+
+  <section class="data-card">
+    <mifosx-officer-activity [userId]="user.userId" [refresh]="refreshCount"></mifosx-officer-activity>
+  </section>
+</div>

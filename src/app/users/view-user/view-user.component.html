@@ -67,3 +67,7 @@
     </mat-card-content>
   </mat-card>
 </div>
+
+<div class="container m-t-20" *mifosxHasPermission="'READ_OFFICERAPP'">
+  <mifosx-user-officer-app-access [userId]="userData.id"></mifosx-user-officer-app-access>
+</div>
